@@ -4,8 +4,8 @@ package lifetime
 import (
 	"reflect"
 
-	"github.com/tkw1536/goprogram/lib/reflectx"
 	"github.com/tkw1536/pkglib/lazy"
+	"github.com/tkw1536/pkglib/reflectx"
 )
 
 // TESTME
