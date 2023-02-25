@@ -6,9 +6,11 @@ import (
 	"unicode/utf8"
 )
 
-// ReadRune reads a single encoded Unicode character and
-// returns the rune and its size in bytes.
-// If no character is available, err will be set.
+// ReadRune reads the next rune from r.
+// It does not read from reader beyond the rune.
+//
+// It returns the rune being read, and its' size in bytes.
+// If no rune can be read, it returns an error.
 //
 // See [io.RuneReader].
 func ReadRune(reader io.Reader) (r rune, size int, err error) {

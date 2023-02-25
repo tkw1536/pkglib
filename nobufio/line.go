@@ -6,9 +6,10 @@ import (
 )
 
 // ReadLine reads the current line from the provided reader.
+// It does not use a buffer, and does not read beyond the end of line marker.
 //
 // A line is considered to end when one of the following is encountered: '\r\n', '\n' or EOF or '\r' followed by EOF.
-// Note that only a '\r' is not considered an end-of-line.
+// Note that only a '\r' alone is not considered an end-of-line.
 //
 // The returned line never contains the end-of-line markers, such as '\n' or '\r\n'.
 // A line may be empty, however when only EOF is read, returns "", EOF.
