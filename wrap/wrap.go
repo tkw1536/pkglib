@@ -5,20 +5,15 @@ import (
 	"io"
 	"strings"
 	"sync"
-)
 
-var builderPool = &sync.Pool{
-	New: func() interface{} {
-		return new(strings.Builder)
-	},
-}
+	"github.com/tkw1536/pkglib/pools"
+)
 
 // String is a convenience method that creates a new Wrapper, writes s to it, and then returns the written data.
 // When s has a trailing newline, also adds a trailing newline to the return value.
 func String(length int, s string) string {
-	builder := builderPool.Get().(*strings.Builder)
-	builder.Reset()
-	defer builderPool.Put(builder)
+	builder := pools.GetBuilder()
+	defer pools.ReleaseBuilder(builder)
 
 	Write(builder, length, s)
 	if strings.HasSuffix(s, "\n") {
