@@ -11,6 +11,7 @@ import (
 	"github.com/tdewolff/minify/html"
 	"github.com/tdewolff/minify/js"
 	"github.com/tdewolff/minify/svg"
+	"github.com/tkw1536/pkglib/noop"
 )
 
 // minifier holds the minfier used for all html minification
@@ -32,7 +33,7 @@ var minifier = (func() *minify.M {
 func Minify(mediatype string, dest io.Writer) io.WriteCloser {
 	_, _, f := minifier.Match(mediatype)
 	if f == nil {
-		return noop{Writer: dest}
+		return noop.Writer{Writer: dest}
 	}
 	return minifier.Writer(mediatype, dest)
 }

@@ -2,16 +2,7 @@ package minify
 
 import (
 	"bytes"
-	"io"
 )
-
-type noop struct {
-	io.Writer
-}
-
-func (noop) Close() error {
-	return nil
-}
 
 func MinifyBytes(mediatype string, in []byte) []byte {
 	// create a new minifier
