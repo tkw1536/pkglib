@@ -12,6 +12,9 @@ import (
 type ErrInterceptor struct {
 	Errors   map[error]Response
 	Fallback Response
+
+	// onFallback (if non-nil) is called when a fallback error is intercepted
+	OnFallback func(*http.Request, error)
 }
 
 // Intercept attempts to intercept the given error.
@@ -27,11 +30,23 @@ func (ei ErrInterceptor) Intercept(w http.ResponseWriter, r *http.Request, err e
 
 	res, ok := ei.Errors[err]
 	if !ok {
+		ei.onFallbackSafe(r, err)
 		res = ei.Fallback
 	}
 
 	res.ServeHTTP(w, r)
 	return true
+}
+func (ei ErrInterceptor) onFallbackSafe(req *http.Request, err error) {
+	if ei.OnFallback == nil {
+		return
+	}
+
+	defer func() {
+		recover()
+	}()
+
+	ei.OnFallback(req, err)
 }
 
 // StatusInterceptor creates a new ErrInterceptor handling default responses.
@@ -58,6 +73,12 @@ func StatusInterceptor(contentType string, body func(code int, text string) ([]b
 			ErrMethodNotAllowed:    makeResponse(http.StatusMethodNotAllowed),
 		},
 		Fallback: makeResponse(http.StatusInternalServerError),
+		OnFallback: func(req *http.Request, err error) {
+			if InterceptorOnFallback == nil {
+				return
+			}
+			InterceptorOnFallback(req, err)
+		},
 	}
 }
 
@@ -69,6 +90,10 @@ var (
 	ErrForbidden           = errors.New("httpx: Forbidden")
 	ErrMethodNotAllowed    = errors.New("httpx: Method Not Allowed")
 )
+
+// InterceptorOnFallback (if non-nil) is called by any StatusInterceptor when OnFallback is triggered.
+// It should be set by any client package.
+var InterceptorOnFallback func(*http.Request, error)
 
 var (
 	TextInterceptor = StatusInterceptor("text/plain", func(code int, text string) ([]byte, error) {
