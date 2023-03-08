@@ -37,6 +37,7 @@ func AddSlice[F any](coll Collection, name string, sep string, validator func(va
 					return err
 				}
 			}
+			return nil
 		}
 
 		// no default provided => set if to an empty slice
