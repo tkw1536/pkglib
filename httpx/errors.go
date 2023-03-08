@@ -38,7 +38,12 @@ func (ei ErrInterceptor) Intercept(w http.ResponseWriter, r *http.Request, err e
 	return true
 }
 func (ei ErrInterceptor) onFallbackSafe(req *http.Request, err error) {
-	if ei.OnFallback == nil {
+	fallback := ei.OnFallback
+	if fallback == nil {
+		fallback = InterceptorOnFallback
+	}
+
+	if fallback == nil {
 		return
 	}
 
@@ -46,7 +51,7 @@ func (ei ErrInterceptor) onFallbackSafe(req *http.Request, err error) {
 		recover()
 	}()
 
-	ei.OnFallback(req, err)
+	fallback(req, err)
 }
 
 // StatusInterceptor creates a new ErrInterceptor handling default responses.
@@ -73,12 +78,6 @@ func StatusInterceptor(contentType string, body func(code int, text string) ([]b
 			ErrMethodNotAllowed:    makeResponse(http.StatusMethodNotAllowed),
 		},
 		Fallback: makeResponse(http.StatusInternalServerError),
-		OnFallback: func(req *http.Request, err error) {
-			if InterceptorOnFallback == nil {
-				return
-			}
-			InterceptorOnFallback(req, err)
-		},
 	}
 }
 
@@ -91,8 +90,10 @@ var (
 	ErrMethodNotAllowed    = errors.New("httpx: Method Not Allowed")
 )
 
-// InterceptorOnFallback (if non-nil) is called by any StatusInterceptor when OnFallback is triggered.
-// It should be set by any client package.
+// InterceptorOnFallback (if non-nil) is called used by any ErrInterceptor as default OnFallback.
+// It is triggered whenever OnFallback is nil.
+//
+// This should be set by any client package to globally log any errors.
 var InterceptorOnFallback func(*http.Request, error)
 
 var (
