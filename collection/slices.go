@@ -17,12 +17,6 @@ func First[T any](slice []T, test func(T) bool) T {
 	return v
 }
 
-// Any returns true if there is some value in slice for which test returns true
-// and false otherwise.
-func Any[T any](slice []T, test func(T) bool) bool {
-	return slices.IndexFunc(slice, test) >= 0
-}
-
 // Filter modifies slice in-place to those elements where filter returns true.
 // Filter never re-allocates, invalidating the previous value of slice.
 // Values in the old slice, but no longer referenced by the new slice are zeroed out.

@@ -22,23 +22,6 @@ func ExampleFirst() {
 	// 0
 }
 
-func ExampleAny() {
-	values := []int{-1, 0, 1}
-	fmt.Println(
-		Any(values, func(v int) bool {
-			return v > 0
-		}),
-	)
-
-	fmt.Println(
-		Any(values, func(v int) bool {
-			return v > 2 // no such value exists
-		}),
-	)
-	// Output: true
-	// false
-}
-
 func ExampleMapSlice() {
 	values := []int{-1, 0, 1}
 	fmt.Println(
