@@ -178,7 +178,7 @@ func validateWord(word string, exceptions map[string]struct{}) ValidationKind {
 	}
 
 	// exceptions for words
-	if _, ok := exceptions[word]; ok {
+	if _, ok := exceptions[string(runes)]; ok {
 		return ValidationOK
 	}
 
