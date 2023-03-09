@@ -65,7 +65,12 @@ var wordTests = []struct {
 	{"noth,ing", WordForbiddenRune, "non-trailing comma not allowed", true},
 	{"som%thing", WordForbiddenRune, "% in the middle of word not allowed", true},
 	{"a%", WordForbiddenRune, "trailing % not allowed", true},
+
+	{exception, ValidationOK, "excluded special word is ok", true},
+	{exception + ",", ValidationOK, "excluded special word is ok", true},
 }
+
+var exception = "SpeCiAL"
 
 // add the word tests to the part tests
 func init() {
@@ -103,7 +108,7 @@ func init() {
 func TestValidate(t *testing.T) {
 	for _, tt := range partTests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotErr := Validate(tt.input)
+			gotErr := Validate(tt.input, exception)
 
 			if !reflect.DeepEqual(gotErr, tt.wantError) {
 				t.Errorf("Validate() error = %#v, want = %#v", gotErr, tt.wantError)
@@ -115,7 +120,7 @@ func TestValidate(t *testing.T) {
 func Test_validateWord(t *testing.T) {
 	for _, tt := range wordTests {
 		t.Run(tt.comment, func(t *testing.T) {
-			if got := validateWord(tt.input); got != tt.want {
+			if got := validateWord(tt.input, map[string]struct{}{exception: {}}); got != tt.want {
 				t.Errorf("validateWord() = %v, want %v", got, tt.want)
 			}
 		})

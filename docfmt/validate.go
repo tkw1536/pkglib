@@ -57,7 +57,14 @@ const (
 //   - a word may contain '-'s, but only non-sequential occurences (WordNoSequentialDashes) that are not the first or last letter (WordNoOutsideDashes)
 //   - a word that starts with '%' is always valid, because it might be a format string
 //   - each word (except for the last word) must end with a space character, that is either " " or "\n" (InvalidEndSpace)
-func Validate(message string) (errors []ValidationResult) {
+//
+// Furthermore, words inside of exceptions are always permitted.
+func Validate(message string, exceptions ...string) (errors []ValidationResult) {
+	emap := make(map[string]struct{}, len(exceptions))
+	for _, exception := range exceptions {
+		emap[exception] = struct{}{}
+	}
+
 	parts := SplitParts(message)
 partloop:
 	for pI, part := range parts {
@@ -101,7 +108,7 @@ partloop:
 			word = strings.TrimSpace(word)
 
 			// check word for appropriate letters
-			if typ := validateWord(word); typ != ValidationOK {
+			if typ := validateWord(word, emap); typ != ValidationOK {
 				errors = append(errors, ValidationResult{
 					PartIndex: pI,
 					Part:      part,
@@ -117,7 +124,7 @@ partloop:
 }
 
 // IsValidWord checks that word fullfills the rules for a valid word
-func validateWord(word string) ValidationKind {
+func validateWord(word string, exceptions map[string]struct{}) ValidationKind {
 	// NOTE(twiesing): Return the exact validation result
 	runes := []rune(word)
 
@@ -167,6 +174,11 @@ func validateWord(word string) ValidationKind {
 
 	// all digits
 	if value, ok := allEqual(runes, unicode.IsDigit); value && ok {
+		return ValidationOK
+	}
+
+	// exceptions for words
+	if _, ok := exceptions[word]; ok {
 		return ValidationOK
 	}
 
