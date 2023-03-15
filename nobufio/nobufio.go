@@ -19,9 +19,8 @@ func ReadRune(reader io.Reader) (r rune, size int, err error) {
 		return rreader.ReadRune()
 	}
 
-	var runeBuffer []byte
+	runeBuffer := make([]byte, 0, utf8.MaxRune)
 	for !utf8.FullRune(runeBuffer) {
-		// expand the rune buffer
 		runeBuffer = append(runeBuffer, 0)
 
 		// read the next byte into it into or bail out!
