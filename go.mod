@@ -7,6 +7,7 @@ require (
 	github.com/feiin/sqlstring v0.3.0
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/websocket v1.5.0
+	github.com/gosuri/uilive v0.0.4
 	github.com/rs/zerolog v1.29.0
 	github.com/tdewolff/minify v2.3.6+incompatible
 	golang.org/x/crypto v0.3.0
