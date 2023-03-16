@@ -229,6 +229,9 @@ func UseErrorGroup[Item any](status *Status, group Group[Item, error], items []I
 		}
 	}
 
+	if len(final) == 0 {
+		return nil
+	}
 	return final
 }
 
