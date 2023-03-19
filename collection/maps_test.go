@@ -29,3 +29,25 @@ func ExampleMapValues() {
 
 	// Output: map[0:2 1:5]
 }
+
+func ExampleAppend() {
+	// append to the first map
+	fmt.Println(Append(map[string]string{
+		"hello": "world",
+	}, map[string]string{
+		"answer": "42",
+	}))
+
+	// append to the first non-nil map
+	fmt.Println(Append(nil, nil, nil, map[string]string{
+		"hello": "world",
+	}, map[string]string{
+		"answer": "42",
+	}))
+
+	fmt.Println(Append[string, string]())
+
+	// Output: map[answer:42 hello:world]
+	// map[answer:42 hello:world]
+	// map[]
+}
