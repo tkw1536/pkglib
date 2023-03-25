@@ -3,7 +3,6 @@ package contextx
 import (
 	"context"
 	"io"
-	"os"
 	"time"
 )
 
@@ -21,23 +20,32 @@ func Copy(ctx context.Context, dst io.Writer, src io.Reader) (written int64, err
 		start()
 		return io.Copy(dst, src)
 	}, func() {
-		// close the source file
-		// and set a read deadline!
-		if closer, ok := src.(io.Closer); ok {
-			closer.Close()
-		}
-		if file, ok := src.(*os.File); ok {
-			file.SetReadDeadline(time.Now())
-		}
-
-		// close the destination file
-		// and set a write deadline!
-		if closer, ok := dst.(io.Closer); ok {
-			closer.Close()
-		}
-		if file, ok := dst.(*os.File); ok {
-			file.SetWriteDeadline(time.Now())
-		}
+		CancelRead(src)
+		CancelWrite(dst)
 	})
 	return written, err
+}
+
+// CancelRead attempts to cancel any in-progress and future reads on the given reader.
+// In particular, this function sets the read deadline to the current time and closes the reader.
+func CancelRead(reader io.Reader) {
+	if srd, ok := reader.(interface{ SetReadDeadline(time.Time) error }); ok {
+		srd.SetReadDeadline(time.Now())
+	}
+
+	if closer, ok := reader.(io.Closer); ok {
+		closer.Close()
+	}
+}
+
+// CancelWrite attempts to cancel any in-progress and future writes on the given writer.
+// In particular, this function sets the write deadline to the current time and closes the writer.
+func CancelWrite(writer io.Writer) {
+	if swd, ok := writer.(interface{ SetWriteDeadline(time.Time) error }); ok {
+		swd.SetWriteDeadline(time.Now())
+	}
+
+	if closer, ok := writer.(io.Closer); ok {
+		closer.Close()
+	}
 }
