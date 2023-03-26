@@ -5,16 +5,22 @@ import (
 )
 
 // Trigger represents an object for which either multiple non-exclusive holds, or a single exclusive hold can be acquired.
-// Holds must not be acquired recursively within the same call.
 //
 // A trigger is that to be in "held" state if at least one hold has been acquired.
 // Otherwise it is said to be in "unheld" state.
+//
 // Whenever it switches from unheld to held state, OnAcquire is called.
 // Whenever it switches from held to unheld state, OnRelease is called.
 //
 // The zero value is ready for holds to be acquired; it represents a trigger in "unheld" state.
+//
+// Trigger behaves similar to a "sync".RWMutex.
+// It only adds OnAcquire and OnRelease functions.
+//
+// Like an RWMutex, even a blocked call to XLock may block calls to Lock.
+// As such, helds should not be acquired recursively.
 type Trigger struct {
-	l       sync.RWMutex // held by any "client"
+	l       sync.RWMutex // internal state, held by callers
 	s       sync.Mutex   // held when changing state
 	counter int64
 
@@ -82,7 +88,7 @@ func (trigger *Trigger) XLock() {
 
 // XUnlock calls trigger.OnRelease(true), and then releases an exclusive hold on trigger.
 //
-// If onRelease is nil, it is not called.
+// If OnRelease is nil, it is not called.
 // If OnRelease panics, the trigger is considered unlocked.
 func (trigger *Trigger) XUnlock() {
 	defer trigger.l.Unlock()
@@ -90,4 +96,21 @@ func (trigger *Trigger) XUnlock() {
 	if trigger.OnRelease != nil {
 		trigger.OnRelease(true)
 	}
+}
+
+// XLocker returns a sync.Locker that calls XLock and XUnlock when locking and unlocking.
+func (trigger *Trigger) XLocker() sync.Locker {
+	return triggerXLocker{trigger: trigger}
+}
+
+type triggerXLocker struct {
+	trigger *Trigger
+}
+
+func (t triggerXLocker) Lock() {
+	t.trigger.XLock()
+}
+
+func (t triggerXLocker) Unlock() {
+	t.trigger.XUnlock()
 }
