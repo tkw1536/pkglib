@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/tkw1536/pkglib/nobufio"
 	"github.com/tkw1536/pkglib/wrap"
-	"golang.org/x/term"
 )
 
 // IOStream represents a set of input and output streams commonly associated to a process.
@@ -20,23 +20,17 @@ type IOStream struct {
 
 // StdinIsATerminal checks if standard input is a terminal
 func (str IOStream) StdinIsATerminal() bool {
-	return streamIsTerminal(str.Stdin)
+	return nobufio.IsTerminal(str.Stdin)
 }
 
 // StdoutIsATerminal checks if standard output is a terminal
 func (str IOStream) StdoutIsATerminal() bool {
-	return streamIsTerminal(str.Stdout)
+	return nobufio.IsTerminal(str.Stdout)
 }
 
 // StderrIsATerminal checks if standard error is a terminal
 func (str IOStream) StderrIsATerminal() bool {
-	return streamIsTerminal(str.Stderr)
-}
-
-// streamIsTerminal checks if stream is a terminal
-func streamIsTerminal(stream any) bool {
-	file, ok := stream.(interface{ Fd() uintptr })
-	return ok && term.IsTerminal(int(file.Fd()))
+	return nobufio.IsTerminal(str.Stderr)
 }
 
 // Printf is like [fmt.Printf] but prints to str.Stdout.

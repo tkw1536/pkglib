@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/gosuri/uilive"
+	"github.com/tkw1536/pkglib/nobufio"
 	"github.com/tkw1536/pkglib/noop"
 	"github.com/tkw1536/pkglib/stream"
 	"golang.org/x/exp/maps"
-	"golang.org/x/term"
 )
 
 // Status represents an interactive status display that can write to multiple lines at once.
@@ -137,9 +137,7 @@ func New(writer io.Writer, count int) *Status {
 // In compatibility mode, Status automatically prints each line to the output, instead of putting them onto separate lines.
 func NewWithCompat(writer io.Writer, count int) (st *Status) {
 	st = New(writer, count)
-	if file, ok := writer.(interface{ Fd() uintptr }); !ok || !term.IsTerminal(int(file.Fd())) {
-		st.compat = true
-	}
+	st.compat = !nobufio.IsTerminal(writer)
 	return st
 }
 

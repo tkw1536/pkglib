@@ -3,6 +3,7 @@ package nobufio
 import (
 	"errors"
 	"io"
+	"os"
 
 	"golang.org/x/term"
 )
@@ -23,12 +24,12 @@ var ErrNoTerminal = errors.New("reader is not a terminal")
 // ReadPasswordSrict is like ReadPassword, except that when reader is not a terminal, returns ErrNoTerminal.
 func ReadPasswordStrict(reader io.Reader) (value string, err error) {
 	// check if reader is a terminal
-	file, ok := reader.(interface{ Fd() uintptr })
-	if !ok || !term.IsTerminal(int(file.Fd())) {
+	fd, ok := reader.(*os.File)
+	if !ok || !isTerminal(fd) {
 		return "", ErrNoTerminal
 	}
 
 	// read the bytes
-	bytes, err := term.ReadPassword(int(file.Fd()))
+	bytes, err := term.ReadPassword(int(fd.Fd()))
 	return string(bytes), err
 }
