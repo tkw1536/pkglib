@@ -7,6 +7,8 @@ import (
 
 // First returns the first value in slice for which test returns true.
 // When no such value exists, returns the zero value of T.
+//
+// To find the index of such an element, use "slices".IndexFunc.
 func First[T any](slice []T, test func(T) bool) T {
 	for _, v := range slice {
 		if test(v) {
@@ -54,6 +56,7 @@ func FilterClone[T any, S ~[]T](slice S, filter func(T) bool) (results S) {
 			results = append(results, value)
 		}
 	}
+
 	return
 }
 

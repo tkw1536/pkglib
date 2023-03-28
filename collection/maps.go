@@ -7,7 +7,7 @@ import (
 )
 
 // IterateSorted iterates over the the map, calling f for each element.
-// Iteration is performed in ascending order of the keys.
+// Iteration is performed in ascending order of the keys
 func IterateSorted[K constraints.Ordered, V any](M map[K]V, f func(k K, v V)) {
 	keys := maps.Keys(M)
 	slices.Sort(keys)
