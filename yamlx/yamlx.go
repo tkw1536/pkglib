@@ -1,9 +1,9 @@
 package yamlx
 
 import (
-	"context"
 	"fmt"
 
+	"github.com/tkw1536/pkglib/iterator"
 	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
@@ -75,53 +75,52 @@ func (path Path) HasChildren() bool {
 //
 // does not return an error should also not return an error in node.
 func Transplant(node, donor *yaml.Node) error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	it := IteratePaths(donor)
+	defer it.Close()
 
-	for path := range IteratePaths(donor, ctx) {
+	for it.Next() {
+		path := it.Datum()
+
 		if path.HasChildren() {
 			continue
 		}
+
 		if err := Replace(node, *path.Node, path.Path...); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
 // Iterate iterates over all paths in node.
-// If the context is closed (and is not nil), iteration is stopped.
-func IteratePaths(node *yaml.Node, ctx context.Context) <-chan Path {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	c := make(chan Path)
-	go func() {
-		defer close(c)
-		iterpaths(c, ctx, node, nil)
-	}()
-	return c
+func IteratePaths(node *yaml.Node) iterator.Iterator[Path] {
+	return iterator.New(func(g iterator.Generator[Path]) {
+		defer g.Return()
+		iterpaths(g, node, nil)
+	})
 }
 
-func iterpaths(c chan<- Path, ctx context.Context, node *yaml.Node, path []string) bool {
+// iterpaths generates all paths in the given node.
+// It returns if the user requested cancellation.
+func iterpaths(g iterator.Generator[Path], node *yaml.Node, path []string) bool {
 	if node == nil {
-		return true
-	}
-
-	// send the node itself
-	select {
-	case c <- Path{Path: path, Node: node}:
-	case <-ctx.Done():
 		return false
 	}
 
-	// resolve the alias!
+	// send the node itself
+	if g.Yield(Path{Path: path, Node: node}) {
+		return true
+	}
+
+	// resolve the alias
+	// TODO: Implement the limit here
 	for node.Kind == yaml.AliasNode {
 		node = node.Alias
 	}
 
 	if node.Kind != yaml.MappingNode {
-		return true
+		return false
 	}
 
 	for i := 0; i+1 < len(node.Content); i += 2 {
@@ -134,10 +133,10 @@ func iterpaths(c chan<- Path, ctx context.Context, node *yaml.Node, path []strin
 			continue
 		}
 
-		// iterate over the child
+		// iterate over the children
 		path := append(slices.Clone(path), key.Value)
-		if !iterpaths(c, ctx, value, path) {
-			return false
+		if iterpaths(g, value, path) {
+			return true
 		}
 	}
 
@@ -235,7 +234,6 @@ func Find(node *yaml.Node, path ...string) (*yaml.Node, error) {
 // Child finds the child node with the given name.
 // Find is safe to be used on untrusted input; it does not follow anchors.
 func Child(node *yaml.Node, name string) (index int, err error) {
-	// TODO: Test me
 	if node == nil {
 		return -1, NodeIsNil
 	}
