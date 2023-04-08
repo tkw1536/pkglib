@@ -5,6 +5,9 @@ import (
 	"os"
 )
 
+// DefaultDirPerm should be used by callers to use a consistent mode for new directories.
+const DefaultDirPerm fs.FileMode = fs.ModeDir | fs.ModePerm
+
 // Mkdir is like [os.Mkdir].
 func Mkdir(path string, mode fs.FileMode) error {
 	m.Lock()
