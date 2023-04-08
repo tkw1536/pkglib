@@ -1,3 +1,5 @@
+//go:build !windows
+
 // Package umaskfree provides file system functionality that ignore the umask.
 // As such it is not safe to use otherwise equivalent functions provided by the standard go library concurrently with this package.
 // Users should take care that no other code in their application uses these functions.
