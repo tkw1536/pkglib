@@ -7,8 +7,6 @@ import (
 	"strings"
 
 	crand "crypto/rand"
-
-	"github.com/tkw1536/pkglib/pools"
 )
 
 // Charset represents a set of runes to include in a password.
@@ -55,8 +53,7 @@ func Generate(rand io.Reader, length int, charset Charset) (string, error) {
 	runeCount := big.NewInt(int64(len(runes)))
 
 	// create a buffer to write the string to!
-	password := pools.GetBuilder()
-	defer pools.ReleaseBuilder(password)
+	var password strings.Builder
 	password.Grow(length)
 
 	for i := 0; i < length; i++ {

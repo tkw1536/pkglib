@@ -3,12 +3,12 @@ package httpx
 import (
 	"html/template"
 	"net/http"
+	"strings"
 
 	_ "embed"
 
 	"github.com/gorilla/csrf"
 	"github.com/tkw1536/pkglib/httpx/field"
-	"github.com/tkw1536/pkglib/pools"
 )
 
 // Form provides a form that a user can submit via a http POST method call.
@@ -46,8 +46,7 @@ type Form[D any] struct {
 
 // Form renders the gives values into a template html string to be inserted into a template.
 func (form *Form[D]) Form(values map[string]string, isError bool) template.HTML {
-	builder := pools.GetBuilder()
-	defer pools.ReleaseBuilder(builder)
+	var builder strings.Builder
 
 	for _, field := range form.Fields {
 		value := values[field.Name]
@@ -55,7 +54,7 @@ func (form *Form[D]) Form(values map[string]string, isError bool) template.HTML 
 			value = ""
 		}
 
-		field.WriteTo(builder, form.FieldTemplate, value)
+		field.WriteTo(&builder, form.FieldTemplate, value)
 	}
 
 	return template.HTML(builder.String())

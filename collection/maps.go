@@ -7,7 +7,7 @@ import (
 )
 
 // IterateSorted iterates over the the map, calling f for each element.
-// Iteration is performed in ascending order of the keys
+// Iteration is performed in ascending order of the keys.
 func IterateSorted[K constraints.Ordered, V any](M map[K]V, f func(k K, v V)) {
 	keys := maps.Keys(M)
 	slices.Sort(keys)
@@ -18,7 +18,7 @@ func IterateSorted[K constraints.Ordered, V any](M map[K]V, f func(k K, v V)) {
 }
 
 // MapValues creates a new map which has the same keys as M.
-// the values are determined by f.
+// The values of the map are determined by passin the old key and values into f.
 func MapValues[K comparable, V1, V2 any](M map[K]V1, f func(K, V1) V2) map[K]V2 {
 	if M == nil {
 		return nil
@@ -32,7 +32,7 @@ func MapValues[K comparable, V1, V2 any](M map[K]V1, f func(K, V1) V2) map[K]V2 
 }
 
 // Append adds elements from all other maps into the first map.
-// If the first element is nil, a new empty map is used instead.
+// If the first map is nil, a new empty map is used instead.
 //
 // It is the map equivalent of the built-in append function for slices.
 func Append[K comparable, V any](maps ...map[K]V) (mp map[K]V) {
