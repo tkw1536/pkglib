@@ -1,30 +1,60 @@
 package fsx
 
 import (
+	"errors"
 	"io/fs"
 	"os"
 )
 
-// Exists checks if the given path exists
-func Exists(path string) bool {
-	_, err := os.Lstat(path)
-	return err == nil
+// stat performs stat on path, following links if requested.
+func stat(path string, follow bool) (info fs.FileInfo, IsNotNotExists bool, err error) {
+	if follow {
+		info, err = os.Stat(path)
+	} else {
+		info, err = os.Lstat(path)
+	}
+	IsNotNotExists = err != nil && !errors.Is(err, fs.ErrNotExist)
+	return
 }
 
-// IsDirectory checks if the provided path exists and is a directory
-func IsDirectory(path string) bool {
-	info, err := os.Stat(path)
-	return err == nil && info.Mode().IsDir()
+// Exists checks if the given path exists.
+// An invalid link is considered to exist.
+//
+// If an error occurs, returns false, err.
+func Exists(path string) (bool, error) {
+	_, other, err := stat(path, false)
+	if other {
+		return false, err
+	}
+	return err == nil, nil
 }
 
-// IsRegular checks if the provided path exists and is a regular file
-func IsRegular(path string) bool {
-	info, err := os.Stat(path)
-	return err == nil && info.Mode().IsRegular()
+// IsDirectory checks if the provided path exists and is a directory.
+// IsDirectory follows links iff followLinks is true.
+func IsDirectory(path string, followLinks bool) (bool, error) {
+	info, other, err := stat(path, followLinks)
+	if other {
+		return false, err
+	}
+	return err == nil && info.Mode().IsDir(), nil
 }
 
-// IsLink checks if the provided path exists and is a symlink
-func IsLink(path string) bool {
-	info, err := os.Lstat(path)
-	return err == nil && info.Mode()&fs.ModeSymlink != 0
+// IsRegular checks if the provided path exists and is a directory.
+// IsRegular follows links iff followLinks is true.
+func IsRegular(path string, followLinks bool) (bool, error) {
+	info, other, err := stat(path, followLinks)
+	if other {
+		return false, err
+	}
+	return err == nil && info.Mode().IsRegular(), nil
+}
+
+// IsLink checks if the provided path exists and is a symlink.
+// An invalid link is considered a link.
+func IsLink(path string) (bool, error) {
+	info, other, err := stat(path, false)
+	if other {
+		return false, err
+	}
+	return err == nil && info.Mode()&fs.ModeSymlink != 0, nil
 }

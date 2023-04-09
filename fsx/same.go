@@ -1,8 +1,6 @@
 package fsx
 
 import (
-	"errors"
-	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -49,9 +47,8 @@ func Same(path1, path2 string) bool {
 // authorative indiciates if the result is authorative.
 func couldBeSameFile(path1, path2 string) (same, authorative bool) {
 	{
-		// stat both files
-		info1, err1 := os.Stat(path1)
-		info2, err2 := os.Stat(path2)
+		info1, other1, err1 := stat(path1, true)
+		info2, other2, err2 := stat(path2, true)
 
 		// both files exist => check using env.SameFile
 		// the result is always authorative
@@ -67,7 +64,7 @@ func couldBeSameFile(path1, path2 string) (same, authorative bool) {
 		}
 
 		// only 1 file does not exist => they could be different
-		if errors.Is(err1, fs.ErrNotExist) != errors.Is(err2, fs.ErrNotExist) {
+		if other1 != other2 {
 			return
 		}
 	}

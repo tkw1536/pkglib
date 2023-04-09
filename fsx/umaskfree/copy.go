@@ -71,9 +71,15 @@ func CopyLink(ctx context.Context, dst, src string) error {
 	}
 
 	// delete it if it already exists
-	if fsx.Exists(dst) {
-		if err := os.Remove(dst); err != nil {
+	{
+		exists, err := fsx.Exists(dst)
+		if err != nil {
 			return err
+		}
+		if exists {
+			if err := os.Remove(dst); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -95,8 +101,16 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 	if fsx.Same(src, dst) {
 		return ErrCopySameFile
 	}
-	if fsx.IsRegular(dst) {
-		return ErrDstFile
+
+	// check that the destination is a regular file
+	{
+		isRegular, err := fsx.IsRegular(dst, true)
+		if err != nil {
+			return err
+		}
+		if !isRegular {
+			return ErrDstFile
+		}
 	}
 
 	return filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
@@ -142,8 +156,14 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		// create the directory, but ignore an error if the directory already exists.
 		// this is so that we can copy one tree into another tree.
 		err = Mkdir(dst, info.Mode())
-		if errors.Is(err, fs.ErrExist) && fsx.IsDirectory(dst) {
-			err = nil
+		if errors.Is(err, fs.ErrExist) {
+			isDir, isDirE := fsx.IsDirectory(dst, false)
+			if isDirE != nil {
+				return isDirE
+			}
+			if isDir {
+				err = nil
+			}
 		}
 
 		return err
