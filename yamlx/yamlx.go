@@ -142,8 +142,7 @@ func iterpaths(g iterator.Generator[Path], node *yaml.Node, path []string) bool 
 		}
 	}
 
-	return true
-
+	return false
 }
 
 // Replace replaces the node found by Find(node, path...) with replacement.
