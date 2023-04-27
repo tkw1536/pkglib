@@ -69,12 +69,13 @@ func (path Path) HasChildren() bool {
 
 // Transplant transplants all nodes found inside donor onto node.
 //
-// donor and node should be of the same shape, meaning for every path where
+// Unless SkipMissing is true, donor and node should be of the same shape.
+// Being of the same shape means every path where
 //
 //	Find(donor, path...)
 //
 // does not return an error should also not return an error in node.
-func Transplant(node, donor *yaml.Node) error {
+func Transplant(node, donor *yaml.Node, SkipMissing bool) error {
 	it := IteratePaths(donor)
 	defer it.Close()
 
@@ -85,7 +86,8 @@ func Transplant(node, donor *yaml.Node) error {
 			continue
 		}
 
-		if err := Replace(node, *path.Node, path.Path...); err != nil {
+		err := Replace(node, *path.Node, path.Path...)
+		if err != nil && !SkipMissing {
 			return err
 		}
 	}
