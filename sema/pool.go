@@ -34,7 +34,7 @@ type Pool[V any] struct {
 func (pool *Pool[V]) Use(f func(V) error) error {
 	// ensure that at most limit calls are active at the same time.
 	// this implements the limit on the items in the pool.
-	sema := pool.s.Get(func() sync.Locker { return NewSemaphore(pool.Limit) })
+	sema := pool.s.Get(func() sync.Locker { return New(pool.Limit) })
 	sema.Lock()
 	defer sema.Unlock()
 

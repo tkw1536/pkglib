@@ -35,7 +35,7 @@ func Schedule(worker func(int) error, count int, concurrency Concurrency) (err e
 		return nil
 	}
 
-	sema := NewSemaphore(concurrency.Limit) // semaphore to use for the limit
+	sema := New(concurrency.Limit) // semaphore to use for the limit
 
 	var next uint64    // id of next worker call!
 	var errDone uint64 // 0 => everything is fine, 1 => no error!

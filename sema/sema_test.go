@@ -2,7 +2,6 @@ package sema
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -11,9 +10,9 @@ import (
 	"github.com/tkw1536/pkglib/testlib"
 )
 
-func ExampleNewSemaphore() {
+func ExampleNew() {
 	// create a new semaphore with two elements
-	sema := NewSemaphore(2)
+	sema := New(2)
 
 	// some very finite resource pool
 	var resource uint64 = 2
@@ -55,8 +54,8 @@ func ExampleNewSemaphore() {
 	// Output: Worked 100 times
 }
 
-func ExampleNewSemaphore_simple() {
-	sema := NewSemaphore(2)
+func ExampleNew_simple() {
+	sema := New(2)
 
 	// we can lock it two times
 	sema.Lock()
@@ -75,9 +74,9 @@ func ExampleNewSemaphore_simple() {
 	// Output: two lock calls
 	// another lock call only after unlock
 }
-func ExampleNewSemaphore_zero() {
+func ExampleNew_zero() {
 	// a zero or negative limit creates a semaphore without any limits
-	sema := NewSemaphore(0)
+	sema := New(0)
 
 	N := 1000
 
@@ -86,14 +85,16 @@ func ExampleNewSemaphore_zero() {
 		sema.Lock()
 	}
 
+	sema.Unlock()
+
 	// and nothing was blocked!
 	fmt.Println("nothing blocked")
 	// Output: nothing blocked
 }
 
-func ExampleNewSemaphore_two() {
+func ExampleNew_two() {
 	// a semaphore with value >= 2 is a regular semaphore
-	sema := NewSemaphore(2)
+	sema := New(2)
 	nothing := time.Nanosecond
 
 	// do a bunch of locks and unlocks
@@ -114,12 +115,10 @@ func ExampleNewSemaphore_two() {
 	// Output: nothing blocked
 }
 
-func ExampleNewSemaphore_one() {
-	// a semaphore with value one is just a mutex
-	sema := NewSemaphore(1)
+func ExampleNew_one() {
+	// a semaphore with value one behaves just like a mutex
+	sema := New(1)
 	nothing := time.Nanosecond
-
-	fmt.Printf("type = %s\n", reflect.TypeOf(sema).String())
 
 	// do a bunch of locks and unlocks
 	N := 1000
@@ -132,12 +131,11 @@ func ExampleNewSemaphore_one() {
 
 	// and nothing was blocked!
 	fmt.Println("nothing blocked")
-	// Output: type = *sync.Mutex
-	// nothing blocked
+	// Output: nothing blocked
 }
 
-func ExampleNewSemaphore_panic() {
-	sema := NewSemaphore(2)
+func ExampleNew_panic() {
+	sema := New(2)
 
 	// an unlock without a corresponding unlock will always panic
 	didPanic, value := testlib.DoesPanic(func() {
@@ -152,7 +150,7 @@ func ExampleNewSemaphore_panic() {
 }
 
 func TestNewSemaphore_simple(t *testing.T) {
-	sema := NewSemaphore(2)
+	sema := New(2)
 	sema.Lock()
 	sema.Lock()
 
@@ -167,7 +165,7 @@ func TestNewSemaphore_simple(t *testing.T) {
 func TestNewSemaphore_exhausting(t *testing.T) {
 	// this test tests all cases for 1 <= n < 100
 	for n := 1; n <= 100; n++ {
-		s := NewSemaphore(n)
+		s := New(n)
 
 		// fully lock it
 		for i := 0; i < n; i++ {
@@ -181,7 +179,7 @@ func TestNewSemaphore_exhausting(t *testing.T) {
 }
 
 func BenchmarkNewSemaphore_uncontested(b *testing.B) {
-	sema := NewSemaphore(2)
+	sema := New(2)
 	nothing := time.Nanosecond
 
 	for i := 0; i < b.N; i++ {
@@ -196,7 +194,7 @@ func BenchmarkNewSemaphore_uncontested(b *testing.B) {
 }
 
 func BenchmarkNewSemaphore_contested(b *testing.B) {
-	sema := NewSemaphore(2)
+	sema := New(2)
 	nothing := time.Nanosecond
 
 	sema.Lock()
@@ -213,7 +211,7 @@ func BenchmarkNewSemaphore_contested(b *testing.B) {
 		}
 	}()
 
-	// do the attempting to aquire
+	// do the attempting to acquire
 	for i := 0; i < b.N; i++ {
 		sema.Lock()
 		time.Sleep(nothing)
@@ -226,7 +224,7 @@ func TestNewSemaphore_TryLock(t *testing.T) {
 
 	for limit := 1; limit < N; limit++ {
 		t.Run(fmt.Sprintf("limit = %d", limit), func(t *testing.T) {
-			sema := NewSemaphore(limit)
+			sema := New(limit)
 
 			// lock the semaphore limit times!
 			for j := 0; j < limit; j++ {
