@@ -14,9 +14,9 @@ import (
 // A validator is a non-nil function with signature func(value *F, dflt string) error.
 // Here F is the type of a value of a field.
 // The value is the initialized value to be validated.
-// The validator may perform abitrary normalization on the value.
+// The validator may perform arbitrary normalization on the value.
 // dflt is the default value (read from the 'default' tag).
-// error should be an appropriate error that occured.
+// error should be an appropriate error that occurred.
 //
 // A validator function is applied by calling it.
 type Collection map[string]any
@@ -27,7 +27,7 @@ func Add[F any](coll Collection, name string, validator func(value *F, dflt stri
 	coll[name] = validator
 }
 
-// AddSlice adds a Validator to the provided collection of validators that validates a slice of the given type. The default is seperated by seperator.
+// AddSlice adds a Validator to the provided collection of validators that validates a slice of the given type. The default is separated by sep.
 func AddSlice[F any](coll Collection, name string, sep string, validator func(value *F, dflt string) error) {
 	Add(coll, name, func(value *[]F, dflt string) error {
 		// some value is set, so we do not need to set the default!
@@ -75,7 +75,7 @@ func (uv UnknownValidator) Error() string {
 type NotAValidator string
 
 func (nv NotAValidator) Error() string {
-	return fmt.Sprintf("entry %q in validators is not a valiator", string(nv))
+	return fmt.Sprintf("entry %q in validators is not a validator", string(nv))
 }
 
 // IncompatibleValidator is returned when a validator in the validators map is incompatible

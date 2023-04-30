@@ -18,7 +18,7 @@ import (
 // Calling start multiple times or not at all is also permitted.
 // However these use-cases should be carefully considered.
 // In cases where start is not called, cancel will never be called, regardless of when ctx is cancelled.
-// In cases where start is called multiple times, cancel may be invoked immediatly after the first invocation.
+// In cases where start is called multiple times, cancel may be invoked immediately after the first invocation.
 //
 // Run always waits for f to return, and always returns the return value of f as the first argument, even if cancel is called.
 func Run[T any](ctx context.Context, f func(start func()) T, cancel func()) (t T, err error) {

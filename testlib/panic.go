@@ -2,7 +2,7 @@
 package testlib
 
 // DoesPanic runs f and checks if it panicked or not.
-// When f does panic, returns the recovered value.
+// When f does panic, returns the original argument to panic.
 func DoesPanic(f func()) (panicked bool, recovered interface{}) {
 
 	// In principle this function could just return the value of recover.

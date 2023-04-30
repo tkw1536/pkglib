@@ -26,14 +26,14 @@ const (
 //   - If the 'recurse' tag is not the empty string, recurse into the struct type by calling Validate on it.
 //     If the annotated field is not a struct, return an error.
 //
-// Any error is wrapped in a FieldError, indicating the field they occured in.
+// Any error is wrapped in a FieldError, indicating the field they occurred in.
 // Recursive validate calls may result in FieldError wraps.
 // For a description of struct tags, see [reflect.StructTag].
 func Validate[T any](data *T, validators map[string]any) error {
 	return validate(reflect.ValueOf(data).Elem(), validators)
 }
 
-// FieldError wraps an error to indicate which field it occured in.
+// FieldError wraps an error to indicate which field it occurred in.
 type FieldError struct {
 	Field string
 	Err   error

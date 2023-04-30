@@ -13,7 +13,7 @@ import (
 const HTMLFlushInterval = time.Second / 10
 
 // WriteHTML writes a html response of type T to w.
-// If an error occured, writes an error response instead.
+// If an error occurred, writes an error response instead.
 func WriteHTML[T any](result T, err error, template *template.Template, templateName string, w http.ResponseWriter, r *http.Request) (e error) {
 	// log any error that occurs;
 	defer func() {
@@ -22,7 +22,7 @@ func WriteHTML[T any](result T, err error, template *template.Template, template
 		}
 	}()
 
-	// create a synced respone writer
+	// create a synced response writer
 	sw := &SyncedResponseWriter{ResponseWriter: w}
 
 	done := make(chan struct{})

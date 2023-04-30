@@ -54,7 +54,7 @@ func (h *WebSocket) makePoolSocket() *webSocketConn {
 }
 
 func (h *WebSocket) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// if the user did not request a websocket, go to the fallbacjk handler
+	// if the user did not request a websocket, go to the fallback handler
 	if !websocket.IsWebSocketUpgrade(r) {
 		h.serveFallback(w, r)
 		return
@@ -95,7 +95,7 @@ type WebSocketConnection interface {
 	Context() context.Context
 
 	// Read returns a channel that receives message.
-	// The channel is closed if no more messags are available (for instance because the server closed).
+	// The channel is closed if no more messages are available (for instance because the server closed).
 	Read() <-chan WebSocketMessage
 
 	// Write queues the provided message for sending.

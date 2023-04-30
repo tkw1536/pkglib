@@ -19,7 +19,7 @@ type Lazy[T any] struct {
 // A nil init function indicates to store the zero value of T.
 // If an initialization has been previously completed, the previously stored value is returned.
 //
-// If init panics, the initization is considered to be completed.
+// If init panics, the initialization is considered to be completed.
 // Future calls to Get() do not invoke init, and the zero value of T is returned.
 //
 // Get may safely be called concurrently.

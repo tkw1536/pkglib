@@ -56,7 +56,7 @@ var wordTests = []struct {
 	{"a1", WordForbiddenRune, "mixed letter numbers not allowed", true},
 	{`"hello world"extra stuff`, WordIncorrectQuote, "may not have extra content after quote", false},
 	{`"unclosed`, WordIncorrectQuote, "unclosed quote", true},
-	{"hello world", WordForbiddenRune, "spaces not allowed", false}, // exluded from part test because it won't be seen as a part
+	{"hello world", WordForbiddenRune, "spaces not allowed", false}, // excluded from part test because it won't be seen as a part
 	{"Hello", WordForbiddenRune, "capital letter not allowed", true},
 	{"hello--world", WordNoSequentialDashes, "non sequential dashes not allowed", true},
 	{"-hello", WordNoOutsideDashes, "leading dash not allowed", true},

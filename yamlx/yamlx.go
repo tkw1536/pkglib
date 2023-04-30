@@ -183,7 +183,7 @@ func Apply(node *yaml.Node, replacement yaml.Node) {
 }
 
 // Find attempts to find the yaml node with the given path inside a yaml tree.
-// Find should not be used on untrustued input; it follows anchors by default.
+// Find should not be used on untrusted input; it follows anchors by default.
 // If the node does not exist, it returns nil.
 func Find(node *yaml.Node, path ...string) (*yaml.Node, error) {
 	switch {

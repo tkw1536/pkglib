@@ -32,7 +32,7 @@ func ExampleRun() {
 
 	// and run the function with the context and explicit cancel!
 	result, err := Run(ctx, func(start func()) int {
-		start() // allow calling cancel immediatly!
+		start() // allow calling cancel immediately!
 
 		// start the work!
 		return work()

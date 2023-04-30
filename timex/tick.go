@@ -9,7 +9,7 @@ import (
 // TickContext is like [time.Tick], but closes the returned channel once the context closes.
 // As such it can be recovered by the garbage collector; see [time.TickContext].
 //
-// Unlike [time.Tick], immediatly sends the current time on the given channel.
+// Unlike [time.Tick], immediately sends the current time on the given channel.
 func TickContext(c context.Context, d time.Duration) <-chan time.Time {
 	if d < 0 {
 		return nil
@@ -38,7 +38,7 @@ func TickContext(c context.Context, d time.Duration) <-chan time.Time {
 }
 
 // TickUntilFunc invokes f every d until either context is closed, or f returns true.
-// f is invoked once immediatly when the timer starts.
+// f is invoked once immediately when the timer starts.
 //
 // TickUntilFunc blocks until f is no longer invoked.
 //

@@ -152,7 +152,7 @@ func (fc FormContext) Error() string {
 	return fc.Err.Error()
 }
 
-// renderSuccess renders a successfull pass of the form
+// renderSuccess renders a successful pass of the form
 // if an error occurs during rendering, renderForm is called instead
 func (form *Form[D]) renderSuccess(data D, values map[string]string, w http.ResponseWriter, r *http.Request) {
 	err := form.RenderSuccess(data, values, w, r)
@@ -165,5 +165,5 @@ func (form *Form[D]) renderSuccess(data D, values map[string]string, w http.Resp
 //go:embed "form.html"
 var formBytes []byte
 
-// FormTeplate is a template to embed a form
+// FormTemplate is a template to embed a form
 var FormTemplate = template.Must(template.New("form.html").Parse(string(formBytes)))

@@ -26,8 +26,8 @@ type Writer struct {
 
 // write performs the write operation w
 //
-// - if an error occured previously, w is not called and 0, PreviousWriteFailed is returned
-// - if no error occured, w is called and the state is updated
+// - if an error occurred previously, w is not called and 0, PreviousWriteFailed is returned
+// - if no error occurred, w is called and the state is updated
 func (sw *Writer) write(w func() (int, error)) (int, error) {
 	// if there was an error, return it and don't do a write
 	if sw.err != nil {
@@ -59,13 +59,13 @@ func (sw *Writer) WriteString(s string) (int, error) {
 	})
 }
 
-// Sum returns the total number of bytes written the underlying writer, and any error that occured.
+// Sum returns the total number of bytes written the underlying writer, and any error that occurred.
 // The underlying error is not wrapped.
 func (cw *Writer) Sum() (int, error) {
 	return cw.n, cw.err
 }
 
-// Reset resets the underyling error and total count of bytes written.
+// Reset resets the underlying error and total count of bytes written.
 // Future writes will again be passed through to the underlying writer.
 func (sw *Writer) Reset() {
 	sw.err = nil

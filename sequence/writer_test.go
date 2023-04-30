@@ -24,10 +24,10 @@ func ExampleWriter() {
 	// 22 <nil>
 }
 
-// finitewrites is a writer that writes to stdout a finite number of times.
-type finitewrites int
+// finWrites is a writer that writes to stdout a finite number of times.
+type finWrites int
 
-func (f *finitewrites) Write(d []byte) (int, error) {
+func (f *finWrites) Write(d []byte) (int, error) {
 	if f == nil || *f <= 0 {
 		return 0, errors.New("no writes left")
 	}
@@ -37,7 +37,7 @@ func (f *finitewrites) Write(d []byte) (int, error) {
 
 func ExampleWriter_fail() {
 	// create a writer that can only be written to once
-	writeonce := finitewrites(1)
+	writeonce := finWrites(1)
 
 	w := Writer{
 		Writer: &writeonce,

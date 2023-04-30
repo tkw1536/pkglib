@@ -24,7 +24,7 @@ func (v ValidationResult) Error() string {
 	return fmt.Sprintf("part %d word %d %q: %s", v.PartIndex, v.WordIndex, v.Word, v.Kind)
 }
 
-// ValidationKind represents different types of validationn errors
+// ValidationKind represents different types of validation errors
 type ValidationKind string
 
 const (
@@ -54,7 +54,7 @@ const (
 //   - a word may contain a trailing comma
 //   - a word may only contain capital letters when all runes in it are capital letters, or if the last letter is an s and the rest are capital.
 //   - a word may consist of only digits when all runes in it are digits
-//   - a word may contain '-'s, but only non-sequential occurences (WordNoSequentialDashes) that are not the first or last letter (WordNoOutsideDashes)
+//   - a word may contain '-'s, but only non-sequential occurrences (WordNoSequentialDashes) that are not the first or last letter (WordNoOutsideDashes)
 //   - a word that starts with '%' is always valid, because it might be a format string
 //   - each word (except for the last word) must end with a space character, that is either " " or "\n" (InvalidEndSpace)
 //
@@ -123,7 +123,7 @@ partloop:
 	return errors
 }
 
-// IsValidWord checks that word fullfills the rules for a valid word
+// IsValidWord checks that word fulfills the rules for a valid word
 func validateWord(word string, exceptions map[string]struct{}) ValidationKind {
 	// NOTE(twiesing): Return the exact validation result
 	runes := []rune(word)

@@ -10,7 +10,7 @@ import (
 // An iterator is not safe for concurrent access.
 //
 // A user of an iterator must ensure that the iterator is closed once it is no longer needed.
-// A user should furthermore use the Err() method to check if an error occured.
+// A user should furthermore use the Err() method to check if an error occurred.
 //
 // A typical use of an iterator would be something like:
 //
@@ -23,7 +23,7 @@ import (
 //	}
 //
 //	if err := it.Err(); err != nil {
-//	  return err // an error occured!
+//	  return err // an error occurred!
 //	}
 type Iterator[T any] interface {
 	// Next advances this iterator to the next value.
@@ -33,7 +33,7 @@ type Iterator[T any] interface {
 	// Datum returns the current value of this iterator.
 	Datum() T
 
-	// Err returns any error that occured during iteration.
+	// Err returns any error that occurred during iteration.
 	Err() error
 
 	// Close closes this iterator, indicating to the sender that no more
@@ -125,7 +125,7 @@ func (it *impl[T]) Close() error {
 	return nil
 }
 
-// Err returns any error that occured.
+// Err returns any error that occurred.
 // It may not be called
 func (it *impl[T]) Err() error {
 	return it.err

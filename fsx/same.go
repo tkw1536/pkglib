@@ -44,17 +44,17 @@ func Same(path1, path2 string) bool {
 // Otherwise compares absolute paths using string comparison.
 //
 // same indicates if they might be the same file.
-// authorative indiciates if the result is authorative.
-func couldBeSameFile(path1, path2 string) (same, authorative bool) {
+// authoritative indicates if the result is authoritative.
+func couldBeSameFile(path1, path2 string) (same, authoritative bool) {
 	{
 		info1, other1, err1 := stat(path1, true)
 		info2, other2, err2 := stat(path2, true)
 
 		// both files exist => check using env.SameFile
-		// the result is always authorative
+		// the result is always authoritative
 		if err1 == nil && err2 == nil {
 			same = os.SameFile(info1, info2)
-			authorative = true
+			authoritative = true
 			return
 		}
 
@@ -85,7 +85,7 @@ func couldBeSameFile(path1, path2 string) (same, authorative bool) {
 
 		// compare using strings
 		same = rpath1 == rpath2
-		authorative = same // positive result is authorative!
+		authoritative = same // positive result is authoritative!
 		return
 	}
 }

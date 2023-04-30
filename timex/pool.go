@@ -17,7 +17,7 @@ var tPool = sync.Pool{
 	},
 }
 
-// NewTimer returns an unusued timer from an internal timer pool.
+// NewTimer returns an unused timer from an internal timer pool.
 // The timer is guaranteed to be initialized and stopped.
 // The timer will not have been created with AfterFunc.
 //

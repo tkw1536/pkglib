@@ -68,8 +68,8 @@ func (m *meta[Component]) init(tp reflect.Type) {
 	scanForFields(component, m.Name, dependenciesField.Type, true, m.DCFields, m.DIFields)
 }
 
-// scanForFields scans the structtype for fields of component-like fields.
-// they are then writen to the cFields and iFields maps.
+// scanForFields scans the struct type for fields of component-like fields.
+// they are then written to the cFields and iFields maps.
 // inDependenciesStruct indicates if we are inside a dependency struct
 func scanForFields(component reflect.Type, elem string, structType reflect.Type, inDependenciesStruct bool, cFields map[string]reflect.Type, iFields map[string]reflect.Type) {
 	count := structType.NumField()

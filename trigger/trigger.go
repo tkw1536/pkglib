@@ -18,7 +18,7 @@ import (
 // It only adds OnAcquire and OnRelease functions.
 //
 // Like an RWMutex, even a blocked call to XLock may block calls to Lock.
-// As such, helds should not be acquired recursively.
+// As such, holds should not be acquired recursively.
 type Trigger struct {
 	l       sync.RWMutex // internal state, held by callers
 	s       sync.Mutex   // held when changing state
@@ -33,7 +33,7 @@ type Trigger struct {
 //
 // If this call switches the trigger from a non-held to a held state, OnAcquire(false) is called unless OnAcquire is nil.
 // Any concurrent calls to Lock or Unlock will not return until this OnAcquire call has returned.
-// If OnAquire panics, the trigger is considered locked.
+// If OnAcquire panics, the trigger is considered locked.
 func (trigger *Trigger) Lock() {
 	trigger.l.RLock()
 

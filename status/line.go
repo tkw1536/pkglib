@@ -45,7 +45,7 @@ type LineBuffer struct {
 }
 
 // Write writes b into the internal buffer.
-// When this completes one or more lines, calls Line appropriatly.
+// When this completes one or more lines, calls Line appropriately.
 func (lb *LineBuffer) Write(b []byte) (int, error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
@@ -111,7 +111,7 @@ func (lb *LineBuffer) ReadFrom(r io.Reader) (n int64, err error) {
 	return lb.buffer.ReadFrom(r)
 }
 
-// runeR and runeN represent the bytes corresponding to '\r' and '\n' respecitively.
+// runeR and runeN represent the bytes corresponding to '\r' and '\n' respectively
 const runeR byte = '\r'
 const runeN byte = '\n'
 

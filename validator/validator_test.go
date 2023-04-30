@@ -106,7 +106,7 @@ func ExampleValidate_notavalidator() {
 	}
 	err := Validate(&value, collection)
 	fmt.Println(err)
-	// Output: field "Field": entry "generic" in validators is not a valiator
+	// Output: field "Field": entry "generic" in validators is not a validator
 }
 
 func ExampleValidate_invalid() {

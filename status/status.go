@@ -32,8 +32,8 @@ import (
 //
 // Using the status to Write messages outside of the Start / Stop process results in no-ops.
 //
-// In addition to writing to lines directly, a status keeps seperate logfiles for each line.
-// These are automatically deleted once the Stop method is called, unless a seperate call to the Keep() method is made.
+// In addition to writing to lines directly, a status keeps separate logfiles for each line.
+// These are automatically deleted once the Stop method is called, unless a separate call to the Keep() method is made.
 //
 // Status should only be used on interactive terminals.
 // On other [io.Writer]s, a so-called compatibility mode can be used, that writes updates to the terminal line by line.
@@ -177,7 +177,7 @@ func (st *Status) flush(force bool, changed int) {
 	st.flushNormal(force)
 }
 
-// flishCompat flushes the provided updated message, if it is valid.
+// flushCompat flushes the provided updated message, if it is valid.
 func (st *Status) flushCompat(changed int) {
 	line, ok := st.messages[changed]
 	if !ok {

@@ -38,7 +38,7 @@ func ExampleSchedule_order() {
 
 func ExampleSchedule_error() {
 	err := Schedule(func(i int) error {
-		// the first invocation produces an error and returns immediatly!
+		// the first invocation produces an error and returns immediately!
 		if i == 0 {
 			return errors.New("first function error")
 		}

@@ -25,7 +25,7 @@ func AsChannel[T any](it Iterator[T], ctx context.Context) <-chan T {
 }
 
 // FromChannel creates a new iterator that receives values from the provided channel.
-// The context is cancelled once the receiving end of the iterator requests canellation or the input channel is exhausted.
+// The context is cancelled once the receiving end of the iterator requests cancellation or the input channel is exhausted.
 //
 // NOTE: Even if the receiving iterator end requests cancellation, the input channel will always be drained.
 // This ensures that any process sending to the iterator can always continue to send values.

@@ -11,7 +11,7 @@ func JSON[T any](f func(r *http.Request) (T, error)) JSONHandler[T] {
 }
 
 // WriteJSON writes a JSON response of type T to w.
-// If an error occured, writes an error response instead.
+// If an error occurred, writes an error response instead.
 func WriteJSON[T any](result T, err error, w http.ResponseWriter, r *http.Request) {
 	// handle any errors
 	if JSONInterceptor.Intercept(w, r, err) {

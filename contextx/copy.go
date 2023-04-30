@@ -7,9 +7,9 @@ import (
 )
 
 // Copy copies from src to dst, cancelling the operation is cancelled.
-// See io.Copy() for a description of the copy behaviour.
+// See io.Copy() for a description of the copy behavior.
 //
-// The operation is cancelled by closing the src and destionation (if they support the Close() interface).
+// The operation is cancelled by closing the src and destination (if they support the Close() interface).
 // Futhermore appropriate read and write deadlines are set.
 // Either of these calls may not have any effect, depending on the underlying operation.
 func Copy(ctx context.Context, dst io.Writer, src io.Reader) (written int64, err error) {

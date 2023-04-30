@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// DoesPanic behavior for a panicing function
+// DoesPanic behavior for a panicking function
 func ExampleDoesPanic_panic() {
 	didPanic, recovered := DoesPanic(func() {
 		panic("some error message")

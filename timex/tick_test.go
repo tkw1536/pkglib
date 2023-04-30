@@ -26,7 +26,7 @@ func ExampleStopTimer() {
 
 func ExampleStopTimer_fired() {
 
-	// create a new timer to fire pretty much immediatly
+	// create a new timer to fire pretty much immediately
 	t := time.NewTimer(time.Nanosecond)
 
 	// wait for a bit, then stop the timer

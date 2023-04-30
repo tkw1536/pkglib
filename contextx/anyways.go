@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Anyways behaves simular to [context.WithTimeout].
+// Anyways behaves similar to [context.WithTimeout].
 // However if the context is already cancelled before Anyways is called, the returned context's Done() channel is only closed after timeout.
 func Anyways(parent context.Context, timeout time.Duration) (context.Context, context.CancelFunc) {
 	// context is not yet cancelled => return as-is

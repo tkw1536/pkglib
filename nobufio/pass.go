@@ -21,7 +21,7 @@ func ReadPassword(reader io.Reader) (value string, err error) {
 // ErrNoTerminal is returned by ReadPasswordStrict when stdin is not a terminal
 var ErrNoTerminal = errors.New("reader is not a terminal")
 
-// ReadPasswordSrict is like ReadPassword, except that when reader is not a terminal, returns ErrNoTerminal.
+// ReadPasswordStrict is like ReadPassword, except that when reader is not a terminal, returns ErrNoTerminal.
 func ReadPasswordStrict(reader io.Reader) (value string, err error) {
 	// check if reader is a terminal
 	fd, ok := reader.(*os.File)

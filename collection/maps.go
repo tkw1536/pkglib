@@ -18,7 +18,7 @@ func IterateSorted[K constraints.Ordered, V any](M map[K]V, f func(k K, v V)) {
 }
 
 // MapValues creates a new map which has the same keys as M.
-// The values of the map are determined by passin the old key and values into f.
+// The values of the map are determined by passing the old key and values into f.
 func MapValues[K comparable, V1, V2 any](M map[K]V1, f func(K, V1) V2) map[K]V2 {
 	if M == nil {
 		return nil

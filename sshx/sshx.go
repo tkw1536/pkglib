@@ -54,7 +54,7 @@ func ParseKeys(in []byte, limit int) (keys []ssh.PublicKey, comments []string, o
 
 // ParseAllKeys parses all keys in authorized_keys format.
 //
-// Parsing stops if the input is exchausted, or when an equivalent ParseKeys call would return an error.
+// Parsing stops if the input is exhausted, or when an equivalent ParseKeys call would return an error.
 // This function exists for convenience; use ParseKeys for more fine-grained control.
 func ParseAllKeys(in []byte) (keys []ssh.PublicKey) {
 	// NOTE(twiesing): We could use ParseKeys() from above

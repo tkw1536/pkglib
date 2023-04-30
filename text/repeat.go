@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-// Join writes the elements of elem into writer, seperated by sep.
+// Join writes the elements of elem into writer, separated by sep.
 // Returns the number of runes written and a nil error.
 //
 // It is like strings.Join, but writes into a writer instead of allocating a strings.Builder.

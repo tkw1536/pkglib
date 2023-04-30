@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// SyncedResponseWriter wraps a http ResponseWriter to syncronize all actions
+// SyncedResponseWriter wraps a http ResponseWriter to synchronize all actions
 type SyncedResponseWriter struct {
 	m sync.Mutex
 	http.ResponseWriter
