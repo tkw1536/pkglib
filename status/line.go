@@ -3,7 +3,6 @@ package status
 import (
 	"bytes"
 	"errors"
-	"io"
 	"sync"
 	"time"
 )
@@ -95,20 +94,6 @@ func (lb *LineBuffer) WriteString(s string) (int, error) {
 
 	defer lb.flush()
 	return lb.buffer.WriteString(s)
-}
-
-// ReadFrom reads all available bytes from r into this LineBuffer, until an error is encountered.
-// io.EOF is not considered an error.
-func (lb *LineBuffer) ReadFrom(r io.Reader) (n int64, err error) {
-	lb.m.Lock()
-	defer lb.m.Unlock()
-
-	if lb.closed {
-		return 0, errLineBufferClosed
-	}
-
-	defer lb.flush()
-	return lb.buffer.ReadFrom(r)
 }
 
 // runeR and runeN represent the bytes corresponding to '\r' and '\n' respectively
