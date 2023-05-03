@@ -79,6 +79,9 @@ func scanForFields(component reflect.Type, elem string, structType reflect.Type,
 		if !inDependenciesStruct && field.Tag.Get("auto") != "true" {
 			continue
 		}
+		if !field.IsExported() {
+			panic("GetMeta: " + dependencies + " field (" + elem + ") contains field (" + field.Name + ") which is not exported")
+		}
 		if inDependenciesStruct && field.Tag != "" {
 			panic("GetMeta: " + dependencies + " field (" + elem + ") contains field (" + field.Name + ") with tag")
 		}
