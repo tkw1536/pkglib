@@ -8,18 +8,18 @@ import (
 )
 
 func ExampleSchedule() {
-	var counter uint64
+	var counter atomic.Uint64
 
 	// because we have a parallelism of 1, we run exactly in order!
 	Schedule(func(i int) error {
-		atomic.AddUint64(&counter, 1)
+		counter.Add(1)
 		return nil
 	}, 1000, Concurrency{
 		Limit: 0,
 		Force: false,
 	})
 
-	fmt.Print(counter)
+	fmt.Print(counter.Load())
 	// Output: 1000
 }
 
@@ -64,11 +64,11 @@ func ExampleSchedule_error() {
 }
 
 func ExampleSchedule_force() {
-	var counter uint64
+	var counter atomic.Uint64
 
 	err := Schedule(func(i int) error {
 		// count the number of invocations
-		atomic.AddUint64(&counter, 1)
+		counter.Add(1)
 
 		// the first function returns an error
 		// but because of force = True, the execution is not aborted
@@ -85,7 +85,7 @@ func ExampleSchedule_force() {
 	})
 
 	fmt.Println(err)
-	fmt.Println(counter, "workers called")
+	fmt.Println(counter.Load(), "workers called")
 
 	// Output: first function error
 	// 10 workers called

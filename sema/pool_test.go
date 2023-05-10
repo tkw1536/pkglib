@@ -28,12 +28,12 @@ func (t *Thing) Close() {
 }
 
 func ExamplePool() {
-	var counter uint64
+	var counter atomic.Uint64
 	p := Pool[*Thing]{
 		Limit: 1, // at most one item in the pool
 		New: func() *Thing {
 			// create a new thing (and print creating it)
-			id := atomic.AddUint64(&counter, 1)
+			id := counter.Add(1)
 			fmt.Printf("New(%d)\n", id)
 			return ((*Thing)(&id))
 		},
@@ -64,7 +64,7 @@ func ExamplePool() {
 }
 
 func ExamplePool_Limit() {
-	var counter uint64
+	var counter atomic.Uint64
 
 	N := 10
 	M := 1000
@@ -75,7 +75,7 @@ func ExamplePool_Limit() {
 	p := Pool[uint64]{
 		Limit: 10, // at most one item in the pool
 		New: func() uint64 {
-			return atomic.AddUint64(&counter, 1)
+			return counter.Add(1)
 		},
 		Discard: func(u uint64) {
 			destroyedM.Lock()

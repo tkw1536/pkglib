@@ -15,18 +15,19 @@ func ExampleNew() {
 	sema := New(2)
 
 	// some very finite resource pool
-	var resource uint64 = 2
+	var resource atomic.Uint64
+	resource.Store(2)
 
 	// create N = 100 workers that each attempt to use the finite resource
 	N := 100
-	var worked uint64
+	var worked atomic.Uint64
 	var wg sync.WaitGroup
 	wg.Add(N)
 	for i := 0; i < N; i++ {
 		go func() {
 			// accounting: keep track that we did some work and that we're done!
 			defer wg.Done()
-			defer atomic.AddUint64(&worked, 1)
+			worked.Add(1)
 
 			// Lock the semaphore
 			// the lock can be locked at most twice
@@ -35,13 +36,13 @@ func ExampleNew() {
 
 			// check that the resource is available
 			// since we are protected by the semaphore, this is guaranteed to be the case
-			if atomic.LoadUint64(&resource) == 0 {
+			if resource.Load() == 0 {
 				panic("no resource available")
 			}
 
 			// while we are working, take the resources away
-			atomic.AddUint64(&resource, ^uint64(0))
-			defer atomic.AddUint64(&resource, 1)
+			resource.Add(^uint64(0))
+			defer resource.Add(1)
 
 			// ... deep computation ...
 			time.Sleep(10 * time.Millisecond)
@@ -50,7 +51,7 @@ func ExampleNew() {
 
 	wg.Wait()
 
-	fmt.Printf("Worked %d times", worked)
+	fmt.Printf("Worked %d times", worked.Load())
 	// Output: Worked 100 times
 }
 
