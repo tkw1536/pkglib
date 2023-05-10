@@ -39,8 +39,8 @@ type LineBuffer struct {
 	// CloseLine may be nil, in which case it is not called.
 	CloseLine func()
 
-	annot   bool // is the annotation valid
-	annotID int  // annotated id (for use from within status)
+	annot   bool   // is the annotation valid
+	annotID uint64 // annotated id (for use from within status)
 }
 
 // Write writes b into the internal buffer.

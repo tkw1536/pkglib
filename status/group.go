@@ -74,7 +74,7 @@ func DefaultWaitString[Item any](item Item, index int) string {
 // Otherwise they are closed right before returning.
 //
 // Use returns the results of the Handler, along with the ids of each line used.
-func (group Group[Item, Result]) Use(status *Status, items []Item) ([]Result, []int) {
+func (group Group[Item, Result]) Use(status *Status, items []Item) ([]Result, []uint64) {
 	// setup defaults
 	if group.PrefixString == nil {
 		group.PrefixString = DefaultPrefixString[Item]
@@ -86,7 +86,7 @@ func (group Group[Item, Result]) Use(status *Status, items []Item) ([]Result, []
 	// create data arrays
 	prefixes := make([]string, len(items))        // prefixes per-line
 	writers := make([]io.WriteCloser, len(items)) // writers per-line
-	ids := make([]int, len(items))                // ids of lines added
+	ids := make([]uint64, len(items))             // ids of lines added
 	results := make([]Result, len(items))         // results per item
 
 	// generate all the prefixes and compute the maximum prefix length

@@ -39,23 +39,22 @@ import (
 // On other [io.Writer]s, a so-called compatibility mode can be used, that writes updates to the terminal line by line.
 // See [NewWithCompat].
 type Status struct {
-	state   uint64 // see state* comments below
-	keepLog uint64 // if non-zero, keeps the log files (has to be 64-bit-aligned)
+	state   atomic.Uint64 // see state* comments below
+	keepLog atomic.Bool   // keep the log files around
+	counter atomic.Uint64 // the first free message id, increased atomically
 
 	w      *uilive.Writer // underlying uilive writer
 	compat bool           // compatibility mode enabled
 
-	logPath      string                 // temporary path for log files (passed when creating logwriters)
-	logWriters   map[int]io.WriteCloser // writers for the backup loggers
-	logNamesLock sync.RWMutex           // protects the below
-	logNames     map[int]string         // the names of the log files
+	logPath      string                    // temporary path for log files (passed when creating logwriters)
+	logWriters   map[uint64]io.WriteCloser // writers for the backup loggers
+	logNamesLock sync.RWMutex              // protects the below
+	logNames     map[uint64]string         // the names of the log files
 
-	counter int32 // the first free message id, increased atomically
+	ids  []uint64       // ordered list of active message ids
+	idsI map[uint64]int // inverse list of active message ids
 
-	ids  []int       // ordered list of active message ids
-	idsI map[int]int // inverse list of active message ids
-
-	messages map[int]string // content of all the messages
+	messages map[uint64]string // content of all the messages
 
 	lastFlush time.Time // last time we flushed
 
@@ -63,7 +62,7 @@ type Status struct {
 	done    chan struct{}
 }
 
-// state* describe the livecycle of a Status
+// state* describe the lifecycle of a Status
 const (
 	stateInvalid uint64 = iota
 	stateNewCalled
@@ -83,15 +82,20 @@ const (
 // action describes actions to perform on a [Status]
 type action struct {
 	action  lineAction // what kind of action to perform
-	id      int        // id of line to perform action on
+	id      uint64     // id of line to perform action on
 	message string     // content of the line
 }
 
 // New creates a new writer with the provided number of status lines.
+// count must fit into the uint64 type, meaning it has to be non-negative.
 //
 // The ids of the status lines are guaranteed to be 0...(count-1).
 // When count is less than 0, it is set to 0.
 func New(writer io.Writer, count int) *Status {
+	if int(uint64(count)) != count {
+		panic("Status: count does not fit into uint64")
+	}
+
 	// when a zero writer was passed, we don't need a status.
 	// and everything should become a no-op.
 	if stream.IsNullWriter(writer) {
@@ -103,26 +107,25 @@ func New(writer io.Writer, count int) *Status {
 	}
 
 	st := &Status{
-		state: stateNewCalled,
-
 		w:      uilive.New(),
 		compat: false,
 
-		counter: int32(count),
+		ids:  make([]uint64, count),
+		idsI: make(map[uint64]int, count),
 
-		ids:  make([]int, count),
-		idsI: make(map[int]int, count),
-
-		messages: make(map[int]string, count),
+		messages: make(map[uint64]string, count),
 
 		actions: make(chan action, count),
 		done:    make(chan struct{}),
 	}
+	st.state.Store(stateNewCalled)
+	st.counter.Store(uint64(count))
 
 	// setup new ids
-	for i := range st.ids {
-		st.ids[i] = i
-		st.idsI[i] = i
+	for index := range st.ids {
+		i := uint64(index)
+		st.ids[index] = i
+		st.idsI[i] = index
 
 		// open the logger!
 		st.openLogger(i)
@@ -154,10 +157,10 @@ func (st *Status) Start() {
 		return
 	}
 
-	if atomic.LoadUint64(&st.state) == stateInvalid {
+	if st.state.Load() == stateInvalid {
 		panic("Status: Not created using New")
 	}
-	if !atomic.CompareAndSwapUint64(&st.state, stateNewCalled, stateStartCalled) {
+	if !st.state.CompareAndSwap(stateNewCalled, stateStartCalled) {
 		panic("Status: Start() called multiple times")
 	}
 
@@ -168,7 +171,7 @@ const minFlushDelay = 50 * time.Millisecond
 
 // flush flushes the output of this Status to the underlying writer.
 // see [flushCompat] and [flushNormal]
-func (st *Status) flush(force bool, changed int) {
+func (st *Status) flush(force bool, changed uint64) {
 	st.flushLogs(changed)
 	if st.compat {
 		st.flushCompat(changed)
@@ -178,7 +181,7 @@ func (st *Status) flush(force bool, changed int) {
 }
 
 // flushCompat flushes the provided updated message, if it is valid.
-func (st *Status) flushCompat(changed int) {
+func (st *Status) flushCompat(changed uint64) {
 	line, ok := st.messages[changed]
 	if !ok {
 		return
@@ -187,7 +190,7 @@ func (st *Status) flushCompat(changed int) {
 }
 
 // flushLogs flushes to the given logfile
-func (st *Status) flushLogs(changed int) {
+func (st *Status) flushLogs(changed uint64) {
 	line, ok := st.messages[changed]
 	if !ok {
 		return
@@ -226,15 +229,15 @@ func (st *Status) flushNormal(force bool) {
 }
 
 // Keep instructs this Status to not keep any log files, and returns a map from ids to file names.
-func (st *Status) Keep() map[int]string {
+func (st *Status) Keep() map[uint64]string {
 	// we keep the log files!
-	atomic.StoreUint64(&st.keepLog, 1)
+	st.keepLog.Store(true)
 
 	st.logNamesLock.RLock()
 	defer st.logNamesLock.RUnlock()
 
 	// make a copy of the logNames!
-	files := make(map[int]string, len(st.logNames))
+	files := make(map[uint64]string, len(st.logNames))
 	maps.Copy(files, st.logNames)
 	return files
 }
@@ -251,13 +254,13 @@ func (st *Status) Stop() {
 		return
 	}
 
-	if !atomic.CompareAndSwapUint64(&st.state, stateStartCalled, stateStopCalled) {
+	if !st.state.CompareAndSwap(stateStartCalled, stateStopCalled) {
 		panic("Status: Stop() called out-of-order")
 	}
 
 	close(st.actions)
 	<-st.done
-	st.flush(true, int(atomic.AddInt32(&st.counter, 1))) // force an invalid flush!
+	st.flush(true, st.counter.Add(1)) // force an invalid flush!
 
 	// close the remaining loggers
 	for _, id := range st.ids {
@@ -265,7 +268,7 @@ func (st *Status) Stop() {
 	}
 
 	// if we requested for the log files to be deleted, do it!
-	if atomic.LoadUint64(&st.keepLog) == 0 {
+	if !st.keepLog.Load() {
 		st.logNamesLock.Lock()
 		defer st.logNamesLock.Unlock()
 
@@ -277,7 +280,7 @@ func (st *Status) Stop() {
 }
 
 // openLogger opens the logger for the line with the given id
-func (st *Status) openLogger(id int) {
+func (st *Status) openLogger(id uint64) {
 	if st == nil {
 		return
 	}
@@ -291,23 +294,23 @@ func (st *Status) openLogger(id int) {
 	defer st.logNamesLock.Unlock()
 
 	if st.logNames == nil {
-		st.logNames = make(map[int]string)
+		st.logNames = make(map[uint64]string)
 	}
 
 	// store the file and name!
 	if st.logWriters == nil {
-		st.logWriters = make(map[int]io.WriteCloser, 1)
+		st.logWriters = make(map[uint64]io.WriteCloser, 1)
 	}
 	st.logWriters[id] = file
 
 	if st.logNames == nil {
-		st.logNames = make(map[int]string, 1)
+		st.logNames = make(map[uint64]string, 1)
 	}
 	st.logNames[id] = file.Name()
 }
 
 // closeLogger closes the logger for the line with the given id
-func (st *Status) closeLogger(id int) {
+func (st *Status) closeLogger(id uint64) {
 	defer func() { recover() }()
 
 	if st == nil {
@@ -334,8 +337,8 @@ func (st *Status) closeLogger(id int) {
 //
 // Set may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored, and return an invalid line id.
-func (st *Status) Set(id int, message string) {
-	if atomic.LoadUint64(&st.state) != stateStartCalled {
+func (st *Status) Set(id uint64, message string) {
+	if st.state.Load() != stateStartCalled {
 		return
 	}
 
@@ -352,7 +355,7 @@ func (st *Status) Set(id int, message string) {
 //
 // Line may be called at any time.
 // Line should not be called multiple times with the same id.
-func (st *Status) Line(prefix string, id int) io.WriteCloser {
+func (st *Status) Line(prefix string, id uint64) io.WriteCloser {
 	// nil check for no-op status
 	if st == nil {
 		return stream.Null
@@ -377,12 +380,15 @@ func (st *Status) Line(prefix string, id int) io.WriteCloser {
 	}
 }
 
+// NoLine indicates that the given writer does not have an associated line id.
+const NoLine = ^uint64(0)
+
 // LineOf returns the id of a line returned by the Line and OpenLine methods.
-// If a different writer is passed (or there is no associated id), returns -1.
-func LineOf(line io.WriteCloser) int {
+// If a different writer is passed (or there is no associated id), returns NoLine.
+func LineOf(line io.WriteCloser) uint64 {
 	lb, ok := line.(*LineBuffer)
 	if !ok || !lb.annot {
-		return -1
+		return NoLine
 	}
 	return lb.annotID
 }
@@ -396,7 +402,7 @@ func LineOf(line io.WriteCloser) int {
 //
 // Open may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored, and return an invalid line id.
-func (st *Status) Open(message string) (id int) {
+func (st *Status) Open(message string) (id uint64) {
 	// nil check for no-op status
 	if st == nil {
 		return 0
@@ -404,8 +410,8 @@ func (st *Status) Open(message string) (id int) {
 
 	// even when not active, generate a new id
 	// this guarantees that other calls are no-ops.
-	id = int(atomic.AddInt32(&st.counter, 1))
-	if atomic.LoadUint64(&st.state) != stateStartCalled {
+	id = st.counter.Add(1)
+	if st.state.Load() != stateStartCalled {
 		return
 	}
 
@@ -441,12 +447,12 @@ func (st *Status) OpenLine(prefix, data string) io.WriteCloser {
 //
 // Close may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored.
-func (st *Status) Close(id int) {
+func (st *Status) Close(id uint64) {
 	// nil check for no-op status
 	if st == nil {
 		return
 	}
-	if atomic.LoadUint64(&st.state) != stateStartCalled {
+	if st.state.Load() != stateStartCalled {
 		return
 	}
 
