@@ -37,8 +37,8 @@ func Schedule(worker func(int) error, count int, concurrency Concurrency) (err e
 
 	sema := New(concurrency.Limit) // semaphore to use for the limit
 
-	var next uint64    // id of next worker call!
-	var errDone uint64 // 0 => everything is fine, 1 => no error!
+	var next atomic.Uint64 // id of next worker call!
+	var hadAnError atomic.Bool
 
 	// create a wait group that waits for all the work to be done!
 	var wg sync.WaitGroup
@@ -53,12 +53,12 @@ func Schedule(worker func(int) error, count int, concurrency Concurrency) (err e
 
 			// check if something already broke
 			// and if so, stop doing stuff!
-			if !concurrency.Force && atomic.LoadUint64(&errDone) != 0 {
+			if !concurrency.Force && hadAnError.Load() {
 				return
 			}
 
 			// grab the next id to work on
-			id := int(atomic.AddUint64(&next, 1) - 1)
+			id := int(next.Add(1) - 1)
 
 			// do the work!
 			res := worker(id)
@@ -67,7 +67,7 @@ func Schedule(worker func(int) error, count int, concurrency Concurrency) (err e
 			}
 
 			// store the error (if we haven't already)
-			if atomic.CompareAndSwapUint64(&errDone, 0, 1) {
+			if hadAnError.CompareAndSwap(false, true) {
 				err = res
 			}
 		}()
