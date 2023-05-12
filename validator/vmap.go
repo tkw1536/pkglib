@@ -60,8 +60,8 @@ func AddSlice[F any](coll Collection, name string, sep string, validator func(va
 }
 
 var (
-	errTyp = reflectx.TypeOf[error]()
-	strTyp = reflectx.TypeOf[string]()
+	errTyp = reflectx.MakeType[error]()
+	strTyp = reflectx.MakeType[string]()
 )
 
 // UnknownValidator is an error returned from Validate if a validator does not exist

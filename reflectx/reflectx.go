@@ -7,17 +7,24 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// TypeOf returns the reflection Type that represents T.
+// MakeType returns the reflection Type that represents T.
 //
 // Unlike reflect.TypeOf, this method does not require instantiating T.
-func TypeOf[T any]() reflect.Type {
+func MakeType[T any]() reflect.Type {
 	return reflect.TypeOf((*T)(nil)).Elem()
 }
 
+// TypeOf is a legacy alias of MakeType
+//
+// Deprecated: Use MakeType instead.
+func TypeOf[T any]() reflect.Type {
+	return MakeType[T]()
+}
+
 // MakePointerCopy returns a new copy of value of interface type I that is backed by a pointer (if possible).
-// ptr holds the new copy, ok indiciates if the value is indeed a pointer.
+// ptr holds the new copy, ok indicates if the value is indeed a pointer.
 func MakePointerCopy[I any](value I) (ptr I, ok bool) {
-	iType := TypeOf[I]()
+	iType := MakeType[I]()
 	if iType.Kind() != reflect.Interface {
 		panic("MakePointer: I must be an interface type")
 	}

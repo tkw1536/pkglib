@@ -9,7 +9,7 @@ import (
 
 // getMeta gets the component belonging to a component type
 func getMeta[Component any, ConcreteComponent any](cache map[reflect.Type]meta[Component]) meta[Component] {
-	tp := reflectx.TypeOf[ConcreteComponent]()
+	tp := reflectx.MakeType[ConcreteComponent]()
 
 	// we already have a m => return it
 	if m, ok := cache[tp]; ok {
@@ -39,7 +39,7 @@ type meta[Component any] struct {
 
 // init initializes this meta
 func (m *meta[Component]) init(tp reflect.Type) {
-	var component = reflectx.TypeOf[Component]()
+	var component = reflectx.MakeType[Component]()
 
 	if tp.Kind() != reflect.Pointer && tp.Elem().Kind() != reflect.Struct {
 		panic("GetMeta: Type (" + tp.String() + ") must be backed by a pointer to slice")
