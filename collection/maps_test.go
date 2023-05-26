@@ -45,9 +45,14 @@ func ExampleAppend() {
 		"answer": "42",
 	}))
 
+	// appending nothing results in an empty map
 	fmt.Println(Append[string, string]())
+
+	// appending to the nil map results in an empty map
+	fmt.Println(Append[string, string](nil))
 
 	// Output: map[answer:42 hello:world]
 	// map[answer:42 hello:world]
+	// map[]
 	// map[]
 }

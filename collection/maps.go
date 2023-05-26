@@ -36,10 +36,13 @@ func MapValues[K comparable, V1, V2 any](M map[K]V1, f func(K, V1) V2) map[K]V2 
 //
 // It is the map equivalent of the built-in append function for slices.
 func Append[K comparable, V any](maps ...map[K]V) (mp map[K]V) {
-	// use the first map as the return value
-	if len(maps) > 0 {
-		mp = maps[0]
+	// no maps provided => return an empty map
+	if len(maps) == 0 {
+		return make(map[K]V)
 	}
+
+	// use the first map as the return value
+	mp = maps[0]
 
 	// ensure that it is non-nil and has enough space for all of the elements.
 	// NOTE(twiesing): There could be duplicates, so we may be over-allocating here.
@@ -52,11 +55,7 @@ func Append[K comparable, V any](maps ...map[K]V) (mp map[K]V) {
 	}
 
 	// add elements from all the other maps
-	for i, aMap := range maps {
-		// skip the first map, because by precondition we already have it!
-		if i == 0 {
-			continue
-		}
+	for _, aMap := range maps[1:] {
 		for k, v := range aMap {
 			mp[k] = v
 		}
