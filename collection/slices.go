@@ -23,21 +23,35 @@ func First[T any](slice []T, test func(T) bool) T {
 // Filter never re-allocates, invalidating the previous value of slice.
 // Values in the old slice, but no longer referenced by the new slice are zeroed out.
 //
+// Filter guarantees that the filter function is called in element order.
+// Filter guarantees that the return value is non-nil if and only if slice is non-nil.
+//
 // To create a new slice instead, use [FilterClone].
 func Filter[T any, S ~[]T](slice S, filter func(T) bool) S {
 	if slice == nil {
 		return nil
 	}
 
-	results := slice[:0]
-	for _, value := range slice {
-		if filter(value) {
-			results = append(results, value)
+	var (
+		results  = slice[:0] // the current result slice
+		allMatch = true      // did we have all elements (0...index)?
+	)
+	for index, value := range slice {
+		// we did not have all elements
+		if !filter(value) {
+			allMatch = false
+			continue
+		}
+
+		if allMatch {
+			results = slice[:index+1] // all elements => just re-slice
+		} else {
+			results = append(results, value) // append the element regularly
 		}
 	}
 
 	// we need to zero out other entries
-	// so that they can be picked up by the GC
+	// so that they can be picked up by gc!
 	var zero T
 	for i := len(results); i < len(slice); i++ {
 		slice[i] = zero
@@ -49,6 +63,14 @@ func Filter[T any, S ~[]T](slice S, filter func(T) bool) S {
 // FilterClone behaves like [Filter], except that it generates a new slice
 // and keeps the original reference slice valid.
 func FilterClone[T any, S ~[]T](slice S, filter func(T) bool) (results S) {
+	// if there are no elements, make a copy of the original slice
+	if len(slice) == 0 {
+		if slice == nil {
+			return nil
+		}
+		return []T{}
+	}
+
 	// NOTE(twiesing): We could allocate a slice of the original capacity here.
 	// But that would waste space for calls where only few operations are required.
 	for _, value := range slice {
