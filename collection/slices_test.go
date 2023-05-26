@@ -2,7 +2,9 @@ package collection
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
+	"testing"
 )
 
 func ExampleFirst() {
@@ -52,4 +54,26 @@ func ExampleNonSequential() {
 		}),
 	)
 	// Output: [a b c]
+}
+
+func TestDeduplicate(t *testing.T) {
+	type args struct {
+		s []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{"nil slice", args{nil}, nil},
+		{"no duplicates", args{[]string{"a", "b", "c", "d"}}, []string{"a", "b", "c", "d"}},
+		{"some duplicates", args{[]string{"b", "c", "c", "d", "a", "b", "c", "d"}}, []string{"b", "c", "d", "a"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Deduplicate(tt.args.s); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("RemoveDuplicates() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

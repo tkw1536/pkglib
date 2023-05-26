@@ -73,6 +73,25 @@ func MapSlice[T1 any, S1 ~[]T1, T2 any](slice S1, f func(T1) T2) []T2 {
 	return results
 }
 
+// Deduplicate removes duplicates from the given slice in place.
+// Elements are not reordered.
+func Deduplicate[T comparable, S ~[]T](slice S) S {
+	cache := make(map[T]struct{}, len(slice))
+
+	return Filter(slice, func(t T) bool {
+		// check if we saw the element before
+		// seen => don't include it
+		_, seen := cache[t]
+		if seen {
+			return false
+		}
+
+		// not seen => include
+		cache[t] = struct{}{}
+		return true
+	})
+}
+
 // AsAny returns a new slice containing the same elements as slice, but as any.
 func AsAny[T any](slice []T) []any {
 	// NOTE(twiesing): This function is untested because MapSlice is tested.
@@ -80,7 +99,7 @@ func AsAny[T any](slice []T) []any {
 }
 
 // Partition partitions elements of s into sub-slices by passing them through f.
-// Order of elements within subslices is preserved.
+// Order of elements within sub-slices is preserved.
 func Partition[T any, S ~[]T, P comparable](slice S, f func(T) P) map[P]S {
 	result := make(map[P]S)
 	for _, v := range slice {
