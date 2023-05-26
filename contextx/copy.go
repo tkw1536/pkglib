@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Copy copies from src to dst, cancelling the operation is cancelled.
+// Copy copies from src to dst, stopping once ctx is closed.
 // See io.Copy() for a description of the copy behavior.
 //
 // The operation is cancelled by closing the src and destination (if they support the Close() interface).

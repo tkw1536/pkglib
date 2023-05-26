@@ -1,7 +1,5 @@
 package contextx
 
-// TESTME
-
 import (
 	"context"
 	"sync"

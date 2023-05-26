@@ -1,28 +1,19 @@
 package contextx
 
-import "context"
+import (
+	"context"
+)
 
 // WithValues creates a new context that inherits from parent, but has associated values from values.
 //
-// This function is roughly equivalent to repeated invocations of [context.WithValue].
+// This function is equivalent to repeated invocations of [context.WithValue].
 // See the appropriate documentation for details on restrictions of keys and values to be used.
 func WithValues(parent context.Context, values map[any]any) context.Context {
-	return &withvalues{
-		Context: parent,
-		values:  values,
+	ctx := parent
+	for key, val := range values {
+		ctx = context.WithValue(ctx, key, val)
 	}
-}
-
-type withvalues struct {
-	context.Context
-	values map[any]any
-}
-
-func (wv *withvalues) Value(key any) any {
-	if value, ok := wv.values[key]; ok {
-		return value
-	}
-	return wv.Context.Value(key)
+	return ctx
 }
 
 // WithValuesOf creates a new context that inherits from parent, but values stored in values take precedence over already associated values.
