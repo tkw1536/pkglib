@@ -108,7 +108,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		if err != nil {
 			return err
 		}
-		if !isRegular {
+		if isRegular {
 			return ErrDstFile
 		}
 	}
