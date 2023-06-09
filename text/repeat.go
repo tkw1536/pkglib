@@ -19,19 +19,48 @@ func Join(writer io.Writer, elems []string, sep string) (n int, err error) {
 		return io.WriteString(writer, elems[0])
 	}
 
-	n = len(sep) * (len(elems) - 1)
-	for i := 0; i < len(elems); i++ {
-		n += len(elems[i])
+	// count how many elements we'll have to write
+	{
+		n := len(sep) * (len(elems) - 1)
+		for _, elem := range elems {
+			n += len(elem)
+		}
+		Grow(writer, n)
 	}
-	Grow(writer, n)
 
-	io.WriteString(writer, elems[0])
+	// figure out what to use for WriteString
+	writeString := writeString(writer)
+
+	// write the first string
+	{
+		m, err := writeString(elems[0])
+		n += m
+		if err != nil {
+			return n, err
+		}
+	}
+
 	for _, s := range elems[1:] {
-		io.WriteString(writer, sep)
-		io.WriteString(writer, s)
+		// write a separator
+		{
+			m, err := writeString(sep)
+			n += m
+			if err != nil {
+				return n, err
+			}
+		}
+
+		// write the next string
+		{
+			m, err := writeString(s)
+			n += m
+			if err != nil {
+				return n, err
+			}
+		}
 	}
 
-	return
+	return n, nil
 }
 
 // RepeatJoin writes s, followed by (count -1) instances of sep + s into w.
@@ -46,10 +75,18 @@ func RepeatJoin(w io.Writer, s, sep string, count int) (n int, err error) {
 	n = len(s)*count + len(sep)*(count-1)
 	Grow(w, n)
 
-	io.WriteString(w, s)
-	Repeat(w, sep+s, count-1)
+	writeString := writeString(w)
 
-	return
+	m, err := writeString(s)
+	if err != nil {
+		return m, err
+	}
+
+	if n, err := repeat(writeString, sep+s, count-1); err != nil {
+		return m + n, err
+	}
+
+	return n, nil
 }
 
 // Repeat writes count instances of s into w.
@@ -75,13 +112,35 @@ func Repeat(w io.Writer, s string, count int) (n int, err error) {
 	n = len(s) * count
 	Grow(w, n)
 
-	// write the string into w repeatedly
-	// only compute the number of bytes written if something goes wrong
+	// do the actual repeat
+	if n, err := repeat(writeString(w), s, count); err != nil {
+		return n, err
+	}
+
+	return n, nil
+}
+
+// writeString returns a function that does io.WriteString(w, ...)
+// It is used for init time branching.
+func writeString(w io.Writer) func(string) (int, error) {
+	if sw, ok := w.(io.StringWriter); ok {
+		return sw.WriteString
+	}
+
+	return func(s string) (int, error) {
+		return w.Write([]byte(s))
+	}
+}
+
+// write the string into w repeatedly
+// only compute the number of bytes written if something goes wrong
+func repeat(w func(string) (int, error), s string, count int) (int, error) {
+	// NOTE(twiesing): This function exists to save having to repeatedly call
+	// io.WriteString; which always rechecks if the passed type fulfils the interface.
 	for i := 0; i < count; i++ {
-		if m, err := io.WriteString(w, s); err != nil {
+		if m, err := w(s); err != nil {
 			return len(s)*i + m, err
 		}
 	}
-
-	return
+	return 0, nil
 }
