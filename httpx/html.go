@@ -7,7 +7,6 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/tkw1536/pkglib/minify"
-	"github.com/tkw1536/pkglib/timex"
 )
 
 const HTMLFlushInterval = time.Second / 10
@@ -22,39 +21,17 @@ func WriteHTML[T any](result T, err error, template *template.Template, template
 		}
 	}()
 
-	// create a synced response writer
-	sw := &SyncedResponseWriter{ResponseWriter: w}
-
-	done := make(chan struct{})
-	defer close(done)
-
-	// and regularly flush it until the end of the function
-	go func() {
-		timer := timex.NewTimer()
-		defer timex.ReleaseTimer(timer)
-
-		for {
-			timer.Reset(HTMLFlushInterval)
-			select {
-			case <-timer.C:
-				sw.Flush()
-			case <-done:
-				return
-			}
-		}
-	}()
-
 	// intercept any errors
-	if HTMLInterceptor.Intercept(sw, r, err) {
+	if HTMLInterceptor.Intercept(w, r, err) {
 		return nil
 	}
 
 	// write out the response as html
-	sw.Header().Set("Content-Type", "text/html")
-	sw.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
 
 	// minify html!
-	minifier := minify.Minify("text/html", sw)
+	minifier := minify.Minify("text/html", w)
 	defer minifier.Close()
 
 	// and return the template
