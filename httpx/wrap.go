@@ -5,10 +5,39 @@ import (
 	"net/http"
 )
 
-// WithContextWrapper generates a new handler that wraps the context of each request with the wrapper function.
-func WithContextWrapper(handler http.Handler, wrapper func(context.Context) context.Context) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r = r.WithContext(wrapper(r.Context()))
-		handler.ServeHTTP(w, r)
-	})
+// WithContextWrapper creates a new ContextHandler, wrapping handler and replacing the context using f.
+// If f is nil, or returns a nil context, the incoming request is forwarded as is.
+func WithContextWrapper(handler http.Handler, f func(context.Context) context.Context) ContextHandler {
+	// NOTE(twiesing): This function is untested, because ContextHandler is tested.
+	replacer := func(r *http.Request) context.Context { return f(r.Context()) }
+	if f == nil {
+		replacer = nil
+	}
+
+	return ContextHandler{
+		Handler:  handler,
+		Replacer: replacer,
+	}
+}
+
+// ContextHandler wraps Handler, replacing every context using the replacer function.
+type ContextHandler struct {
+	// Handler is the handler this ContextHandler wraps.
+	Handler http.Handler
+
+	// Replacer is called to replace the context of any incoming request.
+	// If Replacer is nil, or returns a nil context, the context of the incoming request is left unchanged.
+	Replacer func(*http.Request) context.Context
+}
+
+// ServeHTTP modifies the context of an incoming request, and passes it to Handler.
+func (ch ContextHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if ch.Replacer != nil {
+		ctx := ch.Replacer(r)
+		if ctx != nil {
+			r = r.WithContext(ctx)
+		}
+	}
+
+	ch.Handler.ServeHTTP(w, r)
 }
