@@ -30,7 +30,7 @@ func ExampleDoesPanic_nil() {
 // DoesPanic behavior for a function that does not panic
 func ExampleDoesPanic_normal() {
 	didPanic, _ := DoesPanic(func() {
-		/* do something */
+		/* do nothing */
 	})
 	fmt.Printf("didPanic = %t\n", didPanic)
 	// Output: didPanic = false
