@@ -52,9 +52,11 @@ func Filter[T any, S ~[]T](slice S, filter func(T) bool) S {
 
 	// we need to zero out other entries
 	// so that they can be picked up by gc!
-	var zero T
-	for i := len(results); i < len(slice); i++ {
-		slice[i] = zero
+	if len(results) < len(slice) {
+		var zero T
+		for i := len(results); i < len(slice); i++ {
+			slice[i] = zero
+		}
 	}
 
 	return results
@@ -154,9 +156,11 @@ func NonSequential[T constraints.Ordered, S ~[]T](slice S, test func(prev, curre
 
 	// we need to zero out other entries
 	// so that they can be picked up by the GC
-	var zero T
-	for i := len(results); i < len(slice); i++ {
-		slice[i] = zero
+	if len(results) < len(slice) {
+		var zero T
+		for i := len(results); i < len(slice); i++ {
+			slice[i] = zero
+		}
 	}
 
 	return results
