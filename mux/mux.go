@@ -4,6 +4,7 @@ package mux
 import (
 	"context"
 	"net/http"
+	"runtime/debug"
 )
 
 // TODO: TESTME
@@ -19,8 +20,10 @@ type Mux[C any] struct {
 	// When context is nil, the zero value of type C is added as a context.
 	Context func(r *http.Request) C
 
-	// Panic, if non-nil, is called when a panic occurs in any step of the response process
-	Panic func(panic any, w http.ResponseWriter, r *http.Request)
+	// Panic, if non-nil, is called when a panic occurs in any step of the response process.
+	// Additionally the stack trace right after recover is provided.
+	// When Panic is nil, no recover is performed.
+	Panic func(panic any, stack []byte, w http.ResponseWriter, r *http.Request)
 
 	// NotFound is called when a specific path cannot be associated to a handler.
 	NotFound http.Handler
@@ -133,23 +136,19 @@ func (mux *Mux[T]) Match(r *http.Request) (http.Handler, bool) {
 func (mux *Mux[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// handle panics with the panic handler
 	defer func() {
+		// if there is no panic handler, don't do anything
+		if mux == nil || mux.Panic == nil {
+			return
+		}
+
+		// try to recover
 		caught := recover()
 		if caught == nil {
 			return
 		}
 
-		if mux == nil || mux.Panic == nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		// silently ignore any panic()s in the panic handler
-		defer func() {
-			recover()
-		}()
-
 		// call the panic handler
-		mux.Panic(caught, w, r)
+		mux.Panic(caught, debug.Stack(), w, r)
 	}()
 
 	// prepare the request
