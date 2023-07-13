@@ -74,6 +74,9 @@ func (h *WebSocket) serveFallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *WebSocket) serveWebsocket(w http.ResponseWriter, r *http.Request) {
+	// clone the incoming request (to avoid having duplicate connection state)
+	r2 := r.Clone(r.Context())
+
 	// upgrade the connection or bail out!
 	conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -82,7 +85,7 @@ func (h *WebSocket) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 	// get a new socket from the pool
 	socket := h.makePoolSocket()
-	socket.Serve(h.Context, h.Limits, conn, h.Handler)
+	socket.Serve(h.Context, h.Limits, r2, conn, h.Handler)
 
 	// return a reset socket to the pool
 	socket.reset()
@@ -93,6 +96,12 @@ func (h *WebSocket) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 type WebSocketConnection interface {
 	// Context returns a context that is closed once the connection is terminated.
 	Context() context.Context
+
+	// Request returns a clone of the original request used for upgrading the connection.
+	// It can be used to e.g. check for authentication.
+	//
+	// Multiple calls to Request may return the same Request.
+	Request() *http.Request
 
 	// Read returns a channel that receives message.
 	// The channel is closed if no more messages are available (for instance because the server closed).
@@ -123,6 +132,7 @@ type outWebSocketMessage struct {
 
 // webSocketConn implements [WebSocketConnection]
 type webSocketConn struct {
+	r      *http.Request   // underlying http request
 	conn   *websocket.Conn // underlying connection
 	limits WebSocketLimits
 
@@ -137,8 +147,10 @@ type webSocketConn struct {
 }
 
 // Serve serves the provided connection
-func (h *webSocketConn) Serve(ctx context.Context, limits WebSocketLimits, conn *websocket.Conn, handler func(ws WebSocketConnection)) {
+// r is the original request that has been passed
+func (h *webSocketConn) Serve(ctx context.Context, limits WebSocketLimits, r *http.Request, conn *websocket.Conn, handler func(ws WebSocketConnection)) {
 	// use the connection!
+	h.r = r
 	h.conn = conn
 
 	// setup limits
@@ -181,7 +193,14 @@ func (h *webSocketConn) handle(handler func(ws WebSocketConnection)) {
 	handler(h)
 }
 
+func (h *webSocketConn) Request() *http.Request {
+	return h.r
+}
+
 func (h *webSocketConn) sendMessages() {
+	// turn on write compression!
+	h.conn.EnableWriteCompression(true)
+
 	h.outgoing = make(chan outWebSocketMessage)
 
 	go func() {
@@ -309,6 +328,7 @@ func (h *webSocketConn) Close() {
 // reset resets this websocket
 func (h *webSocketConn) reset() {
 	h.limits = WebSocketLimits{}
+	h.r = nil
 	h.conn = nil
 	h.incoming = nil
 	h.outgoing = nil
