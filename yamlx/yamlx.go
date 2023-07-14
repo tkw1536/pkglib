@@ -158,6 +158,15 @@ func Replace(node *yaml.Node, replacement yaml.Node, path ...string) error {
 	return nil
 }
 
+// ReplaceWith is like Replace, except that the replacement is first marshalled to yaml.
+func ReplaceWith(node *yaml.Node, replacement any, path ...string) error {
+	mNode, err := Marshal(replacement)
+	if err != nil {
+		return err
+	}
+	return Replace(node, *mNode, path...)
+}
+
 // Apply applies a replacement to a node.
 //
 // If the node is nil, it is not replaced.
