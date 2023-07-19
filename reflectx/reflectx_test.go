@@ -179,7 +179,7 @@ func (c counter) AsInt() int {
 	return c.Value
 }
 
-func ExampleMakePointerCopy_pointer() {
+func ExampleCopyInterface_pointer() {
 	// Inc is an interface that increments
 	type Inc interface {
 		Inc()
@@ -189,7 +189,7 @@ func ExampleMakePointerCopy_pointer() {
 	original := Inc(&counter{Value: 0})
 
 	// make a copy and increment the copy
-	copy, _ := MakePointerCopy(original)
+	copy, _ := CopyInterface(original)
 	copy.Inc()
 
 	// print the value of the original counter and the copy
@@ -201,7 +201,7 @@ func ExampleMakePointerCopy_pointer() {
 	// copy of counter &{1}
 }
 
-func ExampleMakePointerCopy_lift() {
+func ExampleCopyInterface_lift() {
 
 	// AsInt is an interface that returns an integer value
 	type AsInt interface {
@@ -212,7 +212,7 @@ func ExampleMakePointerCopy_lift() {
 	original := AsInt(counter{Value: 0})
 
 	// make a copy and increment the copy
-	copy, _ := MakePointerCopy(original)
+	copy, _ := CopyInterface(original)
 	copy.(interface{ Inc() }).Inc()
 
 	// print the original value and the new value
@@ -222,42 +222,4 @@ func ExampleMakePointerCopy_lift() {
 
 	// Output: original counter {0}
 	// copy of counter &{1}
-}
-
-func ExampleCopy() {
-	// counter is a struct holding a single number
-
-	// copying a data structure directly
-	func() {
-		original := counter{Value: 0}
-		copy := Copy(original, false)
-		copy.Value++
-		fmt.Println("original data", original)
-		fmt.Println("copy of data", copy)
-	}()
-
-	// copy a pointed value, which copies only the pointer
-	func() {
-		original := &counter{Value: 0}
-		copy := Copy(original, false)
-		copy.Value++
-		fmt.Println("original pointer", original)
-		fmt.Println("copy of pointer", copy)
-	}()
-
-	// copy a pointed value with element which copies the data
-	func() {
-		original := &counter{Value: 0}
-		copy := Copy(original, true)
-		copy.Value++
-		fmt.Println("original pointer", original)
-		fmt.Println("copied data", copy)
-	}()
-
-	// Output: original data {0}
-	// copy of data {1}
-	// original pointer &{1}
-	// copy of pointer &{1}
-	// original pointer &{0}
-	// copied data &{1}
 }

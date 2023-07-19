@@ -14,65 +14,41 @@ func MakeType[T any]() reflect.Type {
 	return reflect.TypeOf((*T)(nil)).Elem()
 }
 
-// TypeOf is a legacy alias of MakeType
+// CopyInterface returns a new copy of the interface value I.
+// I must be an interface type.
 //
-// Deprecated: Use MakeType instead.
-func TypeOf[T any]() reflect.Type {
-	return MakeType[T]()
-}
+// value is a copy of value, mutable indicates if the value is mutable, i.e. if it is backed by a pointer type.
+//
+// If value is backed by a pointer type, the pointed-to-value is copied, and a pointer to that copy and the boolean true is returned.
+// If the value is not backed by a non-pointer type C, and *C implements I, then a pointer to the copy of the underlying value, along with the boolean true, is returned.
+// Otherwise, a simple copy, and the boolean false, is returned.
+func CopyInterface[I any](value I) (ptr I, mutable bool) {
 
-// MakePointerCopy returns a new copy of value of interface type I that is backed by a pointer (if possible).
-// ptr holds the new copy, ok indicates if the value is indeed a pointer.
-func MakePointerCopy[I any](value I) (ptr I, ok bool) {
-	iType := MakeType[I]()
-	if iType.Kind() != reflect.Interface {
-		panic("MakePointer: I must be an interface type")
+	// ensure that we are dealing with an interface
+	iTyp := MakeType[I]()
+	if iTyp.Kind() != reflect.Interface {
+		panic("CopyInterface: I must be an interface type")
 	}
 
-	// get concrete type and value
-	rValue := reflect.ValueOf(value)
-	rTyp := rValue.Type()
+	// get C, the concrete type backing value
+	cTyp := reflect.TypeOf(value)
 
-	// check that the target type implements type
-	tTyp := reflect.PointerTo(rTyp)
-	if !tTyp.Implements(iType) {
-		return Copy(value, true), rTyp.Kind() == reflect.Pointer
+	// case 1: we have a pointer => copy the underlying value
+	if cTyp.Kind() == reflect.Pointer {
+		copy := reflect.New(cTyp.Elem())
+		copy.Elem().Set(reflect.ValueOf(value).Elem())
+		return copy.Interface().(I), true
 	}
 
-	// easy case: we can address the value
-	if rValue.CanAddr() {
-		return rValue.Addr().Interface().(I), true // ok because of implements test above!
+	// case 2: *C implements I => return a pointer to the copy
+	if reflect.PointerTo(cTyp).Implements(iTyp) {
+		copy := reflect.New(cTyp)
+		copy.Elem().Set(reflect.ValueOf(value))
+		return copy.Interface().(I), true
 	}
 
-	// create a new copy of value
-	copy := reflect.New(rTyp)
-	copy.Elem().Set(rValue)
-
-	// safe because above
-	return copy.Interface().(I), true
-}
-
-// Copy returns a copy of value.
-// When copyElem is true, and value is of kind pointer, returns a pointer to a copy of the pointed to value.
-func Copy[T any](value T, copyElem bool) T {
-	rValue := reflect.ValueOf(value)
-	rTyp := rValue.Type()
-
-	// copy the underlying element if requested
-	if copyElem && rTyp.Kind() == reflect.Pointer {
-		eValue := rValue.Elem()
-		eTyp := eValue.Type()
-
-		copy := reflect.New(eTyp)
-		copy.Elem().Set(eValue)
-
-		return copy.Interface().(T)
-	}
-
-	// make a copy
-	copy := reflect.New(rTyp)
-	copy.Elem().Set(rValue)
-	return copy.Elem().Interface().(T)
+	// case 3: *C does not implement I => fallback
+	return value, false
 }
 
 // IterateFields iterates over the struct fields of T and calls f for each field.
@@ -90,7 +66,7 @@ func Copy[T any](value T, copyElem bool) T {
 // See also IterateFields.
 func IterateFields(T reflect.Type, f func(field reflect.StructField, index int) (stop bool)) (cancelled bool) {
 	if T.Kind() != reflect.Struct {
-		panic("IterateFields: tp is not a Struct")
+		panic("IterateFields: T is not a Struct")
 	}
 
 	return iterateFields(false, nil, T, func(field reflect.StructField, index ...int) (stop bool) {
