@@ -39,7 +39,7 @@ type Lifetime[Component any, InitParams any] struct {
 //
 // Only groups not referenced during initialization need to be registered explicitly.
 func RegisterGroup[Group any, Component any, InitParams any](p *Lifetime[Component, InitParams]) {
-	p.extraGroups = append(p.extraGroups, reflectx.MakeType[Group]())
+	p.extraGroups = append(p.extraGroups, reflectx.TypeFor[Group]())
 }
 
 // All initializes or returns all components stored in this initializes.

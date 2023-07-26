@@ -7,10 +7,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// MakeType returns the reflection Type that represents T.
-//
-// Unlike reflect.TypeOf, this method does not require instantiating T.
-func MakeType[T any]() reflect.Type {
+// TypeFor returns the reflection Type that represents the static type of T.
+func TypeFor[T any]() reflect.Type {
 	return reflect.TypeOf((*T)(nil)).Elem()
 }
 
@@ -25,7 +23,7 @@ func MakeType[T any]() reflect.Type {
 func CopyInterface[I any](value I) (ptr I, mutable bool) {
 
 	// ensure that we are dealing with an interface
-	iTyp := MakeType[I]()
+	iTyp := TypeFor[I]()
 	if iTyp.Kind() != reflect.Interface {
 		panic("CopyInterface: I must be an interface type")
 	}

@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestMakeType(t *testing.T) {
+func TestTypeFor(t *testing.T) {
 	tests := []struct {
 		name string
 		got  reflect.Type
@@ -15,47 +15,47 @@ func TestMakeType(t *testing.T) {
 	}{
 		{
 			"string",
-			MakeType[string](),
+			TypeFor[string](),
 			reflect.TypeOf(string("")),
 		},
 		{
 			"int",
-			MakeType[int](),
+			TypeFor[int](),
 			reflect.TypeOf(int(0)),
 		},
 		{
 			"slice",
-			MakeType[[]string](),
+			TypeFor[[]string](),
 			reflect.TypeOf([]string(nil)),
 		},
 		{
 			"array",
-			MakeType[[0]string](),
+			TypeFor[[0]string](),
 			reflect.TypeOf([0]string{}),
 		},
 		{
 			"chan",
-			MakeType[chan string](),
+			TypeFor[chan string](),
 			reflect.TypeOf((chan string)(nil)),
 		},
 		{
 			"func",
-			MakeType[func(string) string](),
+			TypeFor[func(string) string](),
 			reflect.TypeOf(func(string) string { return "" }),
 		},
 		{
 			"map",
-			MakeType[map[string]string](),
+			TypeFor[map[string]string](),
 			reflect.TypeOf(map[string]string(nil)),
 		},
 		{
 			"struct",
-			MakeType[struct{ Thing string }](),
+			TypeFor[struct{ Thing string }](),
 			reflect.TypeOf(struct{ Thing string }{}),
 		},
 		{
 			"pointer",
-			MakeType[*struct{ Thing string }](),
+			TypeFor[*struct{ Thing string }](),
 			reflect.TypeOf(&struct{ Thing string }{}),
 		},
 	}
@@ -88,7 +88,7 @@ func ExampleIterateFields() {
 
 	fmt.Println(
 		"returned:",
-		IterateFields(MakeType[SomeStruct](), func(f reflect.StructField, index int) (stop bool) {
+		IterateFields(TypeFor[SomeStruct](), func(f reflect.StructField, index int) (stop bool) {
 			fmt.Println("encountered field", f.Name, "with index", index)
 			return false // do not stop
 		}),
@@ -121,7 +121,7 @@ func ExampleIterateAllFields() {
 
 	fmt.Println(
 		"returned:",
-		IterateAllFields(MakeType[SomeStruct](), func(f reflect.StructField, index ...int) (stop bool) {
+		IterateAllFields(TypeFor[SomeStruct](), func(f reflect.StructField, index ...int) (stop bool) {
 			fmt.Println("encountered field", f.Name, "with index", index)
 			return false // do not stop
 		}),
@@ -154,7 +154,7 @@ func ExampleIterateAllFields_cancel() {
 
 	fmt.Println(
 		"returned:",
-		IterateAllFields(MakeType[SomeStruct](), func(f reflect.StructField, index ...int) (cancel bool) {
+		IterateAllFields(TypeFor[SomeStruct](), func(f reflect.StructField, index ...int) (cancel bool) {
 			fmt.Println("encountered field", f.Name, "with index", index)
 			return f.Name == "EmbeddedField" // cancel on embedded field
 		}),
