@@ -59,10 +59,6 @@ func (trigger *Trigger) Unlock() {
 		trigger.s.Lock()
 		defer trigger.s.Unlock()
 
-		if trigger.counter == 0 {
-			panic("Trigger.Unlock: Too many unlock calls")
-		}
-
 		trigger.counter--
 		if trigger.counter == 0 && trigger.OnRelease != nil {
 			trigger.OnRelease(false)
