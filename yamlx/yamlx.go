@@ -3,8 +3,9 @@ package yamlx
 import (
 	"fmt"
 
+	"slices"
+
 	"github.com/tkw1536/pkglib/iterator"
-	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
 

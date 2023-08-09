@@ -6,7 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 type Thing uint64

@@ -4,6 +4,7 @@ package status
 import (
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"sync"
 	"sync/atomic"
@@ -13,7 +14,6 @@ import (
 	"github.com/tkw1536/pkglib/nobufio"
 	"github.com/tkw1536/pkglib/noop"
 	"github.com/tkw1536/pkglib/stream"
-	"golang.org/x/exp/maps"
 )
 
 // Status represents an interactive status display that can write to multiple lines at once.

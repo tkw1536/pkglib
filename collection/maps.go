@@ -1,15 +1,19 @@
 package collection
 
 import (
-	"golang.org/x/exp/constraints"
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
+	"cmp"
+	"slices"
 )
 
 // IterateSorted iterates over the the map, calling f for each element.
 // Iteration is performed in ascending order of the keys.
-func IterateSorted[K constraints.Ordered, V any](M map[K]V, f func(k K, v V)) {
-	keys := maps.Keys(M)
+func IterateSorted[K cmp.Ordered, V any](M map[K]V, f func(k K, v V)) {
+	// get the keys of the map
+	// and then sort them
+	keys := make([]K, 0, len(M))
+	for k := range M {
+		keys = append(keys, k)
+	}
 	slices.Sort(keys)
 
 	for _, key := range keys {

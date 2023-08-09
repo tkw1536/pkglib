@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 type ValidationResult struct {

@@ -3,8 +3,7 @@ package reflectx
 
 import (
 	"reflect"
-
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 // TypeFor returns the reflection Type that represents the static type of T.

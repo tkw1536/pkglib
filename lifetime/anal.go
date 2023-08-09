@@ -2,9 +2,9 @@ package lifetime
 
 import (
 	"reflect"
+	"slices"
 
 	"github.com/tkw1536/pkglib/collection"
-	"golang.org/x/exp/slices"
 )
 
 type Analytics struct {
@@ -78,7 +78,7 @@ func (context *InjectorContext[Component]) anal(anal *Analytics, groups []reflec
 		})
 	}
 
-	// and analyze all ifaces
+	// and analyze all interfaces
 	for _, iface := range ifaces {
 		name := nameOf(iface)
 		if _, ok := anal.Groups[name]; ok {

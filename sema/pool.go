@@ -3,8 +3,9 @@ package sema
 import (
 	"sync"
 
+	"slices"
+
 	"github.com/tkw1536/pkglib/lazy"
-	"golang.org/x/exp/slices"
 )
 
 // Pool holds a finite set of lazily created objects.

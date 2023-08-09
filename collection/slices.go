@@ -1,8 +1,9 @@
 package collection
 
 import (
-	"golang.org/x/exp/constraints"
-	"golang.org/x/exp/slices"
+	"slices"
+
+	"cmp"
 )
 
 // First returns the first value in slice for which test returns true.
@@ -135,7 +136,7 @@ func Partition[T any, S ~[]T, P comparable](slice S, f func(T) P) map[P]S {
 
 // NonSequential sorts slice, and then removes sequential elements for which test() returns true.
 // NonSequential does not re-allocate, but uses the existing slice.
-func NonSequential[T constraints.Ordered, S ~[]T](slice S, test func(prev, current T) bool) S {
+func NonSequential[T cmp.Ordered, S ~[]T](slice S, test func(prev, current T) bool) S {
 	// if there is at most one element, then we can return the slice as is
 	if len(slice) < 2 {
 		return slice
