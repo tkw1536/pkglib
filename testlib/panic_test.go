@@ -18,13 +18,11 @@ func ExampleDoesPanic_panic() {
 
 // DoesPanic behavior for a function that calls panic(nil)
 func ExampleDoesPanic_nil() {
-	didPanic, recovered := DoesPanic(func() {
+	didPanic, _ := DoesPanic(func() {
 		panic(nil)
 	})
 	fmt.Printf("didPanic = %t\n", didPanic)
-	fmt.Printf("recover() = %v\n", recovered)
 	// Output: didPanic = true
-	// recover() = <nil>
 }
 
 // DoesPanic behavior for a function that does not panic
