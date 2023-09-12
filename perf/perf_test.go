@@ -90,7 +90,7 @@ func TestSnapshot_String(t *testing.T) {
 		fields fields
 		want   string
 	}{
-		{"default", fields{Time: time.Unix(0, 0), Bytes: 1024, Objects: 13}, "1.0 kB (13 objects) used at Jan  1 01:00:00"},
+		{"default", fields{Time: time.Unix(0, 0), Bytes: 1024, Objects: 13}, "1.0 kB (13 objects) used at Jan  1 00:00:00"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -178,13 +178,13 @@ func TestDiff_BytesString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			snapshot := perf.Diff{
+			diff := perf.Diff{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
 				Objects: tt.fields.Objects,
 			}
-			if got := snapshot.BytesString(); got != tt.want {
-				t.Errorf("Snapshot.BytesString() = %v, want %v", got, tt.want)
+			if got := diff.BytesString(); got != tt.want {
+				t.Errorf("Diff.BytesString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -209,13 +209,13 @@ func TestDiff_ObjectsString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			snapshot := perf.Diff{
+			diff := perf.Diff{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
 				Objects: tt.fields.Objects,
 			}
-			if got := snapshot.ObjectsString(); got != tt.want {
-				t.Errorf("Snapshot.ObjectsString() = %v, want %v", got, tt.want)
+			if got := diff.ObjectsString(); got != tt.want {
+				t.Errorf("Diff.ObjectsString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -236,12 +236,12 @@ func TestDiff_String(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			snapshot := perf.Diff{
+			diff := perf.Diff{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
 				Objects: tt.fields.Objects,
 			}
-			if got := snapshot.String(); got != tt.want {
+			if got := diff.String(); got != tt.want {
 				t.Errorf("Diff.String() = %v, want %v", got, tt.want)
 			}
 		})

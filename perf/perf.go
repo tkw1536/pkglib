@@ -43,7 +43,7 @@ func (snapshot Snapshot) ObjectsString() string {
 }
 
 func (snapshot Snapshot) String() string {
-	return fmt.Sprintf("%s (%s) used at %s", snapshot.BytesString(), snapshot.ObjectsString(), snapshot.Time.Format(time.Stamp))
+	return fmt.Sprintf("%s (%s) used at %s", snapshot.BytesString(), snapshot.ObjectsString(), snapshot.Time.UTC().Format(time.Stamp))
 }
 
 // Sub subtracts the other snapshot from this snapshot.
