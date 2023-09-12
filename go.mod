@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/Showmax/go-fqdn v1.0.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/feiin/sqlstring v0.3.0
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/websocket v1.5.0
