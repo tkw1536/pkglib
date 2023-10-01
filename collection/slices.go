@@ -53,12 +53,7 @@ func Filter[T any, S ~[]T](slice S, filter func(T) bool) S {
 
 	// we need to zero out other entries
 	// so that they can be picked up by gc!
-	if len(results) < len(slice) {
-		var zero T
-		for i := len(results); i < len(slice); i++ {
-			slice[i] = zero
-		}
-	}
+	clear(slice[len(results):])
 
 	return results
 }
@@ -157,12 +152,7 @@ func NonSequential[T cmp.Ordered, S ~[]T](slice S, test func(prev, current T) bo
 
 	// we need to zero out other entries
 	// so that they can be picked up by the GC
-	if len(results) < len(slice) {
-		var zero T
-		for i := len(results); i < len(slice); i++ {
-			slice[i] = zero
-		}
-	}
+	clear(slice[len(results):])
 
 	return results
 }

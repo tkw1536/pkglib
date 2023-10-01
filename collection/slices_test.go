@@ -116,6 +116,14 @@ func ExampleFilter() {
 	// []string{"hello", "world", "are", "you"}
 }
 
+func ExampleFilter_allTrue() {
+	values := []string{"hello", "world", "how", "are", "you"}
+	valuesF := Filter(values, func(s string) bool { return true })
+	fmt.Printf("%#v\n%#v\n", values, valuesF)
+	// Output: []string{"hello", "world", "how", "are", "you"}
+	// []string{"hello", "world", "how", "are", "you"}
+}
+
 func ExampleFilterClone() {
 	values := []string{"hello", "world", "how", "are", "you"}
 	valuesF := FilterClone(values, func(s string) bool {
