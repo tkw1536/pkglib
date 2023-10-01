@@ -4,7 +4,7 @@ import "os"
 
 // FromNil creates a new IOStream that silences all output and provides no input.
 func FromNil() IOStream {
-	return NewIOStream(nil, nil, nil, 0)
+	return NewIOStream(nil, nil, nil)
 }
 
 // FromEnv creates a new IOStream using the environment.
@@ -15,6 +15,5 @@ func FromEnv() IOStream {
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
-		wrap:   ioDefaultWrap,
 	}
 }

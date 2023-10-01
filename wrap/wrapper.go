@@ -12,6 +12,8 @@ import (
 var newLine = []byte("\n")
 
 // Wrapper provides methods to write hard-wrapped lines to Writer.
+//
+// Deprecated: Do not use package wrap.
 type Wrapper struct {
 	Writer io.Writer
 	Length int
