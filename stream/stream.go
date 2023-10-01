@@ -61,9 +61,6 @@ func (str IOStream) EPrintln(args ...interface{}) (n int, err error) {
 
 // NewIOStream creates a new IOStream with the provided readers and writers.
 // If any of them are set to nil, they are set to Null.
-// When wrap is set to 0, it is set to a reasonable default.
-//
-// It furthermore wraps output as set by wrap.
 func NewIOStream(Stdout, Stderr io.Writer, Stdin io.Reader) IOStream {
 	if Stdout == nil {
 		Stdout = Null
@@ -88,7 +85,7 @@ func NonInteractive(Writer io.Writer) IOStream {
 	return NewIOStream(Writer, Writer, nil).NonInteractive()
 }
 
-// Streams creates a new IOStream with the provided streams and wrap.
+// Streams creates a new IOStream with the provided streams.
 // If any parameter is the zero value, copies the values from str.
 func (str IOStream) Streams(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
 	if Stdout == nil {
