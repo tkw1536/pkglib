@@ -7,10 +7,9 @@ import (
 // Lazy holds a lazily initialized value of T.
 // A non-zero lazy must not be copied after first use.
 type Lazy[T any] struct {
-	once sync.Once
-
-	m     sync.RWMutex // m protects setting the value of this T
-	value T            // the stored value
+	m     sync.Mutex // m protects the value of this lazy
+	done  bool       // is a value stored?
+	value T          // the held value
 }
 
 // Get returns the value associated with this Lazy.
@@ -24,15 +23,22 @@ type Lazy[T any] struct {
 //
 // Get may safely be called concurrently.
 func (lazy *Lazy[T]) Get(init func() T) T {
-	lazy.m.RLock()
-	defer lazy.m.RUnlock()
+	if lazy == nil {
+		panic("attempt to access (*Lazy[...])(nil)")
+	}
 
-	lazy.once.Do(func() {
+	lazy.m.Lock()
+	defer lazy.m.Unlock()
+
+	// value is not yet initialized
+	if !lazy.done {
+		lazy.done = true
 		if init != nil {
 			lazy.value = init()
 		}
-	})
+	}
 
+	// and return the value!
 	return lazy.value
 }
 
@@ -42,9 +48,14 @@ func (lazy *Lazy[T]) Get(init func() T) T {
 //
 // It may be called concurrently with calls to [Get].
 func (lazy *Lazy[T]) Set(value T) {
+	if lazy == nil {
+		panic("attempt to access (*Lazy[...])(nil)")
+	}
+
 	lazy.m.Lock()
 	defer lazy.m.Unlock()
 
+	// we store the value now!
+	lazy.done = true
 	lazy.value = value
-	lazy.once.Do(func() {})
 }
