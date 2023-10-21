@@ -110,3 +110,20 @@ func iterateFields(embeds bool, index []int, T reflect.Type, f func(field reflec
 	}
 	return false
 }
+
+// NameOf returns the fully qualified name for T.
+//
+// A fully qualified name consists of the package path, followed by a ".", followed by the type name.
+// Builtin types have the empty package path.
+// Types that are not named, return the empty string
+func NameOf(T reflect.Type) string {
+	if T == nil {
+		return ""
+	}
+
+	name := T.Name()
+	if name == "" {
+		return ""
+	}
+	return T.PkgPath() + "." + name
+}

@@ -223,3 +223,59 @@ func ExampleCopyInterface_lift() {
 	// Output: original counter {0}
 	// copy of counter &{1}
 }
+
+type TypeForTesting struct{}
+
+func TestNameOf(t *testing.T) {
+	funcForTesting := func() {}
+
+	tests := []struct {
+		name string
+		T    reflect.Type
+		want string
+	}{
+		{
+			"built-in type",
+			TypeFor[string](),
+			".string",
+		},
+		{
+			"package in standard libary",
+			TypeFor[reflect.Type](),
+			"reflect.Type",
+		},
+		{
+			"type in this library",
+			TypeFor[TypeForTesting](),
+			"github.com/tkw1536/pkglib/reflectx.TypeForTesting",
+		},
+
+		{
+			"non-named type (pointer)",
+			TypeFor[*string](),
+			"",
+		},
+		{
+			"non-named type (slice)",
+			TypeFor[[]string](),
+			"",
+		},
+		{
+			"non-named type (map)",
+			TypeFor[map[string]string](),
+			"",
+		},
+		{
+			"non-named type (local function)",
+			reflect.TypeOf(funcForTesting),
+			"",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NameOf(tt.T); got != tt.want {
+				t.Errorf("NameOf() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
