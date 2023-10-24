@@ -1,6 +1,8 @@
 // Package reflectx provides extensions to the reflect package
 package reflectx
 
+// spellchecker:words reflectx
+
 import (
 	"reflect"
 	"slices"
