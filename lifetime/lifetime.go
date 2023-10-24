@@ -1,16 +1,16 @@
-// Package lifetime implements a dependency injection frameworks.
+// Package lifetime provides a dependency injection framework n the form of a lifetime.
 package lifetime
 
 import (
 	"reflect"
 
 	"github.com/tkw1536/pkglib/lazy"
+	"github.com/tkw1536/pkglib/lifetime/interal/meta"
 	"github.com/tkw1536/pkglib/reflectx"
 )
 
-// TESTME
-
-// Lifetime represents a set of lazily initialize and potentially mutually referencing Component instances.
+// Lifetime implements a dependency injection framework.
+// For usage of a lifetime
 // Each type of component is treated as a singleton for purposes of this lifetime.
 //
 // Component must be an interface type, that should be implemented by various pointers to structs.
@@ -32,6 +32,7 @@ type Lifetime[Component any, InitParams any] struct {
 	Analytics   Analytics
 	extraGroups []reflect.Type
 
+	// all holds the set of initialized components
 	all lazy.Lazy[[]Component]
 }
 
@@ -57,8 +58,7 @@ func (p *Lifetime[Component, InitParams]) All(Params InitParams, All func(contex
 				}
 				return p.Init(c, Params)
 			},
-			metaCache: make(map[reflect.Type]meta[Component]),
-			cache:     make(map[string]Component),
+			cache: make(map[string]Component),
 		}
 
 		// and process them all
@@ -76,13 +76,13 @@ type InjectorContext[Component any] struct {
 	init func(Component) Component                             // initializes a new component
 	all  func(context *InjectorContext[Component]) []Component // initializes all components
 
-	metaCache map[reflect.Type]meta[Component]
+	metaCache meta.Cache[Component]
 	cache     map[string]Component     // cached components
 	queue     []delayedInit[Component] // init queue
 }
 
 type delayedInit[Component any] struct {
-	meta  meta[Component]
+	meta  meta.Datum[Component]
 	value reflect.Value
 }
 
@@ -122,7 +122,7 @@ func (di *delayedInit[Component]) Run(all []Component) {
 // The init function may be nil, indicating that no additional initialization is required.
 func Make[Component any, ConcreteComponent any](context *InjectorContext[Component], init func(component ConcreteComponent)) ConcreteComponent {
 	// get a description of the type
-	cd := getMeta[Component, ConcreteComponent](context.metaCache)
+	cd := context.metaCache.Get(reflectx.TypeFor[ConcreteComponent]())
 
 	// if an instance already exists, return it!
 	if instance, ok := context.cache[cd.Name]; ok {

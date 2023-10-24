@@ -1,4 +1,4 @@
-package lifetime
+package meta
 
 import (
 	"reflect"
@@ -7,26 +7,8 @@ import (
 	"github.com/tkw1536/pkglib/reflectx"
 )
 
-// getMeta gets the component belonging to a component type
-func getMeta[Component any, ConcreteComponent any](cache map[reflect.Type]meta[Component]) meta[Component] {
-	tp := reflectx.TypeFor[ConcreteComponent]()
-
-	// we already have a m => return it
-	if m, ok := cache[tp]; ok {
-		return m
-	}
-
-	// create a new m
-	var m meta[Component]
-	m.init(tp)
-
-	// store it in the cache
-	cache[tp] = m
-	return m
-}
-
-// meta stores meta-information about a specific component
-type meta[Component any] struct {
+// Datum holds information about a specific component.
+type Datum[Component any] struct {
 	Name string       // the type name of this component
 	Elem reflect.Type // the element type of the component
 
@@ -37,16 +19,14 @@ type meta[Component any] struct {
 	DIFields map[string]reflect.Type // fields []I where I is an interface inside auto field that implements component
 }
 
-// init initializes this meta
-func (m *meta[Component]) init(tp reflect.Type) {
-	var component = reflectx.TypeFor[Component]()
-
-	if tp.Kind() != reflect.Pointer && tp.Elem().Kind() != reflect.Struct {
-		panic("GetMeta: Type (" + tp.String() + ") must be backed by a pointer to slice")
+// newDatum creates a new datum by scanning for all relevant fields
+func newDatum[Component any](component reflect.Type, concrete reflect.Type) (m Datum[Component]) {
+	if concrete.Kind() != reflect.Pointer && concrete.Elem().Kind() != reflect.Struct {
+		panic("newDatum: Type (" + concrete.String() + ") must be backed by a pointer to slice")
 	}
 
-	m.Elem = tp.Elem()
-	m.Name = nameOf(m.Elem)
+	m.Elem = concrete.Elem()
+	m.Name = reflectx.NameOf(m.Elem)
 
 	m.CFields = make(map[string]reflect.Type)
 	m.IFields = make(map[string]reflect.Type)
@@ -59,13 +39,15 @@ func (m *meta[Component]) init(tp reflect.Type) {
 	}
 
 	if dependenciesField.Type.Kind() != reflect.Struct {
-		panic("GetMeta: " + dependencies + " field (" + m.Name + ") is not a struct")
+		panic("newDatum: " + dependencies + " field (" + m.Name + ") is not a struct")
 	}
 
 	// and initialize the type map of the given map
 	m.DCFields = make(map[string]reflect.Type)
 	m.DIFields = make(map[string]reflect.Type)
 	scanForFields(component, m.Name, dependenciesField.Type, true, m.DCFields, m.DIFields)
+
+	return
 }
 
 // scanForFields scans the struct type for fields of component-like fields.
@@ -80,45 +62,33 @@ func scanForFields(component reflect.Type, elem string, structType reflect.Type,
 			continue
 		}
 		if !field.IsExported() {
-			panic("GetMeta: " + dependencies + " field (" + elem + ") contains field (" + field.Name + ") which is not exported")
+			panic("newDatum: " + dependencies + " field (" + elem + ") contains field (" + field.Name + ") which is not exported")
 		}
 		if inDependenciesStruct && field.Tag != "" {
-			panic("GetMeta: " + dependencies + " field (" + elem + ") contains field (" + field.Name + ") with tag")
+			panic("newDatum: " + dependencies + " field (" + elem + ") contains field (" + field.Name + ") with tag")
 		}
 
 		tp := field.Type
 		name := field.Name
 
 		switch {
-		case implementsComponent(component, tp):
+		case implementsAsStructPointer(component, tp):
 			cFields[name] = tp
-		case implementsSlice(component, tp):
+		case implementsAsSliceInterface(component, tp):
 			iFields[name] = tp.Elem()
 		case inDependenciesStruct:
-			panic("GetMeta: " + dependencies + " field (" + elem + ") contains non-auto fields")
+			panic("newDatum: " + dependencies + " field (" + elem + ") contains non-auto fields")
 		}
 	}
 }
 
-func implementsComponent(component reflect.Type, tp reflect.Type) bool {
-	return tp.Implements(component) && tp.Kind() == reflect.Pointer && tp.Elem().Kind() == reflect.Struct
-}
-
-func implementsSlice(component reflect.Type, tp reflect.Type) bool {
-	return tp.Kind() == reflect.Slice && tp.Elem().Kind() == reflect.Interface && tp.Elem().Implements(component)
-}
-
-func nameOf(tp reflect.Type) string {
-	return tp.PkgPath() + "." + tp.Name()
-}
-
-// New creates a new ComponentDescription
-func (m meta[Component]) New() Component {
+// New creates a new component of the concrete type this datum describes
+func (m Datum[Component]) New() Component {
 	return reflect.New(m.Elem).Interface().(Component)
 }
 
-// NeedsInitComponent
-func (m meta[Component]) NeedsInitComponent() bool {
+// NeedsInitComponent checks if dependencies need to be injected into this component.
+func (m Datum[Component]) NeedsInitComponent() bool {
 	return len(m.CFields) > 0 || len(m.IFields) > 0 || len(m.DCFields) > 0 || len(m.DIFields) > 0
 }
 
@@ -126,7 +96,7 @@ func (m meta[Component]) NeedsInitComponent() bool {
 const dependencies = "Dependencies"
 
 // InitComponent sets up the fields of the given instance of a component.
-func (m meta[Component]) InitComponent(instance reflect.Value, all []Component) {
+func (m Datum[Component]) InitComponent(instance reflect.Value, all []Component) {
 	elem := instance.Elem()
 	dependenciesElem := elem.FieldByName(dependencies)
 
@@ -137,7 +107,7 @@ func (m meta[Component]) InitComponent(instance reflect.Value, all []Component) 
 		})
 
 		field := elem.FieldByName(field)
-		field.Set(reflect.ValueOf(c))
+		unsafeSetAnyValue(field, reflect.ValueOf(c))
 	}
 	for field, eType := range m.DCFields {
 		c := collection.First(all, func(c Component) bool {
@@ -145,36 +115,19 @@ func (m meta[Component]) InitComponent(instance reflect.Value, all []Component) 
 		})
 
 		field := dependenciesElem.FieldByName(field)
-		field.Set(reflect.ValueOf(c))
+		unsafeSetAnyValue(field, reflect.ValueOf(c))
 	}
 
 	// assign the interface subtypes
 	registryR := reflect.ValueOf(all)
 	for field, eType := range m.IFields {
-		cs := filterSubtype(registryR, eType)
+		cs := filterSliceInterface(registryR, eType)
 		field := elem.FieldByName(field)
-		field.Set(cs)
+		unsafeSetAnyValue(field, cs)
 	}
 	for field, eType := range m.DIFields {
-		cs := filterSubtype(registryR, eType)
+		cs := filterSliceInterface(registryR, eType)
 		field := dependenciesElem.FieldByName(field)
-		field.Set(cs)
+		unsafeSetAnyValue(field, cs)
 	}
-
-}
-
-// filterSubtype filters the slice of type []S into a slice of type []iface.
-// S and I must be interface types.
-func filterSubtype(sliceS reflect.Value, iface reflect.Type) reflect.Value {
-	len := sliceS.Len()
-
-	// convert each element
-	result := reflect.MakeSlice(reflect.SliceOf(iface), 0, len)
-	for i := 0; i < len; i++ {
-		element := sliceS.Index(i)
-		if element.Elem().Type().Implements(iface) {
-			result = reflect.Append(result, element.Elem().Convert(iface))
-		}
-	}
-	return result
 }

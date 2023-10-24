@@ -5,6 +5,8 @@ import (
 	"slices"
 
 	"github.com/tkw1536/pkglib/collection"
+	"github.com/tkw1536/pkglib/lifetime/interal/meta"
+	"github.com/tkw1536/pkglib/reflectx"
 )
 
 type Analytics struct {
@@ -33,12 +35,13 @@ type GroupAnalytics struct {
 
 // anal writes analytics about this context to anal
 func (context *InjectorContext[Component]) anal(anal *Analytics, groups []reflect.Type) {
-	anal.Components = make(map[string]*ComponentAnalytics, len(context.metaCache))
+	size := context.metaCache.Size()
+	anal.Components = make(map[string]*ComponentAnalytics, size)
 	anal.Groups = make(map[string]*GroupAnalytics)
 
 	// collect all the pointers, and setup the anal.Components map!
-	tpPointers := make([]reflect.Type, 0, len(context.metaCache))
-	for _, meta := range context.metaCache {
+	tpPointers := make([]reflect.Type, 0, size)
+	context.metaCache.Iterate(func(meta meta.Datum[Component]) {
 		tp := reflect.PointerTo(meta.Elem)
 		tpPointers = append(tpPointers, tp)
 
@@ -52,35 +55,35 @@ func (context *InjectorContext[Component]) anal(anal *Analytics, groups []reflec
 			method := tp.Method(i)
 			anal.Components[meta.Name].Methods[method.Name] = method.Type.String()
 		}
-	}
+	})
 
 	// collect interfaces to analyze
 	ifaces := make([]reflect.Type, len(groups))
 	copy(ifaces, groups)
 
 	// take all of the components out of the cache
-	for _, meta := range context.metaCache {
+	context.metaCache.Iterate(func(meta meta.Datum[Component]) {
 		anal.Components[meta.Name].Type = meta.Name
 		anal.Components[meta.Name].CFields = collection.MapValues(meta.CFields, func(key string, tp reflect.Type) string {
-			return nameOf(tp.Elem())
+			return reflectx.NameOf(tp.Elem())
 		})
 		anal.Components[meta.Name].DCFields = collection.MapValues(meta.DCFields, func(key string, tp reflect.Type) string {
-			return nameOf(tp.Elem())
+			return reflectx.NameOf(tp.Elem())
 		})
 
 		anal.Components[meta.Name].IFields = collection.MapValues(meta.IFields, func(key string, iface reflect.Type) string {
 			ifaces = append(ifaces, iface)
-			return nameOf(iface)
+			return reflectx.NameOf(iface)
 		})
 		anal.Components[meta.Name].DIFields = collection.MapValues(meta.DIFields, func(key string, iface reflect.Type) string {
 			ifaces = append(ifaces, iface)
-			return nameOf(iface)
+			return reflectx.NameOf(iface)
 		})
-	}
+	})
 
 	// and analyze all interfaces
 	for _, iface := range ifaces {
-		name := nameOf(iface)
+		name := reflectx.NameOf(iface)
 		if _, ok := anal.Groups[name]; ok {
 			continue
 		}
@@ -92,7 +95,7 @@ func (context *InjectorContext[Component]) anal(anal *Analytics, groups []reflec
 		anal.Groups[name] = &GroupAnalytics{
 			Type: name,
 			Components: collection.MapSlice(types, func(tp reflect.Type) string {
-				cname := nameOf(tp.Elem())
+				cname := reflectx.NameOf(tp.Elem())
 				anal.Components[cname].Groups = append(anal.Components[cname].Groups, name)
 				return cname
 			}),
