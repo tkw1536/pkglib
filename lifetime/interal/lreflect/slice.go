@@ -94,14 +94,19 @@ func FirstAssignableInterfaceElement(slice reflect.Value, V reflect.Type) (refle
 	return reflect.New(V).Elem(), nil
 }
 
-// CopySlice makes a copy of the provided slice
+// CopySlice makes a copy of the provided slice.
+// When slice is not a slice, the behavior is undefined.
 func CopySlice(slice reflect.Value) reflect.Value {
-	// TODO: Test me
 	if !slice.IsValid() || slice.Kind() != reflect.Slice {
-		panic("slice is not a slice")
+		return reflect.Value{}
 	}
 
-	// make a copy of the given slice
+	// if the passed slice is nil, return a new nil
+	if slice.IsNil() {
+		return reflect.New(slice.Type()).Elem()
+	}
+
+	// create a new slice and copy over the elements
 	copy := reflect.MakeSlice(slice.Type(), slice.Len(), slice.Len())
 	reflect.Copy(copy, slice)
 	return copy
