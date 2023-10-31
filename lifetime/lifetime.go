@@ -2,15 +2,17 @@
 package lifetime
 
 import (
+	"fmt"
 	"reflect"
+	"sync"
 
 	"github.com/tkw1536/pkglib/lazy"
+	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
 	"github.com/tkw1536/pkglib/lifetime/interal/meta"
 	"github.com/tkw1536/pkglib/reflectx"
 )
 
 // Lifetime implements a dependency injection framework.
-// For usage of a lifetime
 // Each type of component is treated as a singleton for purposes of this lifetime.
 //
 // Component must be an interface type, that should be implemented by various pointers to structs.
@@ -18,22 +20,134 @@ import (
 //
 // Each type of struct is considered a singleton an initialized only once.
 //
-// See [Lifetime.All], [ExportComponents] and [ExportComponent].
+// See [Lifetime.All], [Export] and [Export].
 //
 // The zero value is ready to use.
 type Lifetime[Component any, InitParams any] struct {
 	// Init is called on every component to be initialized.
-	Init func(Component, InitParams) Component
+	//
+	// Init is called after the component has been fully initialized, i.e. all dependencies have been set.
+	// Init is called before any component is returned to a user.
+	// There will only be one concurrent call to Init at any point.
+	//
+	// If Init is nil, it is not called.
+	Init func(Component, InitParams)
+
+	// Register is called once to register all components to be used by this lifetime.
+	Register func(register *RegisterContext[Component, InitParams])
+
+	// registry holds all the initialized components.
+	registry lazy.Lazy[*meta.Registry]
 
 	// Analytics are written on the first retrieval operation on this Lifetime.
 	//
 	// Contains all groups and structs that are referenced during initialization.
 	// To add extra groups, call [RegisterGroup].
-	Analytics   Analytics
+	// Analytics   Analytics
 	extraGroups []reflect.Type
+}
 
-	// all holds the set of initialized components
-	all lazy.Lazy[[]Component]
+// RegisterContext is passed to the call to register.
+type RegisterContext[Component any, InitParams any] struct {
+	m          sync.Mutex
+	c          reflect.Type // reflectx.TypeOf[Component]
+	components map[reflect.Type]func(InitParams) Component
+}
+
+// Register adds a new concrete component during a call to Register.
+//
+// The component is first initialized using the zero value for the struct type that is being pointed to.
+// If Init is not nil, it is then passed to the Init function, along with appropriate InitParams.
+//
+// Context must be a context that was passed to the Register Member function.
+// For each context, Register may not be called concurrently.
+//
+// Different contexts may safely call Register concurrently.
+func Register[Concrete any, Component any, InitParams any](context *RegisterContext[Component, InitParams], Init func(Concrete, InitParams)) {
+	if context == nil {
+		panic("Register: nil context passed (are you inside Lifetime.Register?)")
+	}
+
+	C := reflectx.TypeFor[Concrete]()
+	if b, _ := lreflect.ImplementsAsStructPointer(context.c, C); !b {
+		panic("Register: Attempt to register " + fmt.Sprint(C) + " as non-struct-pointer component")
+	}
+
+	// get the struct type
+	S := C.Elem()
+
+	// ensure that we haven't registered the same component yet
+	if _, ok := context.components[C]; ok {
+		panic("Register: Duplicate registration of " + reflectx.NameOf(S))
+	}
+
+	// make sure the map is there
+	if context.components == nil {
+		context.components = make(map[reflect.Type]func(InitParams) Component)
+	}
+
+	// Add the init function for the component
+	context.components[C] = func(ip InitParams) Component {
+		// ensure that there is only one call going on at the same time
+		if !context.m.TryLock() {
+			panic("Register: Concurrent call detected")
+		}
+		defer context.m.Unlock()
+
+		defer func() {
+			if value := recover(); value != nil {
+				panic(fmt.Sprintf("Register init for %s panicked: %v", reflectx.NameOf(S), value))
+			}
+		}()
+
+		// make the component
+		comp := reflect.New(S).Interface().(Concrete)
+
+		// call the init function (if any)
+		if Init != nil {
+			Init(comp, ip)
+		}
+
+		// and return the component
+		return any(comp).(Component)
+	}
+}
+
+// Place is like Register, except Init is always nil.
+func Place[Concrete any, Component any, InitParams any](context *RegisterContext[Component, InitParams]) {
+	Register[Concrete](context, nil)
+}
+
+func (lt *Lifetime[Component, InitParams]) getRegistry(params InitParams) *meta.Registry {
+	return lt.registry.Get(func() *meta.Registry {
+		// get the component
+		if lt.Register == nil {
+			panic("All: lt.Register is nil")
+		}
+
+		// call the registration function
+		context := &RegisterContext[Component, InitParams]{
+			c: reflectx.TypeFor[Component](),
+		}
+		lt.Register(context)
+
+		// create a new set of components
+		components := make([]Component, 0, len(context.components))
+		for _, init := range context.components {
+			components = append(components, init(params))
+		}
+		return meta.NewRegistry(components)
+	})
+}
+
+// All initializes or returns all components stored in this initializes.
+// The order of components is undefined, but guaranteed to be consistent within a concrete lifetime.
+func (lt *Lifetime[Component, InitParams]) All(Params InitParams) []Component {
+	all, err := lt.getRegistry(Params).All(true)
+	if err != nil {
+		panic(err)
+	}
+	return all.Interface().([]Component)
 }
 
 // RegisterGroup registers the given group type to be added to the lifetime's analytics.
@@ -41,112 +155,6 @@ type Lifetime[Component any, InitParams any] struct {
 // Only groups not referenced during initialization need to be registered explicitly.
 func RegisterGroup[Group any, Component any, InitParams any](p *Lifetime[Component, InitParams]) {
 	p.extraGroups = append(p.extraGroups, reflectx.TypeFor[Group]())
-}
-
-// All initializes or returns all components stored in this initializes.
-//
-// The All function should return an array of calls to [Make] with the provided context.
-// Multiple calls to the this method return the same return value.
-func (p *Lifetime[Component, InitParams]) All(Params InitParams, All func(context *InjectorContext[Component]) []Component) []Component {
-	return p.all.Get(func() []Component {
-		// create a new context
-		context := &InjectorContext[Component]{
-			all: All,
-			init: func(c Component) Component {
-				if p.Init == nil {
-					return c
-				}
-				return p.Init(c, Params)
-			},
-			cache: make(map[string]Component),
-		}
-
-		// and process them all
-		all := context.all(context)
-		context.process(all)
-
-		// write out analytics
-		context.anal(&p.Analytics, p.extraGroups)
-		return all
-	})
-}
-
-// InjectorContext is a context used during [Make].
-type InjectorContext[Component any] struct {
-	init func(Component) Component                             // initializes a new component
-	all  func(context *InjectorContext[Component]) []Component // initializes all components
-
-	metaCache meta.Cache[Component]
-	cache     map[string]Component     // cached components
-	queue     []delayedInit[Component] // init queue
-}
-
-type delayedInit[Component any] struct {
-	meta  meta.Datum[Component]
-	value reflect.Value
-}
-
-// Process processes all components in the queue
-func (p *InjectorContext[Component]) process(all []Component) {
-	index := 0
-	for len(p.queue) > index {
-		p.queue[index].Run(all)
-		index++
-	}
-	p.queue = nil
-}
-
-func (di *delayedInit[Component]) Run(all []Component) {
-	di.meta.InitComponent(di.value, all)
-}
-
-// Make creates or returns a cached component of the given Context.
-//
-// Components are initialized by first creating a new blank struct.
-// Then all component-like fields of fields are filled with their appropriate components.
-//
-// A component-like field has one of the following types:
-//
-// - A pointer to a struct type that implements component
-// - A slice type of an interface type that implements component
-//
-// Such component-like fields are only initialized if one of the following conditions are met:
-//
-// - The field has a tag 'auto' with the value `true`
-// - The field lives inside a struct field named `Dependencies`
-//
-// These fields are initialized in an undefined order during initialization.
-// The init function may not rely on these existing.
-// Furthermore, the init function may not cause other components to be initialized.
-//
-// The init function may be nil, indicating that no additional initialization is required.
-func Make[Component any, ConcreteComponent any](context *InjectorContext[Component], init func(component ConcreteComponent)) ConcreteComponent {
-	// get a description of the type
-	cd := context.metaCache.Get(reflectx.TypeFor[ConcreteComponent]())
-
-	// if an instance already exists, return it!
-	if instance, ok := context.cache[cd.Name]; ok {
-		return any(instance).(ConcreteComponent)
-	}
-
-	// create a fresh new instance and store it in the cache
-	context.cache[cd.Name] = context.init(cd.New())
-	instance := any(context.cache[cd.Name]).(ConcreteComponent)
-
-	// call the passed init function
-	if init != nil {
-		init(instance)
-	}
-
-	// and queue it up
-	if cd.NeedsInitComponent() {
-		context.queue = append(context.queue, delayedInit[Component]{
-			meta:  cd,
-			value: reflect.ValueOf(instance),
-		})
-	}
-
-	return instance
 }
 
 //
@@ -157,38 +165,28 @@ func Make[Component any, ConcreteComponent any](context *InjectorContext[Compone
 //
 // All should be the function of the core that initializes all components.
 // All should only make calls to [InitComponent].
-func ExportComponents[Component any, InitParams any, ConcreteComponentType any](
-	lifetime *Lifetime[Component, InitParams],
+func ExportSlice[ConcreteComponentType any, Component any, InitParams any](
+	lt *Lifetime[Component, InitParams],
 	Params InitParams,
-	All func(context *InjectorContext[Component]) []Component,
 ) []ConcreteComponentType {
-	components := lifetime.All(Params, All)
-
-	results := make([]ConcreteComponentType, 0, len(components))
-	for _, comp := range components {
-		if cc, ok := any(comp).(ConcreteComponentType); ok {
-			results = append(results, cc)
-		}
+	export, err := lt.getRegistry(Params).ExportClass(reflectx.TypeFor[ConcreteComponentType]())
+	if err != nil {
+		panic(err)
 	}
-	return results
+	return export.Interface().([]ConcreteComponentType)
 }
 
 // ExportComponent exports the first component that is a ConcreteComponent from the lifetime.
 //
 // All should be the function of the core that initializes all components.
 // All should only make calls to [InitComponent].
-func ExportComponent[Component any, InitParams any, ConcreteComponentType any](
-	lifetime *Lifetime[Component, InitParams],
+func Export[ConcreteComponentType any, Component any, InitParams any](
+	lt *Lifetime[Component, InitParams],
 	Params InitParams,
-	All func(context *InjectorContext[Component]) []Component,
 ) ConcreteComponentType {
-	components := lifetime.All(Params, All)
-
-	for _, comp := range components {
-		if cc, ok := any(comp).(ConcreteComponentType); ok {
-			return cc
-		}
+	export, err := lt.getRegistry(Params).Export(reflectx.TypeFor[ConcreteComponentType]())
+	if err != nil {
+		panic(err)
 	}
-
-	panic("ExportComponent: Attempted to export unregistered component")
+	return export.Interface().(ConcreteComponentType)
 }

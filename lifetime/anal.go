@@ -1,14 +1,6 @@
 package lifetime
 
-import (
-	"reflect"
-	"slices"
-
-	"github.com/tkw1536/pkglib/collection"
-	"github.com/tkw1536/pkglib/lifetime/interal/meta"
-	"github.com/tkw1536/pkglib/reflectx"
-)
-
+/*
 type Analytics struct {
 	Components map[string]*ComponentAnalytics
 	Groups     map[string]*GroupAnalytics
@@ -113,3 +105,5 @@ func (context *InjectorContext[Component]) anal(anal *Analytics, groups []reflec
 		slices.Sort(comp.Groups)
 	}
 }
+
+*/
