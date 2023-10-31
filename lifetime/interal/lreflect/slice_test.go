@@ -95,7 +95,7 @@ func Test_FilterSliceInterface(t *testing.T) {
 	}
 
 	type args struct {
-		S any
+		S reflect.Value
 		I reflect.Type
 	}
 	tests := []struct {
@@ -106,12 +106,14 @@ func Test_FilterSliceInterface(t *testing.T) {
 		{
 			"filter slice type",
 			args{
-				[]any{
-					somestruct(1),
-					otherstruct(2),
-					otherstruct(3),
-					somestruct(4),
-				},
+				reflect.ValueOf(
+					[]any{
+						somestruct(1),
+						otherstruct(2),
+						otherstruct(3),
+						somestruct(4),
+					},
+				),
 				reflectx.TypeFor[SomeInterface](),
 			},
 			[]SomeInterface{somestruct(1), somestruct(4)},
@@ -119,10 +121,12 @@ func Test_FilterSliceInterface(t *testing.T) {
 		{
 			"slice with no matching elements",
 			args{
-				[]any{
-					otherstruct(1),
-					otherstruct(2),
-				},
+				reflect.ValueOf(
+					[]any{
+						otherstruct(1),
+						otherstruct(2),
+					},
+				),
 				reflectx.TypeFor[SomeInterface](),
 			},
 			[]SomeInterface{},
@@ -130,27 +134,34 @@ func Test_FilterSliceInterface(t *testing.T) {
 		{
 			"non-interface passed",
 			args{
-				[]any{
-					otherstruct(1),
-					otherstruct(2),
-				},
+				reflect.ValueOf(
+					[]any{
+						otherstruct(1),
+						otherstruct(2),
+					},
+				),
 				reflectx.TypeFor[string](),
 			},
-			[]string(nil),
+			nil,
 		},
 		{
 			"non-slice passed",
 			args{
-				"hello world",
+				reflect.ValueOf("hello world"),
 				reflectx.TypeFor[SomeInterface](),
 			},
-			[]SomeInterface(nil),
+			nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := FilterSliceInterface(reflect.ValueOf(tt.args.S), tt.args.I); !reflect.DeepEqual(got.Interface(), tt.want) {
-				t.Errorf("FilterSliceInterface() = %#v, want %#v", got, tt.want)
+			got, err := FilterSliceInterface(tt.args.S, tt.args.I)
+			var gotActual any
+			if err == nil {
+				gotActual = got.Interface()
+			}
+			if !reflect.DeepEqual(gotActual, tt.want) {
+				t.Errorf("FilterSliceInterface() = %#v, want %#v", gotActual, tt.want)
 			}
 		})
 	}
