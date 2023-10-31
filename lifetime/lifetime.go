@@ -157,10 +157,6 @@ func RegisterGroup[Group any, Component any, InitParams any](p *Lifetime[Compone
 	p.extraGroups = append(p.extraGroups, reflectx.TypeFor[Group]())
 }
 
-//
-// PUBLIC FUNCTIONS
-//
-
 // ExportComponents exports all components that are a ConcreteComponentType from the lifetime.
 //
 // All should be the function of the core that initializes all components.
