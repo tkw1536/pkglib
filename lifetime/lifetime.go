@@ -38,13 +38,6 @@ type Lifetime[Component any, InitParams any] struct {
 
 	// registry holds all the initialized components.
 	registry lazy.Lazy[*meta.Registry]
-
-	// Analytics are written on the first retrieval operation on this Lifetime.
-	//
-	// Contains all groups and structs that are referenced during initialization.
-	// To add extra groups, call [RegisterGroup].
-	// Analytics   Analytics
-	extraGroups []reflect.Type
 }
 
 // RegisterContext is passed to the call to register.
@@ -148,13 +141,6 @@ func (lt *Lifetime[Component, InitParams]) All(Params InitParams) []Component {
 		panic(err)
 	}
 	return all.Interface().([]Component)
-}
-
-// RegisterGroup registers the given group type to be added to the lifetime's analytics.
-//
-// Only groups not referenced during initialization need to be registered explicitly.
-func RegisterGroup[Group any, Component any, InitParams any](p *Lifetime[Component, InitParams]) {
-	p.extraGroups = append(p.extraGroups, reflectx.TypeFor[Group]())
 }
 
 // ExportComponents exports all components that are a ConcreteComponentType from the lifetime.
