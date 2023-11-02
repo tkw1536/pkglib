@@ -28,7 +28,9 @@ func NewRegistry(all any) *Registry {
 	}
 }
 
-func (r *Registry) doInit() error {
+// Init initializes all components inside this registry.
+// If the registry has already been initialized, this call is a noop.
+func (r *Registry) Init() error {
 	// do an initialization
 	return r.initErr.Get(func() error {
 		// set allT and componentT correctly
@@ -175,7 +177,7 @@ func (r *Registry) exportClass(T reflect.Type) (reflect.Value, error) {
 // All returns the list of all components
 func (r *Registry) All(copy bool) (reflect.Value, error) {
 	// do the initialization
-	if err := r.doInit(); err != nil {
+	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
 	}
 
@@ -191,7 +193,7 @@ func (r *Registry) All(copy bool) (reflect.Value, error) {
 // Export exports a specific component.
 func (r *Registry) Export(T reflect.Type) (reflect.Value, error) {
 	// initialize the registry
-	if err := r.doInit(); err != nil {
+	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
 	}
 
@@ -207,7 +209,7 @@ func (r *Registry) Export(T reflect.Type) (reflect.Value, error) {
 // ExportClass exports a specific component class.
 func (r *Registry) ExportClass(T reflect.Type) (reflect.Value, error) {
 	// initialize the registry
-	if err := r.doInit(); err != nil {
+	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
 	}
 

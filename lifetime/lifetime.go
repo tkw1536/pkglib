@@ -129,7 +129,22 @@ func (lt *Lifetime[Component, InitParams]) getRegistry(params InitParams) *meta.
 		for _, init := range context.components {
 			components = append(components, init(params))
 		}
-		return meta.NewRegistry(components)
+
+		// get the registry
+		registry := meta.NewRegistry(components)
+
+		// initialize it if needed
+		if lt.Init != nil {
+			if err := registry.Init(); err != nil {
+				panic(err)
+			}
+			for _, c := range components {
+				lt.Init(c, params)
+			}
+		}
+
+		// and return it
+		return registry
 	})
 }
 
