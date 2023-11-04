@@ -1,4 +1,5 @@
-package meta
+// Package souls implements component storage retrieval using the [Souls] struct.
+package souls
 
 import (
 	"errors"
@@ -9,8 +10,8 @@ import (
 	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
 )
 
-// Registry holds a set of (possibly initialized) components.
-type Registry struct {
+// Souls holds the set of all (possibly initialized) components.
+type Souls struct {
 	all        reflect.Value // all holds all components
 	allT       reflect.Type  // reflect.TypeOf(all)
 	componentT reflect.Type  // allT.Elem()
@@ -19,33 +20,35 @@ type Registry struct {
 	components map[reflect.Type]reflect.Value // map[*Component]Instance
 	classes    map[reflect.Type]reflect.Value // map[Class]Index
 
+	// have we been initialized?
 	initErr lazy.Lazy[error] // error that occurred during init
 }
 
-func NewRegistry(all any) *Registry {
-	return &Registry{
+// New creates a new souls from the given slice of all components.
+func New(all any) *Souls {
+	return &Souls{
 		all: reflect.ValueOf(all),
 	}
 }
 
-// Init initializes all components inside this registry.
-// If the registry has already been initialized, this call is a noop.
-func (r *Registry) Init() error {
+// Init initializes all components.
+// If this souls has already been initialized, this call is a noop.
+func (r *Souls) Init() error {
 	// do an initialization
 	return r.initErr.Get(func() error {
 		// set allT and componentT correctly
 		{
 			if !r.all.IsValid() {
-				return errRegistryInternalWrongAll
+				return errWrongAll
 			}
 			r.allT = r.all.Type()
 			if r.allT.Kind() != reflect.Slice {
-				return errRegistryInternalWrongAll
+				return errWrongAll
 			}
 
 			r.componentT = r.allT.Elem()
 			if r.componentT.Kind() != reflect.Interface {
-				return errRegistryInternalWrongAll
+				return errWrongAll
 			}
 		}
 
@@ -66,7 +69,7 @@ func (r *Registry) Init() error {
 }
 
 // initComponent initializes the component with the given id
-func (r *Registry) initComponent(index int) error {
+func (r *Souls) initComponent(index int) error {
 	// the underlying element at the given index
 	elem := r.all.Index(index).Elem()
 	concrete := elem.Type()
@@ -75,7 +78,7 @@ func (r *Registry) initComponent(index int) error {
 	elem = elem.Elem()
 
 	// attempt to initialize the given component metadata
-	m, err := New(r.componentT, concrete)
+	m, err := newSoul(r.componentT, concrete)
 	if err != nil {
 		return err
 	}
@@ -134,7 +137,7 @@ func (eug errUnregisteredComponent) Error() string {
 }
 
 // export exports a component that is assignable to T
-func (r *Registry) export(T reflect.Type) (reflect.Value, error) {
+func (r *Souls) export(T reflect.Type) (reflect.Value, error) {
 	// if we already have the component type cached, then return it
 	if c, ok := r.components[T]; ok {
 		return c, nil
@@ -157,7 +160,7 @@ func (r *Registry) export(T reflect.Type) (reflect.Value, error) {
 }
 
 // exportClass exports all components assignable to interface T
-func (r *Registry) exportClass(T reflect.Type) (reflect.Value, error) {
+func (r *Souls) exportClass(T reflect.Type) (reflect.Value, error) {
 	// if we already have the class cached, then return a copy
 	if clz, ok := r.classes[T]; ok {
 		return lreflect.CopySlice(clz), nil
@@ -175,7 +178,7 @@ func (r *Registry) exportClass(T reflect.Type) (reflect.Value, error) {
 }
 
 // All returns the list of all components
-func (r *Registry) All(copy bool) (reflect.Value, error) {
+func (r *Souls) All(copy bool) (reflect.Value, error) {
 	// do the initialization
 	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
@@ -191,7 +194,7 @@ func (r *Registry) All(copy bool) (reflect.Value, error) {
 }
 
 // Export exports a specific component.
-func (r *Registry) Export(T reflect.Type) (reflect.Value, error) {
+func (r *Souls) Export(T reflect.Type) (reflect.Value, error) {
 	// initialize the registry
 	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
@@ -207,7 +210,7 @@ func (r *Registry) Export(T reflect.Type) (reflect.Value, error) {
 }
 
 // ExportClass exports a specific component class.
-func (r *Registry) ExportClass(T reflect.Type) (reflect.Value, error) {
+func (r *Souls) ExportClass(T reflect.Type) (reflect.Value, error) {
 	// initialize the registry
 	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
@@ -222,7 +225,7 @@ func (r *Registry) ExportClass(T reflect.Type) (reflect.Value, error) {
 	return r.exportClass(T)
 }
 
-var errRegistryInternalWrongAll = errors.New("Registry: Internal error: Wrong type for registry.all")
+var errWrongAll = errors.New("wrong type for souls.all")
 
 type errInitField struct {
 	Concrete       reflect.Type

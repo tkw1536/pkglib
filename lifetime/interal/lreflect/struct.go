@@ -1,4 +1,4 @@
-// Package lreflect provides reflect extensions for use by lifetime
+// Package lreflect provides reflect extensions for use by the lifetime package.
 package lreflect
 
 // spellchecker:words lreflect
