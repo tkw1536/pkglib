@@ -54,9 +54,12 @@ func (r *Souls) Init() error {
 			}
 		}
 
-		// randomly shuffle all elements
+		// randomly shuffle all elements, then sort (if needed)
 		l := r.all.Len()
 		rand.Shuffle(l, reflect.Swapper(r.all.Interface()))
+		if err := lreflect.SortSliceByRank(r.all); err != nil {
+			return err
+		}
 
 		// initialize maps for components and classes
 		r.components = make(map[reflect.Type]reflect.Value, l)
