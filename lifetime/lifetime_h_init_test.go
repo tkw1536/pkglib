@@ -9,7 +9,7 @@ import (
 
 // Demonstrates the use of the Init hook.
 // Reuses types from Example E.
-func ExampleLifetime_gInit() {
+func ExampleLifetime_hInit() {
 	// for purposes of this example keep a list of initialized colors.
 	var colors []string
 

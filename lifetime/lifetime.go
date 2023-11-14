@@ -22,6 +22,15 @@ import (
 //
 // Components must be registered using the Register function, see [Registry] for details.
 // Components must be retrieved using [lifetime.Lifetime.All], [Export] or [ExportSlice].
+//
+// When using slices of components (e.g. in dependencies or using the All or ExportSlice methods) their order is undefined by default.
+// This means that multiple lifetimes (even with the same Component and Init functions) may return components in a different order.
+// It is however guaranteed that the same lifetime struct always returns components in the same order.
+//
+// Order of a specific slice type can be fixed by giving the slice element a method named "Rank${Typ}" with a signature func()T.
+// T must be of kind int, uint, float or string.
+// Slices of this type will then be sorted ascending by the appropriate "<" operator.
+//
 // See the examples for concrete details.
 type Lifetime[Component any, InitParams any] struct {
 	// Init is called on every component once it has been initialized, and all dependency references have been set.
@@ -83,6 +92,8 @@ func (lt *Lifetime[Component, InitParams]) getSouls(params InitParams) *souls.So
 // All initializes and returns all registered components from the lifetime.
 // Params is passed to all Init functions that are being called.
 //
+// See [Lifetime] regarding order of the exported slice.
+//
 // Export may be safely called concurrently with other calls retrieving components.
 func (lt *Lifetime[Component, InitParams]) All(Params InitParams) []Component {
 	all, err := lt.getSouls(Params).All(true)
@@ -96,6 +107,8 @@ func (lt *Lifetime[Component, InitParams]) All(Params InitParams) []Component {
 //
 // ConcreteComponentType must be an interface that implements Component.
 // Params is passed to all Init functions that are being called.
+//
+// See [Lifetime] regarding order of the exported slice.
 //
 // ExportSlice may be safely called concurrently with other calls retrieving components.
 func ExportSlice[ConcreteComponentType any, Component any, InitParams any](

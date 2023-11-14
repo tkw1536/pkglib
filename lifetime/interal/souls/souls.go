@@ -4,6 +4,7 @@ package souls
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"reflect"
 
 	"github.com/tkw1536/pkglib/lazy"
@@ -17,8 +18,8 @@ type Souls struct {
 	componentT reflect.Type  // allT.Elem()
 
 	// cache for component indexes
-	components map[reflect.Type]reflect.Value // map[*Component]Instance
-	classes    map[reflect.Type]reflect.Value // map[Class]Index
+	components map[reflect.Type]reflect.Value // map[*Component]Index
+	classes    map[reflect.Type]reflect.Value // map[Class]Slice
 
 	// have we been initialized?
 	initErr lazy.Lazy[error] // error that occurred during init
@@ -36,6 +37,7 @@ func New(all any) *Souls {
 func (r *Souls) Init() error {
 	// do an initialization
 	return r.initErr.Get(func() error {
+
 		// set allT and componentT correctly
 		{
 			if !r.all.IsValid() {
@@ -52,12 +54,15 @@ func (r *Souls) Init() error {
 			}
 		}
 
+		// randomly shuffle all elements
+		l := r.all.Len()
+		rand.Shuffle(l, reflect.Swapper(r.all.Interface()))
+
 		// initialize maps for components and classes
-		r.components = make(map[reflect.Type]reflect.Value, r.all.Len())
+		r.components = make(map[reflect.Type]reflect.Value, l)
 		r.classes = make(map[reflect.Type]reflect.Value)
 
 		// iterate over all the elements
-		l := r.all.Len()
 		for i := 0; i < l; i += 1 {
 			if err := r.initComponent(i); err != nil {
 				return err
@@ -169,6 +174,11 @@ func (r *Souls) exportClass(T reflect.Type) (reflect.Value, error) {
 	// get the class
 	clz, err := lreflect.FilterSliceInterface(r.all, T)
 	if err != nil {
+		return reflect.Value{}, err
+	}
+
+	// sort the slice by rank
+	if err := lreflect.SortSliceByRank(clz); err != nil {
 		return reflect.Value{}, err
 	}
 
