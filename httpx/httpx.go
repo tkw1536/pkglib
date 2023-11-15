@@ -1,3 +1,4 @@
+// Package httpx provides additional [http.Handler]s and utility functions
 package httpx
 
 import (
@@ -8,7 +9,10 @@ import (
 	"github.com/tkw1536/pkglib/minify"
 )
 
-// Response represents a response to an http request.
+// TODO: Testme
+
+// Response represents a static http Response.
+// It implements [http.Handler].
 type Response struct {
 	ContentType string // defaults to text/plain
 	Body        []byte
@@ -17,35 +21,38 @@ type Response struct {
 	StatusCode int // defaults to a 2XX status code
 }
 
-// Minify returns a copy of the response with the content minified.
+// Minify returns a copy of the response with minified content.
 func (response Response) Minify() Response {
 	response.Body = minify.MinifyBytes(response.ContentType, response.Body)
 	return response
 }
 
-// Now returns a copy of the response with the current time set as the modtime.
+// Now returns a copy of the response with the Modtime field set to the current time in UTC.
 func (response Response) Now() Response {
 	response.Modtime = time.Now().UTC()
 	return response
 }
 
 func (response Response) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// setup and send the ContentType header iff it is set
 	if response.ContentType == "" {
 		response.ContentType = "text/plain"
 	}
 	w.Header().Set("Content-Type", response.ContentType)
 
-	// if we are responding with no status code, then we allow sending partial content
-	// and also send proper headers.
+	// when no status code is set use [http.ServeContent]
+	// which is way better than anything we could implement
 	if response.StatusCode == 0 {
 		http.ServeContent(w, r, "", response.Modtime, bytes.NewReader(response.Body))
 		return
 	}
 
-	// else respond with a normal body only!
+	// ensure that StatusCode is valid!
 	if response.StatusCode < 0 {
 		response.StatusCode = http.StatusOK
 	}
+
+	// write only the response with the given content type
 	w.WriteHeader(response.StatusCode)
 	w.Write(response.Body)
 }

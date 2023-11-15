@@ -1,0 +1,45 @@
+package wrap_test
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+
+	"github.com/tkw1536/pkglib/httpx/wrap"
+)
+
+func ExampleMethods() {
+
+	handler := wrap.Methods(
+		// Create a new handler that echoes the appropriate method
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(r.Method))
+		}),
+
+		// and permit only the GET and POST methods
+		http.MethodGet, http.MethodPost,
+	)
+
+	// A simple function to make a request with a specific method
+	makeRequest := func(method string) {
+		req, err := http.NewRequest(method, "/", nil)
+		if err != nil {
+			panic(err)
+		}
+
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, req)
+
+		result, _ := io.ReadAll(rr.Result().Body)
+		fmt.Printf("%s returned code %d with content %q\n", method, rr.Result().StatusCode, string(result))
+	}
+
+	makeRequest(http.MethodGet)
+	makeRequest(http.MethodPost)
+	makeRequest(http.MethodHead)
+
+	// Output: GET returned code 200 with content "GET"
+	// POST returned code 200 with content "POST"
+	// HEAD returned code 405 with content "Method Not Allowed"
+}

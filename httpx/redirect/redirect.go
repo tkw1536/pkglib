@@ -1,10 +1,15 @@
-package httpx
+// Package redirect provides [RedirectHandler].
+package redirect
 
 import (
 	"net/http"
+
+	"github.com/tkw1536/pkglib/httpx"
 )
 
-// RedirectHandler represents a handler that redirects the user to the address returned
+// TODO: Testme
+
+// RedirectHandler represents a handler that redirects the user to the address returned.
 type RedirectHandler func(r *http.Request) (string, int, error)
 
 // ServeHTTP calls r(r) and returns json
@@ -13,7 +18,7 @@ func (rh RedirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	url, code, err := rh(r)
 
 	// intercept the errors
-	if TextInterceptor.Intercept(w, r, err) {
+	if httpx.TextInterceptor.Intercept(w, r, err) {
 		return
 	}
 

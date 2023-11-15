@@ -8,6 +8,9 @@ import (
 	"github.com/tkw1536/pkglib/minify"
 )
 
+// TODO: Testme
+// TODO: Configurable fallbacks (debug mode)?
+
 // ErrInterceptor intercepts errors and directly returns specific responses for them
 type ErrInterceptor struct {
 	Errors   map[error]Response

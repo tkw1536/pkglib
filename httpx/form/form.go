@@ -1,4 +1,5 @@
-package httpx
+// Package form provides a form abstraction for http
+package form
 
 import (
 	"html/template"
@@ -8,8 +9,12 @@ import (
 	_ "embed"
 
 	"github.com/gorilla/csrf"
-	"github.com/tkw1536/pkglib/httpx/field"
+	"github.com/tkw1536/pkglib/httpx"
+	"github.com/tkw1536/pkglib/httpx/content"
+	"github.com/tkw1536/pkglib/httpx/form/field"
 )
+
+// TODO: Testme
 
 // Form provides a form that a user can submit via a http POST method call.
 // It implements [http.Handler].
@@ -89,7 +94,7 @@ func (form *Form[D]) Values(r *http.Request) (v map[string]string, d D, err erro
 func (form *Form[D]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	default:
-		TextInterceptor.Intercept(w, r, ErrMethodNotAllowed)
+		httpx.TextInterceptor.Intercept(w, r, httpx.ErrMethodNotAllowed)
 		return
 	case r.Method == http.MethodPost:
 		values, data, err := form.Values(r)
@@ -132,7 +137,7 @@ func (form *Form[D]) renderForm(err error, values map[string]string, w http.Resp
 	}
 
 	// render the form
-	WriteHTML(tplctx, nil, form.RenderTemplate, "", w, r)
+	content.WriteHTML(tplctx, nil, form.RenderTemplate, w, r)
 }
 
 // FormContext is passed to Form.Form when used

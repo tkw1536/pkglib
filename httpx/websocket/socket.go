@@ -1,4 +1,5 @@
-package httpx
+// Package websocket provides a handler for websockets
+package websocket
 
 import (
 	"context"
@@ -10,26 +11,31 @@ import (
 	"github.com/tkw1536/pkglib/lazy"
 )
 
+// TODO: Testme
+
 // WebSocket implements serving a WebSocket
 type WebSocket struct {
 	Context context.Context // context which closes all connections
-	Limits  WebSocketLimits // limits for websocket operations
+	Limits  Limits          // limits for websocket operations
 
-	Handler  func(ws WebSocketConnection)
+	Handler  Handler
 	Fallback http.Handler
 
 	pool     lazy.Lazy[*sync.Pool] // pool holds *WebSocketConn objects
 	upgrader websocket.Upgrader    // upgrades upgrades connections
 }
 
-type WebSocketLimits struct {
+// Handler represents a WebSocketHandler
+type Handler func(ws *webSocketConn)
+
+type Limits struct {
 	WriteWait      time.Duration // maximum time to wait for writing
 	PongWait       time.Duration // time to wait for pong responses
 	PingInterval   time.Duration // interval to send pings to the client
 	MaxMessageSize int64         // maximal message size in bytes
 }
 
-func (limits *WebSocketLimits) SetDefaults() {
+func (limits *Limits) SetDefaults() {
 	if limits.WriteWait == 0 {
 		limits.WriteWait = 10 * time.Second
 	}
@@ -134,7 +140,7 @@ type outWebSocketMessage struct {
 type webSocketConn struct {
 	r      *http.Request   // underlying http request
 	conn   *websocket.Conn // underlying connection
-	limits WebSocketLimits
+	limits Limits
 
 	context context.Context // context to cancel the connection
 	cancel  context.CancelFunc
@@ -148,7 +154,7 @@ type webSocketConn struct {
 
 // Serve serves the provided connection
 // r is the original request that has been passed
-func (h *webSocketConn) Serve(ctx context.Context, limits WebSocketLimits, r *http.Request, conn *websocket.Conn, handler func(ws WebSocketConnection)) {
+func (h *webSocketConn) Serve(ctx context.Context, limits Limits, r *http.Request, conn *websocket.Conn, handler Handler) {
 	// use the connection!
 	h.r = r
 	h.conn = conn
@@ -184,7 +190,7 @@ func (h *webSocketConn) Serve(ctx context.Context, limits WebSocketLimits, r *ht
 	h.wg.Wait()
 }
 
-func (h *webSocketConn) handle(handler func(ws WebSocketConnection)) {
+func (h *webSocketConn) handle(handler Handler) {
 	defer func() {
 		h.wg.Done()
 		h.cancel()
@@ -327,7 +333,7 @@ func (h *webSocketConn) Close() {
 
 // reset resets this websocket
 func (h *webSocketConn) reset() {
-	h.limits = WebSocketLimits{}
+	h.limits = Limits{}
 	h.r = nil
 	h.conn = nil
 	h.incoming = nil
