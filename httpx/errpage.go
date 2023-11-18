@@ -13,12 +13,12 @@ import (
 // spellchecker:words errpage
 
 // RenderErrorPage renders a debug error page instead of the fallback response res.
+// The error page is intended to replace error pages for debugging and should not be used in production.
 //
-// The error page is intended for debugging and should not be used in production.
 // It will keep the original status code of res, but will replace the content type and body.
 // It will render as 'text/html'.
 func RenderErrorPage(err error, res Response, w http.ResponseWriter, r *http.Request) {
-	newErrorPage(err, r).Response(res).ServeHTTP(w, r)
+	newErrorPage(err, r).Response(res).Minify().ServeHTTP(w, r)
 }
 
 // newErrorPage returns a new error page for the specified error and request.
