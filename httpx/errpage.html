@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; ">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+
+<style>
+    :root { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    div { margin-left: 1em; }
+    code { user-select: all; }
+</style>
+
+<title>An Error Occured</title>
+<h1>An Error Occured</h1>
+
+<p>
+    You are seeing this page because an error occurred attempting to handle your request.
+    This page is intended to help debug the problem.
+</p>
+
+<h2>
+    Error Response
+</h2>
+
+<p>
+    Information about the response that would have been produced in production.
+</p>
+
+<dl>
+    <dt>Status Code</dt>
+    <dd><code>{{ if .Original.StatusCode }}{{.Original.StatusCode}}{{ else }}200{{ end }}</code></dd>
+
+    <dt>Modification Time</dt>
+    <dd>{{ if .Original.Modtime.IsZero }}<small>(unset)</small>{{ else }}<code>{{.Original.Modtime}}</code>{{ end }}</dd>
+
+    <dt>Content Type</dt>
+    <dd><code>{{ if .Original.ContentType }}{{.Original.ContentType}}{{ else }}text/plain{{ end }}</code></dd>
+
+    <dt>Body</dt>
+    <dd><code>{{.BodyString}}</code></dd>
+</dl>
+
+<h2>
+    Request
+</h2>
+
+<p>
+    Information about the request that caused the error.
+</p>
+
+<dl>
+    <dt>Method</dt>
+    <dd><code>{{.Error.Method}}</code></dd>
+
+    <dt>Path</dt>
+    <dd><code>{{ .Error.Path }}</code></dd>
+
+    <dt>Headers</dt>
+    <dd>
+        <table>
+            {{ range $field, $values := .Error.Headers }}
+            {{ range $unused, $value := $values }}
+            <tr>
+                <td><code>{{ $field }}</code></td>
+                <td><code>{{ $value }}</code></td>
+            </tr>
+            {{ end }}
+            {{ end }}
+        </table>
+    </dd>
+</dl>
+
+
+<h2>
+    Stack
+</h2>
+
+<p>
+    Stack Trace of the code site where the error was caught.
+</p>
+
+<pre>{{ .Error.Stack }}</pre>
+
+<h2>
+    Error
+</h2>
+
+<p>
+    Information about the error itself.
+</p>
+
+<details open>
+    <summary><code>{{ .Error.Error.Source }}</code></summary>
+    <div>{{ template "error" .Error.Error }}</div>
+</details>
+
+{{define "error" }}
+<dl>
+    <dt>Message</dt>
+    <dd>
+        <pre>{{.Error}}</pre>
+    </dd>
+
+    <dt>Type</dt>
+    <dd>
+        <code>{{.Type}}</code>
+    </dd>
+
+    {{ if .Unwrap }}
+        <dt>Unwrap</dt>
+        <dd>
+            {{ range $unused, $err := .Unwrap }}
+            <details>
+                <summary><code>{{ $err.Source }}</code></summary>
+                <div>{{ template "error" $err }}</div>
+            </details>
+            {{ end }}
+        </dd>
+    {{ end }}
+</dl>
+{{ end }}

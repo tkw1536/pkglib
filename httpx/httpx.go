@@ -9,8 +9,6 @@ import (
 	"github.com/tkw1536/pkglib/minify"
 )
 
-// TODO: Testme
-
 // Response represents a static http Response.
 // It implements [http.Handler].
 type Response struct {
