@@ -35,6 +35,7 @@ func ExampleMethods() {
 		fmt.Printf("%s returned code %d with content %q\n", method, rr.Result().StatusCode, string(result))
 	}
 
+	// and do a couple of the requests
 	makeRequest(http.MethodGet)
 	makeRequest(http.MethodPost)
 	makeRequest(http.MethodHead)
