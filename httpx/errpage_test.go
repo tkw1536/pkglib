@@ -45,7 +45,7 @@ func ExampleRenderErrorPage() {
 	}
 
 	// Output: Got status: 404
-	// Got content-type: text/html
+	// Got content-type: text/html; charset=utf-8
 }
 
 // Render an error page in response to a panic
@@ -85,5 +85,5 @@ func ExampleRenderErrorPage_panic() {
 	}
 
 	// Output: Got status: 500
-	// Got content-type: text/html
+	// Got content-type: text/html; charset=utf-8
 }

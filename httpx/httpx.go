@@ -12,12 +12,19 @@ import (
 // Response represents a static http Response.
 // It implements [http.Handler].
 type Response struct {
-	ContentType string // defaults to text/plain
+	ContentType string // defaults to [ContentTypeTextPlain]
 	Body        []byte
 
 	Modtime    time.Time
 	StatusCode int // defaults to a 2XX status code
 }
+
+// Content Types for content offered by this package
+const (
+	ContentTypeText = "text/plain; charset=utf-8"
+	ContentTypeHTML = "text/html; charset=utf-8"
+	ContentTypeJSON = "application/json; charset=utf-8"
+)
 
 // Minify returns a copy of the response with minified content.
 func (response Response) Minify() Response {
@@ -34,7 +41,7 @@ func (response Response) Now() Response {
 func (response Response) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// setup and send the ContentType header iff it is set
 	if response.ContentType == "" {
-		response.ContentType = "text/plain"
+		response.ContentType = ContentTypeText
 	}
 	w.Header().Set("Content-Type", response.ContentType)
 

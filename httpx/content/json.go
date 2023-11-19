@@ -35,7 +35,7 @@ func writeJSON[T any](result T, err error, interceptor httpx.ErrInterceptor, w h
 	}
 
 	// write out the response as json
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", httpx.ContentTypeJSON)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }

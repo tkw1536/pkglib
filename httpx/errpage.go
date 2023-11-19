@@ -55,7 +55,7 @@ type errorPage struct {
 // Response replaces the body and content type of the given response by the formatted html.
 func (err errorPage) Response(res Response) Response {
 	res.Body = []byte(err.FormatHTML(res))
-	res.ContentType = "text/html"
+	res.ContentType = ContentTypeHTML
 	return res
 }
 

@@ -36,7 +36,7 @@
     <dd>{{ if .Original.Modtime.IsZero }}<small>(unset)</small>{{ else }}<code>{{.Original.Modtime}}</code>{{ end }}</dd>
 
     <dt>Content Type</dt>
-    <dd><code>{{ if .Original.ContentType }}{{.Original.ContentType}}{{ else }}text/plain{{ end }}</code></dd>
+    <dd><code>{{ if .Original.ContentType }}{{.Original.ContentType}}{{ else }}text/plain; charset=utf-8{{ end }}</code></dd>
 
     <dt>Body</dt>
     <dd><code>{{.BodyString}}</code></dd>

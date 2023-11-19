@@ -56,11 +56,11 @@ func writeHTML[C any](context C, err error, template *template.Template, interce
 	}
 
 	// write out the response as html
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", httpx.ContentTypeHTML)
 	w.WriteHeader(http.StatusOK)
 
 	// minify html!
-	minifier := minify.Minify("text/html", w)
+	minifier := minify.Minify(httpx.ContentTypeHTML, w)
 	defer minifier.Close()
 
 	// and return the template

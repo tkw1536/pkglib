@@ -158,7 +158,7 @@ var (
 )
 
 var (
-	TextInterceptor = StatusInterceptor("text/plain", func(code int, text string) ([]byte, error) {
+	TextInterceptor = StatusInterceptor(ContentTypeText, func(code int, text string) ([]byte, error) {
 		return []byte(text), nil
 	})
 	JSONInterceptor = StatusInterceptor("application/json", func(code int, text string) ([]byte, error) {

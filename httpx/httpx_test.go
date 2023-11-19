@@ -15,7 +15,7 @@ import (
 func ExampleResponse() {
 	response := httpx.Response{
 		StatusCode:  http.StatusOK,
-		ContentType: "text/html",
+		ContentType: httpx.ContentTypeHTML,
 		Body:        []byte("<!DOCTYPE html>Hello world"),
 	}
 
@@ -34,7 +34,7 @@ func ExampleResponse() {
 	fmt.Printf("Got body: %s", string(body))
 
 	// Output: Got status: 200
-	// Got content-type: text/html
+	// Got content-type: text/html; charset=utf-8
 	// Got body: <!DOCTYPE html>Hello world
 }
 
@@ -59,7 +59,7 @@ func ExampleResponse_defaults() {
 	fmt.Printf("Got body: %s", string(body))
 
 	// Output: Got status: 200
-	// Got content-type: text/plain
+	// Got content-type: text/plain; charset=utf-8
 	// Got body: Hello world
 }
 
