@@ -5,9 +5,8 @@ import (
 	"net/http"
 )
 
-// TODO: TESTME
-
-// Mux is a http handler that handles different requests using either exact or path prefix matching.
+// Mux routes requests to different handlers.
+// See the [Add] for how requests are matched to their handler.
 type Mux struct {
 	prefixes map[string][]handler
 	exacts   map[string][]handler
@@ -44,7 +43,6 @@ func (mux *Mux) Add(path string, predicate Predicate, exact bool, h http.Handler
 }
 
 // Match returns the handler to be applied for the given request.
-// Match expects that Prepare() has been called on the given request.
 func (mux *Mux) Match(r *http.Request) (http.Handler, bool) {
 	if mux == nil {
 		return nil, false

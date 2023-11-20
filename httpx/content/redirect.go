@@ -25,7 +25,7 @@ func Redirect(Handler RedirectFunc) RedirectHandler {
 // error indicates any error that occurred.
 //
 // If error is non-nil it is intercepted by an appropriate [httpx.ErrInterceptor].
-type RedirectFunc = func(r *http.Request) (location string, code int, err error)
+type RedirectFunc func(r *http.Request) (location string, code int, err error)
 
 // RedirectHandler is a [http.Handler] that redirects every request based on the result of invoking Handler.
 type RedirectHandler struct {

@@ -40,7 +40,7 @@ func (j JSONHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func writeJSON[T any](result T, err error, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) {
 	// handle any errors
-	if httpx.JSONInterceptor.Intercept(w, r, err) {
+	if interceptor.Intercept(w, r, err) {
 		return
 	}
 
