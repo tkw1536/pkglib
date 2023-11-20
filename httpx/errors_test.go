@@ -36,7 +36,7 @@ func ExampleStatusCode() {
 	}
 
 	// Output: String: Not Found
-	// GoString: httpx.StandardError(404/* Not Found */)
+	// GoString: httpx.StatusCode(404/* Not Found */)
 	// Error: httpx: Not Found
 	// ServeHTTP() status: 404
 	// ServeHTTP() content-type: text/plain; charset=utf-8
