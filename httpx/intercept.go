@@ -97,9 +97,9 @@ var statuses = []StatusCode{
 	ErrMethodNotAllowed,
 }
 
-// StatusInterceptor creates a new ErrInterceptor handling default responses.
-// If body returns err != nil, StatusInterceptor calls panic().
-func StatusInterceptor(contentType string, body func(code StatusCode) []byte) ErrInterceptor {
+// commonInterceptor creates a new ErrInterceptor handling default responses.
+// If body returns err != nil, commonInterceptor calls panic().
+func commonInterceptor(contentType string, body func(code StatusCode) []byte) ErrInterceptor {
 	var interceptor ErrInterceptor
 
 	interceptor.Errors = make(map[error]Response, len(statuses))
@@ -116,17 +116,27 @@ func StatusInterceptor(contentType string, body func(code StatusCode) []byte) Er
 	return interceptor
 }
 
-// interceptors for common content types
+// Common interceptors for specific content types.
+//
+// These handle all common http status codes by sending their response with a common error code.
+// See the Error constants of this package for supported errors.
 var (
-	TextInterceptor = StatusInterceptor(ContentTypeText, func(code StatusCode) []byte { return []byte(code.String()) })
-	JSONInterceptor = StatusInterceptor(ContentTypeJSON, func(code StatusCode) []byte {
+	TextInterceptor ErrInterceptor
+	JSONInterceptor ErrInterceptor
+	HTMLInterceptor ErrInterceptor
+)
+
+func init() {
+	TextInterceptor = commonInterceptor(ContentTypeText, func(code StatusCode) []byte { return []byte(code.String()) })
+	JSONInterceptor = commonInterceptor(ContentTypeJSON, func(code StatusCode) []byte {
 		res, err := json.Marshal(map[string]any{"status": code.String(), "code": int(code)})
 		if err != nil {
 			panic(err)
 		}
 		return res
 	})
-	HTMLInterceptor = StatusInterceptor(ContentTypeHTML, func(code StatusCode) []byte {
-		return []byte(`<!DOCTYPE HTML><title>` + code.String() + `</title>` + code.String())
+	HTMLInterceptor = commonInterceptor(ContentTypeHTML, func(code StatusCode) []byte {
+		cstring := code.String()
+		return []byte(`<!DOCTYPE HTML><title>` + cstring + `</title>` + cstring)
 	})
-)
+}

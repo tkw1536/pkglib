@@ -21,7 +21,7 @@ type Response struct {
 	StatusCode int // defaults to a 2XX status code
 }
 
-// Content Types for content offered by this package
+// Content Types for standard content offered by several functions.
 const (
 	ContentTypeText = "text/plain; charset=utf-8"
 	ContentTypeHTML = "text/html; charset=utf-8"
