@@ -10,7 +10,7 @@ import (
 // A nil ContextFunc leaves the original context intact.
 //
 // - the returned context, if non-nil, is used to replace the context of the request.
-// - the returned cancelfunc is called once the request ends.
+// - the returned CancelFunc is called once the request ends.
 type ContextFunc = func(r *http.Request) (context.Context, context.CancelFunc)
 
 // Context wraps handler, replacing the context of any request using the given function.

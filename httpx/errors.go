@@ -8,9 +8,15 @@ import (
 // StatusCode represents an error based on a http status code.
 // The integer is the http status code.
 //
-// StatusCode implements [error] as well as [http.Handler].
+// StatusCode implements both [error] and [http.Handler].
 // When used as a handler, it sets the appropriate status code, and returns a simple text response.
 type StatusCode int
+
+// check that StatusCode indeed implements error and http.Handler
+var (
+	_ error        = (StatusCode)(0)
+	_ http.Handler = (StatusCode)(0)
+)
 
 // String returns the status text belonging to this error.
 func (code StatusCode) String() string {
@@ -19,7 +25,7 @@ func (code StatusCode) String() string {
 
 // GoString returns a go source code representation of string.
 func (code StatusCode) GoString() string {
-	return fmt.Sprintf("httpx.StandardError(%d/* %s */)", code, code.String())
+	return fmt.Sprintf("httpx.StatusCode(%d/* %s */)", code, code.String())
 }
 
 // Error implements the built-in [error] interface.
@@ -44,10 +50,4 @@ const (
 	ErrNotFound            = StatusCode(http.StatusNotFound)
 	ErrForbidden           = StatusCode(http.StatusForbidden)
 	ErrMethodNotAllowed    = StatusCode(http.StatusMethodNotAllowed)
-)
-
-// check that http.Handler indeed implements error and http.Handler
-var (
-	_ error        = (StatusCode)(0)
-	_ http.Handler = (StatusCode)(0)
 )
