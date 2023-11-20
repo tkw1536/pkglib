@@ -3,14 +3,10 @@ package httpx
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-	"runtime/debug"
 
 	"github.com/tkw1536/pkglib/minify"
 )
-
-// TODO: Testme
 
 // ErrInterceptor can handle errors for http responses and render appropriate error responses.
 type ErrInterceptor struct {
@@ -118,44 +114,6 @@ func StatusInterceptor(contentType string, body func(code int, text string) ([]b
 		Fallback: makeResponse(http.StatusInternalServerError),
 	}
 }
-
-// Recover returns an error that represents an error caught from recover.
-// It should be used as:
-//
-//	if err := Recover(recover()); err != nil {
-//		// ... handle here ...
-//	}
-func Recover(value any) error {
-	if value == nil {
-		return nil
-	}
-	return errRecover{
-		Stack: debug.Stack(),
-		Value: value,
-	}
-}
-
-type errRecover struct {
-	Stack []byte
-	Value any
-}
-
-func (er errRecover) GoString() string {
-	return "httpx.errRecover{/*details omitted*/}"
-}
-
-func (er errRecover) Error() string {
-	return fmt.Sprintf("%v\n\n%s", er.Value, er.Stack)
-}
-
-// Common errors accepted by all httpx handlers
-var (
-	ErrInternalServerError = errors.New("httpx: Internal Server Error")
-	ErrBadRequest          = errors.New("httpx: Bad Request")
-	ErrNotFound            = errors.New("httpx: Not Found")
-	ErrForbidden           = errors.New("httpx: Forbidden")
-	ErrMethodNotAllowed    = errors.New("httpx: Method Not Allowed")
-)
 
 var (
 	TextInterceptor = StatusInterceptor(ContentTypeText, func(code int, text string) ([]byte, error) {

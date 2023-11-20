@@ -25,7 +25,7 @@ func RenderErrorPage(err error, res Response, w http.ResponseWriter, r *http.Req
 func newErrorPage(err error, r *http.Request) (page errorPage) {
 	page.Stack = string(debug.Stack())
 
-	page.Error = NewError(err)
+	page.Error = newSError(err)
 
 	if r != nil {
 		page.Method = r.Method
@@ -92,8 +92,8 @@ type sError struct {
 	Unwrap []sError // The source of wrapped errors
 }
 
-// NewError safely turns an error into an error
-func NewError(err error) sError {
+// newSError safely turns an error into an error
+func newSError(err error) sError {
 	e := sError{
 		Error:  fmt.Sprintf("%s", err),
 		Type:   fmt.Sprintf("%T", err),
@@ -115,7 +115,7 @@ func NewError(err error) sError {
 		if err == nil {
 			continue
 		}
-		e.Unwrap = append(e.Unwrap, NewError(err))
+		e.Unwrap = append(e.Unwrap, newSError(err))
 	}
 
 	// and we've built the error

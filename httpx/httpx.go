@@ -13,7 +13,7 @@ import (
 // It implements [http.Handler].
 type Response struct {
 	ContentType string // defaults to [ContentTypeTextPlain]
-	Body        []byte
+	Body        []byte // immutable body to be sent to the client
 
 	Modtime    time.Time
 	StatusCode int // defaults to a 2XX status code

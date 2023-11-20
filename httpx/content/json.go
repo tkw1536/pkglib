@@ -7,7 +7,7 @@ import (
 	"github.com/tkw1536/pkglib/httpx"
 )
 
-// JSON creates a new JSONHandler
+// JSON is a convenience method to create a new JSONHandler.
 func JSON[T any](f func(r *http.Request) (T, error)) JSONHandler[T] {
 	return JSONHandler[T](f)
 }

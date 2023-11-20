@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 
 <style>
-    :root { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    :root { font-family: -apple-system, BlinkMacSystemFont, sans-serif; color-scheme: light dark; }
     div { margin-left: 1em; }
     code { user-select: all; }
 </style>
@@ -112,7 +112,7 @@
         <dt>Unwrap</dt>
         <dd>
             {{ range $unused, $err := .Unwrap }}
-            <details>
+            <details open>
                 <summary><code>{{ $err.Source }}</code></summary>
                 <div>{{ template "error" $err }}</div>
             </details>
