@@ -1,6 +1,8 @@
 // Package httpx provides additional [http.Handler]s and utility functions
 package httpx
 
+// spellchecker:words httpx modtime
+
 import (
 	"bytes"
 	"net/http"

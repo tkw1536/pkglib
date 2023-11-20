@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-
-	"github.com/tkw1536/pkglib/minify"
 )
 
 // ErrInterceptor can handle errors for http responses and render appropriate error responses.
@@ -88,41 +86,47 @@ func (ei ErrInterceptor) match(err error) (Response, bool) {
 	return ei.Fallback, false
 }
 
-// StatusInterceptor creates a new ErrInterceptor handling default responses.
-// If body returns err != nil, StatusInterceptor calls panic().
-func StatusInterceptor(contentType string, body func(code int, text string) ([]byte, error)) ErrInterceptor {
-	makeResponse := func(code int) (res Response) {
-		var err error
-		res.Body, err = body(code, http.StatusText(code))
-		if err != nil {
-			panic("StatusInterceptor: err != nil")
-		}
+// TESTME: StatusInterceptor
 
-		res.ContentType = contentType
-		res.StatusCode = code
-		return
-	}
-
-	return ErrInterceptor{
-		Errors: map[error]Response{
-			ErrInternalServerError: makeResponse(http.StatusInternalServerError),
-			ErrBadRequest:          makeResponse(http.StatusBadRequest),
-			ErrNotFound:            makeResponse(http.StatusNotFound),
-			ErrForbidden:           makeResponse(http.StatusForbidden),
-			ErrMethodNotAllowed:    makeResponse(http.StatusMethodNotAllowed),
-		},
-		Fallback: makeResponse(http.StatusInternalServerError),
-	}
+// statuses intercepted by StatusInterceptor
+var statuses = []StatusCode{
+	ErrInternalServerError,
+	ErrBadRequest,
+	ErrNotFound,
+	ErrForbidden,
+	ErrMethodNotAllowed,
 }
 
+// StatusInterceptor creates a new ErrInterceptor handling default responses.
+// If body returns err != nil, StatusInterceptor calls panic().
+func StatusInterceptor(contentType string, body func(code StatusCode) []byte) ErrInterceptor {
+	var interceptor ErrInterceptor
+
+	interceptor.Errors = make(map[error]Response, len(statuses))
+	for _, code := range statuses {
+		interceptor.Errors[code] = Response{
+			ContentType: contentType,
+			StatusCode:  int(code),
+			Body:        body(code),
+		}.Minify()
+	}
+
+	interceptor.Fallback = interceptor.Errors[ErrInternalServerError]
+
+	return interceptor
+}
+
+// interceptors for common content types
 var (
-	TextInterceptor = StatusInterceptor(ContentTypeText, func(code int, text string) ([]byte, error) {
-		return []byte(text), nil
+	TextInterceptor = StatusInterceptor(ContentTypeText, func(code StatusCode) []byte { return []byte(code.String()) })
+	JSONInterceptor = StatusInterceptor(ContentTypeJSON, func(code StatusCode) []byte {
+		res, err := json.Marshal(map[string]any{"status": code.String(), "code": int(code)})
+		if err != nil {
+			panic(err)
+		}
+		return res
 	})
-	JSONInterceptor = StatusInterceptor("application/json", func(code int, text string) ([]byte, error) {
-		return json.Marshal(map[string]any{"status": text, "code": code})
-	})
-	HTMLInterceptor = StatusInterceptor("text/html", func(code int, text string) ([]byte, error) {
-		return minify.MinifyBytes("text/html", []byte(`<!DOCTYPE HTML><title>`+text+`</title>`+text)), nil
+	HTMLInterceptor = StatusInterceptor(ContentTypeHTML, func(code StatusCode) []byte {
+		return []byte(`<!DOCTYPE HTML><title>` + code.String() + `</title>` + code.String())
 	})
 )

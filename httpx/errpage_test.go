@@ -17,7 +17,7 @@ func ExampleRenderErrorPage() {
 
 	// a handler with an error page
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// do some operation, here is always fails for testing.
+		// do some operation, here it always fails for testing.
 		err := fmt.Errorf("for debugging: %w", httpx.ErrNotFound)
 		if err != nil {
 			// render the error page

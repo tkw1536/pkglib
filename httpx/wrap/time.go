@@ -14,6 +14,7 @@ type requestTime struct{}
 var requestTimeKey = requestTime{}
 
 // Time wraps an [http.Handler], storing the time a request was started within it.
+// To retrieve stored time, see [TimeStart] and [TimeSince].
 func Time(h http.Handler) http.Handler {
 	return Context(h, func(c context.Context) context.Context {
 		return context.WithValue(c, requestTimeKey, time.Now())
