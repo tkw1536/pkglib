@@ -5,27 +5,37 @@ import (
 	"net/http"
 
 	"github.com/tkw1536/pkglib/httpx"
+	"github.com/tkw1536/pkglib/recovery"
 )
 
-// JSON is a convenience method to create a new JSONHandler.
+// spellchecker: words httpx
+
+// JSON creates a new [JSONHandler] based on the given function.
+// The Interceptor will be [httpx.JSONInterceptor].
 func JSON[T any](f func(r *http.Request) (T, error)) JSONHandler[T] {
-	return JSONHandler[T](f)
+	return JSONHandler[T]{
+		Handler:     f,
+		Interceptor: httpx.JSONInterceptor,
+	}
 }
 
 // WriteJSON writes a JSON response of type T to w.
-// If an error occurred, writes an error response instead.
+// If an error occurred, [httpx.JSONInterceptor] is used instead.
 func WriteJSON[T any](result T, err error, w http.ResponseWriter, r *http.Request) {
 	writeJSON(result, err, httpx.JSONInterceptor, w, r)
 }
 
-// JSONHandler implements [http.Handler] by returning values as json to the caller.
+// JSONHandler implements [http.Handler] by marshaling values as json to the caller.
 // In case of an error, a generic "internal server error" message is returned.
-type JSONHandler[T any] func(r *http.Request) (T, error)
+type JSONHandler[T any] struct {
+	Handler     func(r *http.Request) (T, error)
+	Interceptor httpx.ErrInterceptor
+}
 
 // ServeHTTP calls j(r) and returns json
 func (j JSONHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	result, err := j(r)
-	writeJSON(result, err, httpx.JSONInterceptor, w, r)
+	result, err := recovery.Safe(func() (T, error) { return j.Handler(r) })
+	writeJSON(result, err, j.Interceptor, w, r)
 }
 
 func writeJSON[T any](result T, err error, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) {

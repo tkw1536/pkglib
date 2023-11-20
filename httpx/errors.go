@@ -3,7 +3,6 @@ package httpx
 import (
 	"fmt"
 	"net/http"
-	"runtime/debug"
 )
 
 // StatusCode represents an error based on a http status code.
@@ -52,34 +51,3 @@ var (
 	_ error        = (StatusCode)(0)
 	_ http.Handler = (StatusCode)(0)
 )
-
-// Recover returns an error that represents an error caught from recover.
-// When passed nil, returns nil.
-//
-// It should be used as:
-//
-//	if err := Recover(recover()); err != nil {
-//		// ... handle here ...
-//	}
-func Recover(value any) error {
-	if value == nil {
-		return nil
-	}
-	return recovery{
-		Stack: debug.Stack(),
-		Value: value,
-	}
-}
-
-type recovery struct {
-	Stack []byte
-	Value any
-}
-
-func (r recovery) GoString() string {
-	return fmt.Sprintf("httpx.recovery{/* recover() = %#v */}", r.Value)
-}
-
-func (r recovery) Error() string {
-	return fmt.Sprintf("%v\n\n%s", r.Value, r.Stack)
-}

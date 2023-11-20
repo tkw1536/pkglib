@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/tkw1536/pkglib/httpx"
 	"github.com/tkw1536/pkglib/minify"
+	"github.com/tkw1536/pkglib/recovery"
 )
 
 // WriteHTML writes an html response to r into w.
@@ -26,20 +27,16 @@ type HTMLHandler[C any] struct {
 	Handler func(r *http.Request) (C, error)
 
 	// Template is the template to be rendered into responses
-	Template     *template.Template
-	TemplateName string // name of template to render, defaults to root
+	Template *template.Template
+
+	Interceptor httpx.ErrInterceptor
 }
 
 // ServeHTTP calls the handler, and then passes it and the template to WriteHTML.
 func (h HTMLHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// call the function
-	result, err := h.Handler(r)
-
-	// TODO: Remove this
-	if h.TemplateName != "" {
-		h.Template = h.Template.Lookup(h.TemplateName)
-	}
-	writeHTML(result, err, h.Template, httpx.HTMLInterceptor, w, r)
+	result, err := recovery.Safe(func() (T, error) { return h.Handler(r) })
+	writeHTML(result, err, h.Template, h.Interceptor, w, r)
 }
 
 func writeHTML[C any](context C, err error, template *template.Template, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) (e error) {

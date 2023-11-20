@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/tkw1536/pkglib/httpx"
+	"github.com/tkw1536/pkglib/recovery"
 )
 
 // Render an error page in response to a panic
@@ -58,7 +59,7 @@ func ExampleRenderErrorPage_panic() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			// recover any errors
-			if err := httpx.Recover(recover()); err != nil {
+			if err := recovery.Recover(recover()); err != nil {
 				// render the error page
 				// which will replace it with a text/html page
 				httpx.RenderErrorPage(err, res, w, r)

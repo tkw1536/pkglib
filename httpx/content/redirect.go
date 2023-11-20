@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/tkw1536/pkglib/httpx"
+	"github.com/tkw1536/pkglib/recovery"
 )
 
 // spellchecker:words httpx
@@ -35,7 +36,7 @@ type RedirectHandler struct {
 // ServeHTTP calls r(r) and returns json
 func (rh RedirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// call the function
-	url, code, err := rh.Handler(r)
+	url, code, err := recovery.Safe2(func() (string, int, error) { return rh.Handler(r) })
 
 	// intercept the errors
 	if rh.Interceptor.Intercept(w, r, err) {
