@@ -7,21 +7,11 @@ import (
 
 // DefaultFieldTemplate is the default template to render fields.
 var DefaultFieldTemplate = template.Must(template.New("").Parse(`
-{{ if (eq .Type "textarea" )}}
-<textarea name="{{.Name}}" id="{{.Name}}" placeholder="{{.Placeholder}}"{{if .Autocomplete }} autocomplete="{{.Autocomplete}}" {{end}}>{{.Value}}</textarea>
+{{ if (eq .Type "textarea" ) }}
+<textarea name="{{.Name}}" id="{{.Name}}" placeholder="{{.Placeholder}}" {{if .Autocomplete }} autocomplete="{{.Autocomplete}}" {{end}}>{{.Value}}</textarea>
 {{ else }}
-<input type="{{.Type}}" value="{{.Value}}" name="{{.Name}}" placeholder={{.Placeholder}}{{if .Autocomplete }} autocomplete="{{.Autocomplete}}{{end}}>
+<input type="{{.Type}}" value="{{.Value}}" name="{{.Name}}" placeholder="{{.Placeholder}}" {{if .Autocomplete }} autocomplete="{{.Autocomplete}}" {{end}}>
 {{ end }}`))
-
-var PureCSSFieldTemplate = template.Must(template.New("").Parse(`
-<div class="pure-control-group">
-<label for="{{.Name}}">{{.Label}}</label>
-{{ if (eq .Type "textarea" )}}
-<textarea name="{{.Name}}" id="{{.Name}}" placeholder="{{.Placeholder}}"{{if .Autocomplete }} autocomplete="{{.Autocomplete}}" {{end}}>{{.Value}}</textarea>
-{{ else }}
-<input type="{{.Type}}" value="{{.Value}}" name="{{.Name}}" id="{{.Name}}" placeholder="{{.Placeholder}}"{{if .Autocomplete }} autocomplete="{{.Autocomplete}}" {{end}}>
-{{ end }}
-</div>`))
 
 // Field represents a field inside a form.
 type Field struct {

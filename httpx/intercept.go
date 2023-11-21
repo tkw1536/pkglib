@@ -86,8 +86,6 @@ func (ei ErrInterceptor) match(err error) (Response, bool) {
 	return ei.Fallback, false
 }
 
-// TESTME: StatusInterceptor
-
 // statuses intercepted by StatusInterceptor
 var statuses = []StatusCode{
 	ErrInternalServerError,
