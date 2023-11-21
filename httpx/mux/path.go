@@ -2,7 +2,6 @@ package mux
 
 import (
 	"path"
-	"path/filepath"
 )
 
 // NormalizePath normalizes a path sent to a webserver.
@@ -16,17 +15,17 @@ func NormalizePath(value string) string {
 		return "/"
 	}
 
-	// ensure we have a leading slash
+	// ensure that we have a leading slash
 	if value[0] != '/' {
 		value = "/" + value
 	}
 
-	// do the cleaning
-	value = filepath.Clean(value)
+	// clean the value
+	value = path.Clean(value)
 
-	// add the trailing slash
-	// required if and only if the path is not the root directory
-	if len(value) == 1 && value == "/" {
+	// The cleaned path ends in a slash if and only if it is the root path.
+	// Add it back otherwise.
+	if value == "/" {
 		return value
 	}
 	return value + "/"

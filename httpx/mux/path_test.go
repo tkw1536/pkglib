@@ -56,7 +56,6 @@ func TestNormalizePath(t *testing.T) {
 		{"abc//./../def", "/def/"},
 		{"abc/../../././../def", "/def/"},
 	}
-	// TODO: Add test cases.
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
