@@ -4,62 +4,38 @@ package websocket
 import (
 	"context"
 	"net/http"
+	"runtime/debug"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/tkw1536/pkglib/lazy"
 )
 
-// TODO: Testme
-
-// WebSocket implements serving a WebSocket
-type WebSocket struct {
+// Server implements a websocket server.
+type Server struct {
 	Context context.Context // context which closes all connections
-	Limits  Limits          // limits for websocket operations
+	Options Options         // Options for websocket connections
 
 	Handler  Handler
 	Fallback http.Handler
 
-	pool     lazy.Lazy[*sync.Pool] // pool holds *WebSocketConn objects
-	upgrader websocket.Upgrader    // upgrades upgrades connections
+	upgrader websocket.Upgrader // upgrades upgrades connections
 }
 
-// Handler represents a WebSocketHandler
-type Handler func(ws *webSocketConn)
+// Common message types see the gorilla websocket package for details.
+const (
+	TextMessage   = websocket.TextMessage
+	BinaryMessage = websocket.BinaryMessage
+	CloseMessage  = websocket.CloseMessage
+	PingMessage   = websocket.PingMessage
+	PongMessage   = websocket.PongMessage
+)
 
-type Limits struct {
-	WriteWait      time.Duration // maximum time to wait for writing
-	PongWait       time.Duration // time to wait for pong responses
-	PingInterval   time.Duration // interval to send pings to the client
-	MaxMessageSize int64         // maximal message size in bytes
-}
+// Handler handles a new incoming websocket connection.
+// Handler may not retain a reference to its' argument past the function returning.
+type Handler func(*Connection)
 
-func (limits *Limits) SetDefaults() {
-	if limits.WriteWait == 0 {
-		limits.WriteWait = 10 * time.Second
-	}
-	if limits.PongWait == 0 {
-		limits.PongWait = time.Minute
-	}
-	if limits.PingInterval <= 0 {
-		limits.PingInterval = (limits.PongWait * 9) / 10
-	}
-	if limits.MaxMessageSize <= 0 {
-		limits.MaxMessageSize = 2048
-	}
-}
-
-// makePoolSocket creates a new socket and makes sure that the pool is initialized
-func (h *WebSocket) makePoolSocket() *webSocketConn {
-	return h.pool.Get(func() *sync.Pool {
-		return &sync.Pool{
-			New: func() any { return new(webSocketConn) },
-		}
-	}).Get().(*webSocketConn)
-}
-
-func (h *WebSocket) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// if the user did not request a websocket, go to the fallback handler
 	if !websocket.IsWebSocketUpgrade(r) {
 		h.serveFallback(w, r)
@@ -70,7 +46,7 @@ func (h *WebSocket) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.serveWebsocket(w, r)
 }
 
-func (h *WebSocket) serveFallback(w http.ResponseWriter, r *http.Request) {
+func (h *Server) serveFallback(w http.ResponseWriter, r *http.Request) {
 	if h.Fallback == nil {
 		http.NotFound(w, r)
 		return
@@ -79,7 +55,7 @@ func (h *WebSocket) serveFallback(w http.ResponseWriter, r *http.Request) {
 	h.Fallback.ServeHTTP(w, r)
 }
 
-func (h *WebSocket) serveWebsocket(w http.ResponseWriter, r *http.Request) {
+func (h *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 	// clone the incoming request (to avoid having duplicate connection state)
 	r2 := r.Clone(r.Context())
 
@@ -89,58 +65,38 @@ func (h *WebSocket) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get a new socket from the pool
-	socket := h.makePoolSocket()
-	socket.Serve(h.Context, h.Limits, r2, conn, h.Handler)
-
-	// return a reset socket to the pool
-	socket.reset()
-	h.pool.Get(nil).Put(socket)
+	// create a new connection
+	var socket Connection
+	defer socket.reset()
+	socket.serve(h.Context, h.Options, r2, conn, h.Handler)
 }
 
-// WebSocketConnection represents a connected WebSocket.
-type WebSocketConnection interface {
-	// Context returns a context that is closed once the connection is terminated.
-	Context() context.Context
-
-	// Request returns a clone of the original request used for upgrading the connection.
-	// It can be used to e.g. check for authentication.
-	//
-	// Multiple calls to Request may return the same Request.
-	Request() *http.Request
-
-	// Read returns a channel that receives message.
-	// The channel is closed if no more messages are available (for instance because the server closed).
-	Read() <-chan WebSocketMessage
-
-	// Write queues the provided message for sending.
-	// The returned channel is closed once the message has been sent.
-	Write(WebSocketMessage) <-chan struct{}
-
-	// WriteText is a convenience method to send a TextMessage.
-	// The returned channel is closed once the message has been sent.
-	WriteText(text string) <-chan struct{}
-
-	// Close closes the underlying connection
-	Close()
-}
-
-// WebSocketMessage represents a connected Websocket
-type WebSocketMessage struct {
+// Message represents a message sent between client and server.
+type Message struct {
 	Type  int
 	Bytes []byte
 }
 
-type outWebSocketMessage struct {
-	WebSocketMessage
+// Binary checks if this message is a binary message
+func (msg Message) Binary() bool {
+	return msg.Type == BinaryMessage
+}
+
+// Text checks if this message is a text message
+func (msg Message) Text() bool {
+	return msg.Type == TextMessage
+}
+
+type outMessage struct {
+	Message
 	done chan<- struct{} // done should be closed when finished
 }
 
-// webSocketConn implements [WebSocketConnection]
-type webSocketConn struct {
-	r      *http.Request   // underlying http request
-	conn   *websocket.Conn // underlying connection
-	limits Limits
+// Connection represents a connection to a client.
+type Connection struct {
+	r    *http.Request   // underlying http request
+	conn *websocket.Conn // underlying connection
+	opts Options
 
 	context context.Context // context to cancel the connection
 	cancel  context.CancelFunc
@@ -148,90 +104,100 @@ type webSocketConn struct {
 	wg sync.WaitGroup // blocks all the ongoing tasks
 
 	// incoming and outgoing tasks
-	incoming chan WebSocketMessage
-	outgoing chan outWebSocketMessage
+	incoming chan Message
+	outgoing chan outMessage
 }
 
-// Serve serves the provided connection
+// serve serves the provided connection
 // r is the original request that has been passed
-func (h *webSocketConn) Serve(ctx context.Context, limits Limits, r *http.Request, conn *websocket.Conn, handler Handler) {
+func (conn *Connection) serve(ctx context.Context, opts Options, r *http.Request, c *websocket.Conn, handler Handler) {
 	// use the connection!
-	h.r = r
-	h.conn = conn
+	conn.r = r
+	conn.conn = c
 
 	// setup limits
-	h.limits = limits
-	h.limits.SetDefaults()
+	conn.opts = opts
+	conn.opts.SetDefaults()
 
 	// create a context for the connection
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	h.context, h.cancel = context.WithCancel(ctx)
+	conn.context, conn.cancel = context.WithCancel(ctx)
 
 	// start receiving and sending messages
-	h.wg.Add(2)
-	h.sendMessages()
-	h.recvMessages()
+	conn.wg.Add(2)
+	conn.sendMessages()
+	conn.recvMessages()
 
 	// wait for the context to be cancelled, then close the connection
-	h.wg.Add(1)
+	conn.wg.Add(1)
 	go func() {
-		defer h.wg.Done()
-		<-h.context.Done()
-		h.conn.Close()
+		defer conn.wg.Done()
+		<-conn.context.Done()
+		conn.conn.Close()
 	}()
 
 	// start the application logic
-	h.wg.Add(1)
-	go h.handle(handler)
+	conn.wg.Add(1)
+	go conn.handle(handler)
 
 	// wait for closing operations
-	h.wg.Wait()
+	conn.wg.Wait()
 }
 
-func (h *webSocketConn) handle(handler Handler) {
+func (conn *Connection) handle(handler Handler) {
 	defer func() {
-		h.wg.Done()
-		h.cancel()
+		// when the handler panic()s, simply print the stack!
+		// to not cause the server to crash!
+		if value := recover(); value != nil {
+			debug.PrintStack()
+		}
+
+		conn.wg.Done()
+		conn.cancel()
 	}()
 
-	handler(h)
+	handler(conn)
 }
 
-func (h *webSocketConn) Request() *http.Request {
-	return h.r
+// Request returns a clone of the original request used for upgrading the connection.
+// It can be used to e.g. check for authentication.
+//
+// Multiple calls to Request may return the same Request.
+func (conn *Connection) Request() *http.Request {
+	return conn.r
 }
 
-func (h *webSocketConn) sendMessages() {
+func (conn *Connection) sendMessages() {
 	// turn on write compression!
-	h.conn.EnableWriteCompression(true)
+	conn.conn.EnableWriteCompression(true)
 
-	h.outgoing = make(chan outWebSocketMessage)
+	conn.outgoing = make(chan outMessage)
 
 	go func() {
 		// close connection when done!
 		defer func() {
-			h.wg.Done()
-			h.cancel()
+			conn.wg.Done()
+			conn.cancel()
 		}()
 
 		// setup a timer for pings!
-		ticker := time.NewTicker(h.limits.PingInterval)
+		ticker := time.NewTicker(conn.opts.PingInterval)
 		defer ticker.Stop()
 
 		for {
 			select {
 			// everything is done!
-			case <-h.context.Done():
+			case <-conn.context.Done():
 				return
 
 			// send outgoing messages
-			case message := <-h.outgoing:
+			case message := <-conn.outgoing:
 				(func() {
 					defer close(message.done)
 
-					err := h.writeRaw(message.Type, message.Bytes)
+					err := conn.writeRaw(message.Type, message.Bytes)
 					if err != nil {
 						return
 					}
@@ -239,7 +205,7 @@ func (h *webSocketConn) sendMessages() {
 				})()
 			// send a ping message
 			case <-ticker.C:
-				if err := h.writeRaw(websocket.PingMessage, []byte{}); err != nil {
+				if err := conn.writeRaw(PingMessage, []byte{}); err != nil {
 					return
 				}
 			}
@@ -249,94 +215,141 @@ func (h *webSocketConn) sendMessages() {
 }
 
 // writeRaw writes to the underlying socket
-func (h *webSocketConn) writeRaw(messageType int, data []byte) error {
-	h.conn.SetWriteDeadline(time.Now().Add(h.limits.WriteWait))
-	return h.conn.WriteMessage(messageType, data)
+func (conn *Connection) writeRaw(messageType int, data []byte) error {
+	conn.conn.SetWriteDeadline(time.Now().Add(conn.opts.WriteWait))
+	return conn.conn.WriteMessage(messageType, data)
 }
 
-// Write writes a message to the websocket connection.
-func (sh *webSocketConn) Write(message WebSocketMessage) <-chan struct{} {
+// Write queues the provided message for sending.
+// The returned channel is closed once the message has been sent.
+func (conn *Connection) Write(message Message) <-chan struct{} {
 	callback := make(chan struct{}, 1)
 	go func() {
 		select {
+
 		// write an outgoing message
-		case sh.outgoing <- outWebSocketMessage{
-			WebSocketMessage: message,
-			done:             callback,
+		case conn.outgoing <- outMessage{
+			Message: message,
+			done:    callback,
 		}:
 		// context
-		case <-sh.context.Done():
+		case <-conn.context.Done():
 			close(callback)
 		}
 	}()
 	return callback
 }
 
-func (sh *webSocketConn) WriteText(text string) <-chan struct{} {
-	return sh.Write(WebSocketMessage{
-		Type:  websocket.TextMessage,
+// WriteText is a convenience method to send a TextMessage.
+// The returned channel is closed once the message has been sent.
+func (sh *Connection) WriteText(text string) <-chan struct{} {
+	return sh.Write(Message{
+		Type:  TextMessage,
 		Bytes: []byte(text),
 	})
 }
 
-func (h *webSocketConn) recvMessages() {
-	h.incoming = make(chan WebSocketMessage)
+// WriteText is a convenience method to send a BinaryMessage.
+// The returned channel is closed once the message has been sent.
+func (conn *Connection) WriteBinary(source []byte) <-chan struct{} {
+	return conn.Write(Message{
+		Type:  BinaryMessage,
+		Bytes: source,
+	})
+}
+
+func (conn *Connection) recvMessages() {
+	conn.incoming = make(chan Message)
 
 	// set a read handler
-	h.conn.SetReadLimit(h.limits.MaxMessageSize)
+	conn.conn.SetReadLimit(conn.opts.MaxMessageSize)
 
 	// configure a pong handler
-	h.conn.SetReadDeadline(time.Now().Add(h.limits.PongWait))
-	h.conn.SetPongHandler(func(string) error { h.conn.SetReadDeadline(time.Now().Add(h.limits.PongWait)); return nil })
+	conn.conn.SetReadDeadline(time.Now().Add(conn.opts.PongWait))
+	conn.conn.SetPongHandler(func(string) error { conn.conn.SetReadDeadline(time.Now().Add(conn.opts.PongWait)); return nil })
 
 	// handle incoming messages
 	go func() {
 		// close connection when done!
 		defer func() {
-			h.wg.Done()
-			h.cancel()
+			conn.wg.Done()
+			conn.cancel()
 		}()
 
 		for {
-			messageType, messageBytes, err := h.conn.ReadMessage()
+			messageType, messageBytes, err := conn.conn.ReadMessage()
 			if err != nil {
 				return
 			}
 
 			// try to send a message to the incoming message channel
 			select {
-			case h.incoming <- WebSocketMessage{
+			case conn.incoming <- Message{
 				Type:  messageType,
 				Bytes: messageBytes,
 			}:
-			case <-h.context.Done():
+			case <-conn.context.Done():
 				return
 			}
 		}
 	}()
 }
 
-// Read returns a channel that receives incoming messages.
-// The channel is close once no more messages are available, or the context is canceled.
-func (h *webSocketConn) Read() <-chan WebSocketMessage {
-	return h.incoming
+// Read returns a channel that receives messages.
+// The channel is closed if no more messages are available (for instance because the connection closed)
+func (conn *Connection) Read() <-chan Message {
+	return conn.incoming
 }
 
 // Context returns a context that is closed once this connection is closed.
-func (h *webSocketConn) Context() context.Context {
-	return h.context
+func (conn *Connection) Context() context.Context {
+	return conn.context
 }
 
-func (h *webSocketConn) Close() {
-	h.cancel()
+// Close closes the underlying connection.
+func (conn *Connection) Close() {
+	conn.cancel()
 }
 
-// reset resets this websocket
-func (h *webSocketConn) reset() {
-	h.limits = Limits{}
+// reset resets this connection to be empty
+func (h *Connection) reset() {
+	h.opts = Options{}
 	h.r = nil
 	h.conn = nil
 	h.incoming = nil
 	h.outgoing = nil
 	h.context, h.cancel = nil, nil
+}
+
+// Options describes limits for [Server].
+type Options struct {
+	WriteWait      time.Duration // maximum time to wait for writing
+	PongWait       time.Duration // time to wait for pong responses
+	PingInterval   time.Duration // interval to send pings to the client
+	MaxMessageSize int64         // maximal message size in bytes
+}
+
+// Defaults for [Options]
+const (
+	DefaultWriteWait      = 10 * time.Second
+	DefaultPongWait       = time.Minute
+	DefaultPingInterval   = (DefaultPongWait * 9) / 10
+	DefaultMaxMessageSize = 2048 // bytes
+)
+
+// SetDefaults sets defaults for options.
+// See the appropriate default constants for this package.
+func (opt *Options) SetDefaults() {
+	if opt.WriteWait == 0 {
+		opt.WriteWait = DefaultWriteWait
+	}
+	if opt.PongWait == 0 {
+		opt.PongWait = DefaultPongWait
+	}
+	if opt.PingInterval <= 0 {
+		opt.PingInterval = DefaultPingInterval
+	}
+	if opt.MaxMessageSize <= 0 {
+		opt.MaxMessageSize = DefaultMaxMessageSize
+	}
 }
