@@ -8,7 +8,7 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
-// spellchecker: words httpx
+// spellchecker: words httpx jsoni
 
 // JSON creates a new [JSONHandler] based on the given function.
 // The Interceptor will be [httpx.JSONInterceptor].
@@ -22,7 +22,20 @@ func JSON[T any](f func(r *http.Request) (T, error)) JSONHandler[T] {
 // WriteJSON writes a JSON response of type T to w.
 // If an error occurred, [httpx.JSONInterceptor] is used instead.
 func WriteJSON[T any](result T, err error, w http.ResponseWriter, r *http.Request) {
-	writeJSON(result, err, httpx.JSONInterceptor, w, r)
+	WriteJSONI(result, err, httpx.JSONInterceptor, w, r)
+}
+
+// WriteJSONI is like [WriteJSON] but uses a custom interceptor.
+func WriteJSONI[T any](result T, err error, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) {
+	// handle any errors
+	if interceptor.Intercept(w, r, err) {
+		return
+	}
+
+	// write out the response as json
+	w.Header().Set("Content-Type", httpx.ContentTypeJSON)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
 }
 
 // JSONHandler implements [http.Handler] by marshaling values as json to the caller.
@@ -35,17 +48,5 @@ type JSONHandler[T any] struct {
 // ServeHTTP calls j(r) and returns json
 func (j JSONHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	result, err := recovery.Safe(func() (T, error) { return j.Handler(r) })
-	writeJSON(result, err, j.Interceptor, w, r)
-}
-
-func writeJSON[T any](result T, err error, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) {
-	// handle any errors
-	if interceptor.Intercept(w, r, err) {
-		return
-	}
-
-	// write out the response as json
-	w.Header().Set("Content-Type", httpx.ContentTypeJSON)
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
+	WriteJSONI(result, err, j.Interceptor, w, r)
 }
