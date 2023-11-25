@@ -125,7 +125,7 @@ func (conn *Connection) sendMessages() {
 				(func() {
 					defer close(message.done)
 
-					err := conn.writeRaw(message.Type, message.Bytes)
+					err := conn.writeRaw(message)
 					if err != nil {
 						return
 					}
@@ -133,7 +133,7 @@ func (conn *Connection) sendMessages() {
 				})()
 			// send a ping message
 			case <-ticker.C:
-				if err := conn.writePreparedRaw(ping); err != nil {
+				if err := conn.writeRaw(queuedMessage{prep: ping}); err != nil {
 					return
 				}
 			}
@@ -142,35 +142,42 @@ func (conn *Connection) sendMessages() {
 
 }
 
-func (conn *Connection) writeRaw(messageType int, data []byte) error {
+func (conn *Connection) writeRaw(message queuedMessage) error {
 	conn.conn.SetWriteDeadline(time.Now().Add(conn.opts.WriteInterval))
-	return conn.conn.WriteMessage(messageType, data)
-}
-
-func (conn *Connection) writePreparedRaw(message *websocket.PreparedMessage) error {
-	conn.conn.SetWriteDeadline(time.Now().Add(conn.opts.WriteInterval))
-	return conn.conn.WritePreparedMessage(message)
+	if message.prep != nil {
+		return conn.conn.WritePreparedMessage(message.prep)
+	}
+	return conn.conn.WriteMessage(message.msg.Type, message.msg.Bytes)
 }
 
 // Write queues the provided message for sending.
 // The returned channel is closed once the message has been sent or the connection is closed.
 func (conn *Connection) Write(message Message) <-chan struct{} {
-	callback := make(chan struct{}, 1)
+	return conn.write(queuedMessage{msg: message})
+}
+
+// WritePrepared queues the provided prepared message for sending.
+// The returned channel is closed once the message has been sent or the connection is closed.
+func (conn *Connection) WritePrepared(message PreparedMessage) <-chan struct{} {
+	return conn.write(queuedMessage{prep: message.m})
+}
+
+func (conn *Connection) write(message queuedMessage) <-chan struct{} {
+	done := make(chan struct{}, 1)
+
 	go func() {
+		message.done = done
 		select {
 
 		// write an outgoing message
-		case conn.outgoing <- queuedMessage{
-			Message: message,
-			done:    callback,
-		}:
+		case conn.outgoing <- message:
 
 		// closed
 		case <-conn.context.Done():
-			close(callback)
+			close(done)
 		}
 	}()
-	return callback
+	return done
 }
 
 // WriteText is a convenience method to send a TextMessage.
@@ -268,9 +275,12 @@ func (h *Connection) reset() {
 	h.context, h.cancel = nil, nil
 }
 
-// queuedMessage is a message queued for writing
+// queuedMessage is a message queued for writing.
+// it is either a regular message or a prepared message.
 type queuedMessage struct {
-	Message
+	msg  Message
+	prep *websocket.PreparedMessage
+
 	done chan<- struct{} // done should be closed when finished
 }
 

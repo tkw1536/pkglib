@@ -54,6 +54,50 @@ func ExampleServer_send() {
 	// world
 }
 
+func ExampleServer_prepared() {
+
+	var server websocket.Server
+
+	// prepare a message to send
+	msg := websocket.NewTextMessage("i am prepared").MustPrepare()
+	server.Handler = func(ws *websocket.Connection) {
+		<-ws.WritePrepared(msg)
+	}
+
+	// The following code below is just for connection to the server.
+	// It is just used to make sure that everything works.
+
+	// create an actual server
+	s := httptest.NewServer(&server)
+	defer s.Close()
+
+	// get the websocket url
+	url := "ws" + strings.TrimPrefix(s.URL, "http")
+
+	// Connect to the server
+	client, _, err := gwebsocket.DefaultDialer.Dial(url, nil)
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+
+	// print text messages
+	for {
+		tp, p, err := client.ReadMessage()
+		if err != nil {
+			return
+		}
+
+		// ignore non-text-messages
+		if tp != websocket.TextMessage {
+			continue
+		}
+		fmt.Println(string(p))
+	}
+
+	// Output: i am prepared
+}
+
 // Demonstrates how panic()ing handlers are handled handler
 func ExampleServer_panic() {
 	var server websocket.Server
