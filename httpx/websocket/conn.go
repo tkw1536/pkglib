@@ -183,19 +183,13 @@ func (conn *Connection) write(message queuedMessage) <-chan struct{} {
 // WriteText is a convenience method to send a TextMessage.
 // The returned channel is closed once the message has been sent.
 func (sh *Connection) WriteText(text string) <-chan struct{} {
-	return sh.Write(Message{
-		Type:  TextMessage,
-		Bytes: []byte(text),
-	})
+	return sh.Write(NewTextMessage(text))
 }
 
 // WriteText is a convenience method to send a BinaryMessage.
 // The returned channel is closed once the message has been sent.
 func (conn *Connection) WriteBinary(source []byte) <-chan struct{} {
-	return conn.Write(Message{
-		Type:  BinaryMessage,
-		Bytes: source,
-	})
+	return conn.Write(NewBinaryMessage(source))
 }
 
 // WriteClose is a convenience method to send a CloseMessage.

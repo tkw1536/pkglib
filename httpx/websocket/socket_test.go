@@ -2,8 +2,10 @@ package websocket_test
 
 import (
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 
 	"github.com/tkw1536/pkglib/httpx/websocket"
 
@@ -96,6 +98,73 @@ func ExampleServer_prepared() {
 	}
 
 	// Output: i am prepared
+}
+
+// How to use subprotocols
+func ExampleServer_subprotocols() {
+
+	// setup a server that supports three subprotocols
+	// and echoes back the negotiated one.
+	var server websocket.Server
+	server.Options.Subprotocols = []string{"a", "b", "c"}
+	server.Handler = func(ws *websocket.Connection) {
+		proto := ws.Subprotocol()
+		if proto == "" {
+			<-ws.WriteText("No subprotocol selected")
+			return
+		}
+		<-ws.WriteText("Selected subprotocol: " + proto)
+	}
+
+	// The following code below is just for connection to the server.
+	// It is just used to make sure that everything works.
+
+	// create an actual server
+	s := httptest.NewServer(&server)
+	defer s.Close()
+
+	// get the websocket url
+	url := "ws" + strings.TrimPrefix(s.URL, "http")
+
+	// connect to the dummy server, and print whatever comes back
+	connectAndPrint := func(subprotocols []string) {
+		var dialer gwebsocket.Dialer
+
+		dialer.Subprotocols = subprotocols
+		dialer.Proxy = http.ProxyFromEnvironment
+		dialer.HandshakeTimeout = 45 * time.Second
+
+		// Connect to the server
+		client, _, err := dialer.Dial(url, nil)
+		if err != nil {
+			panic(err)
+		}
+		defer client.Close()
+
+		// print text messages
+		for {
+			tp, p, err := client.ReadMessage()
+			if err != nil {
+				return
+			}
+
+			// ignore non-text-messages
+			if tp != websocket.TextMessage {
+				continue
+			}
+			fmt.Println(string(p))
+		}
+	}
+
+	connectAndPrint(nil)                     // no subprotocol
+	connectAndPrint([]string{"b", "d"})      // mix between known and unknown
+	connectAndPrint([]string{"a"})           // nothing
+	connectAndPrint([]string{"e", "f", "g"}) // no supported subprotocol
+
+	// Output: No subprotocol selected
+	// Selected subprotocol: b
+	// Selected subprotocol: a
+	// No subprotocol selected
 }
 
 // Demonstrates how panic()ing handlers are handled handler
