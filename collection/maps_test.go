@@ -9,8 +9,31 @@ func ExampleIterateSorted() {
 		0: "hello",
 		1: "world",
 	}
-	IterateSorted(m, func(k int, v string) {
+
+	IterateSorted(m, func(k int, v string) bool {
 		fmt.Printf("%d: %v\n", k, v)
+		return true
+	})
+
+	// Output: 0: hello
+	// 1: world
+}
+
+// Demonstrates how to stop an iteration early.
+func ExampleIterateSorted_early() {
+	m := map[int]string{
+		0: "hello",
+		1: "world",
+		2: "i",
+		3: "like",
+		4: "you",
+	}
+
+	IterateSorted(m, func(k int, v string) bool {
+		fmt.Printf("%d: %v\n", k, v)
+		// We return false to stop the iteration.
+		// Here this happens at k = 1.
+		return k < 1
 	})
 
 	// Output: 0: hello

@@ -9,7 +9,7 @@ import (
 // First returns the first value in slice for which test returns true.
 // When no such value exists, returns the zero value of T.
 //
-// To find the index of such an element, use "slices".IndexFunc.
+// To find the index of such an element, use [slices.IndexFunc].
 func First[T any](slice []T, test func(T) bool) T {
 	for _, v := range slice {
 		if test(v) {
@@ -96,18 +96,19 @@ func MapSlice[T1 any, S1 ~[]T1, T2 any](slice S1, f func(T1) T2) []T2 {
 // Deduplicate removes duplicates from the given slice in place.
 // Elements are not reordered.
 func Deduplicate[T comparable, S ~[]T](slice S) S {
-	cache := make(map[T]struct{}, len(slice))
+
+	// a map of elements that were seen
+	seen := make(map[T]struct{}, len(slice))
 
 	return Filter(slice, func(t T) bool {
-		// check if we saw the element before
-		// seen => don't include it
-		_, seen := cache[t]
-		if seen {
+		// check if we saw the element
+		_, ok := seen[t]
+		if ok {
 			return false
 		}
 
 		// not seen => include
-		cache[t] = struct{}{}
+		seen[t] = struct{}{}
 		return true
 	})
 }
