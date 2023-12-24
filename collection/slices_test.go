@@ -80,7 +80,7 @@ func TestDeduplicate(t *testing.T) {
 	}
 }
 
-func TestFilter(t *testing.T) {
+func TestKeepFunc(t *testing.T) {
 	type args struct {
 		s []string
 		f func(string) bool
@@ -92,23 +92,23 @@ func TestFilter(t *testing.T) {
 	}{
 		{"nil slice", args{nil, func(string) bool { panic("never called") }}, nil},
 		{"empty slice", args{[]string{}, func(string) bool { panic("never called") }}, []string{}},
-		{"filter on value", args{[]string{"a", "b", "c"}, func(s string) bool { return s == "a" }}, []string{"a"}},
+		{"KeepFunc on value", args{[]string{"a", "b", "c"}, func(s string) bool { return s == "a" }}, []string{"a"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Filter(slices.Clone(tt.args.s), tt.args.f); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Filter() = %v, want %v", got, tt.want)
+			if got := KeepFunc(slices.Clone(tt.args.s), tt.args.f); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("KeepFunc() = %v, want %v", got, tt.want)
 			}
-			if got := FilterClone(slices.Clone(tt.args.s), tt.args.f); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FilterClone() = %v, want %v", got, tt.want)
+			if got := KeepFuncClone(slices.Clone(tt.args.s), tt.args.f); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("KeepFuncClone() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func ExampleFilter() {
+func ExampleKeepFunc() {
 	values := []string{"hello", "world", "how", "are", "you"}
-	valuesF := Filter(values, func(s string) bool {
+	valuesF := KeepFunc(values, func(s string) bool {
 		return s != "how"
 	})
 	fmt.Printf("%#v\n%#v\n", values, valuesF)
@@ -116,17 +116,25 @@ func ExampleFilter() {
 	// []string{"hello", "world", "are", "you"}
 }
 
-func ExampleFilter_allTrue() {
+func ExampleKeepFunc_allTrue() {
 	values := []string{"hello", "world", "how", "are", "you"}
-	valuesF := Filter(values, func(s string) bool { return true })
+	valuesF := KeepFunc(values, func(s string) bool { return true })
 	fmt.Printf("%#v\n%#v\n", values, valuesF)
 	// Output: []string{"hello", "world", "how", "are", "you"}
 	// []string{"hello", "world", "how", "are", "you"}
 }
 
-func ExampleFilterClone() {
+func ExampleKeepFunc_allFalse() {
 	values := []string{"hello", "world", "how", "are", "you"}
-	valuesF := FilterClone(values, func(s string) bool {
+	valuesF := KeepFunc(values, func(s string) bool { return false })
+	fmt.Printf("%#v\n%#v\n", values, valuesF)
+	// Output: []string{"", "", "", "", ""}
+	// []string{}
+}
+
+func ExampleKeepFuncClone() {
+	values := []string{"hello", "world", "how", "are", "you"}
+	valuesF := KeepFuncClone(values, func(s string) bool {
 		return s != "how"
 	})
 	fmt.Printf("%#v\n%#v\n", values, valuesF)
@@ -134,13 +142,13 @@ func ExampleFilterClone() {
 	// []string{"hello", "world", "are", "you"}
 }
 
-func ExampleFilterClone_order() {
+func ExampleKeepFuncClone_order() {
 	values := []string{"hello", "world", "how", "are", "you"}
 
-	// the Filter function is guaranteed to be called in order
+	// the KeepFunc function is guaranteed to be called in order
 	index := 0
-	valuesF := FilterClone(values, func(s string) bool {
-		// filter every even element
+	valuesF := KeepFuncClone(values, func(s string) bool {
+		// KeepFunc every even element
 		res := index%2 == 0
 		index++
 		return res
