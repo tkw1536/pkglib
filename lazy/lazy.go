@@ -6,6 +6,9 @@ import (
 
 // Lazy holds a lazily initialized value of T.
 // A non-zero lazy must not be copied after first use.
+//
+// Lazy should be used where a single value is initialized and reset at different call sites with undefined order and values.
+// A value initialized in one place and read many times should use [sync.OnceValue] instead.
 type Lazy[T any] struct {
 	m     sync.Mutex // m protects the value of this lazy
 	done  bool       // is a value stored?
