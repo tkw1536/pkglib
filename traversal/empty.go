@@ -1,4 +1,4 @@
-package iterator
+package traversal
 
 // Empty returns a new iterator that contains no elements.
 // The Err method will return err, which may be nil.

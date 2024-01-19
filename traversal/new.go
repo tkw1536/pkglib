@@ -1,4 +1,4 @@
-package iterator
+package traversal
 
 // New creates a new iterator generator pair and returns the iterator.
 //
@@ -21,7 +21,7 @@ func Slice[T any](elements []T) Iterator[T] {
 		defer sender.Return()
 
 		for _, element := range elements {
-			if sender.Yield(element) {
+			if !sender.Yield(element) {
 				break
 			}
 		}
@@ -42,8 +42,8 @@ func Map[Element1, Element2 any](source Iterator[Element1], f func(Element1) Ele
 }
 
 // Connect creates a new iterator that calls f for every element returned by source.
-// If the pipe function returns true, iteration over the original elements stops.
-func Connect[Element1, Element2 any](source Iterator[Element1], f func(element Element1, sender Generator[Element2]) (closed bool)) Iterator[Element2] {
+// If the pipe function returns false, iteration over the original elements stops.
+func Connect[Element1, Element2 any](source Iterator[Element1], f func(element Element1, sender Generator[Element2]) (ok bool)) Iterator[Element2] {
 	return New(func(sender Generator[Element2]) {
 		// close the source
 		defer source.Close()
@@ -59,7 +59,7 @@ func Connect[Element1, Element2 any](source Iterator[Element1], f func(element E
 		}()
 
 		for source.Next() {
-			if f(source.Datum(), sender) {
+			if !f(source.Datum(), sender) {
 				break
 			}
 			if sender.Returned() {
@@ -72,11 +72,12 @@ func Connect[Element1, Element2 any](source Iterator[Element1], f func(element E
 // Pipe pipes elements from src into dst.
 // If any error occurs in src, the same error is sent to dst.
 //
-// The boolean indicates if the caller should continue running.
-func Pipe[Element any](dst Generator[Element], src Iterator[Element]) bool {
+// A return value of false indicates that the iterator requested cancellation, ok an error occured.
+// In such a case, the caller should not continue the use of dst.
+func Pipe[Element any](dst Generator[Element], src Iterator[Element]) (ok bool) {
 	for src.Next() {
-		if dst.Yield(src.Datum()) {
-			return true
+		if !dst.Yield(src.Datum()) {
+			return false
 		}
 	}
 	return dst.YieldError(src.Err())

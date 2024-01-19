@@ -1,5 +1,5 @@
-// Package iterator provides Generic Iterator and Generator Interfaces
-package iterator
+// Package traversal provides generic Iterator and Generator interfaces.
+package traversal
 
 import (
 	"context"
@@ -45,14 +45,14 @@ type Iterator[T any] interface {
 // Methods on a generator may not be called concurrently.
 type Generator[T any] interface {
 	// Yield yields an item to the receiving end.
-	// The return value indicates if the corresponding Iterator requested cancellation.
+	// A return value of false indicates that the receiving end has been closed and the generator should stop producing values early.
 	Yield(datum T) bool
 
 	// YieldError yields an error to the receiving end.
 	// Calling YieldError(nil) has no effect.
 	//
-	// If the receiving end of this iterator requested cancellation, the return value is true.
-	// Otherwise, if the return value indicates if error is nil.
+	// If the receiving end of this iterator requested cancellation, the return value is false.
+	// Otherwise, if the return value indicates if a non-nil error has been passed.
 	YieldError(err error) bool
 
 	// Returned indicates if the Return method was called.
@@ -133,28 +133,29 @@ func (it *impl[T]) Err() error {
 
 // sending end
 
-func (it *impl[T]) Yield(datum T) (closed bool) {
+func (it *impl[T]) Yield(datum T) (ok bool) {
 	return it.send(message[T]{
 		datum: datum,
 		err:   nil,
 	})
 }
 
-func (it *impl[T]) YieldError(err error) (closed bool) {
+func (it *impl[T]) YieldError(err error) (ok bool) {
 	if err == nil {
-		return false
+		return true
 	}
+
 	return it.send(message[T]{
 		err: err,
-	}) || err != nil
+	}) || err == nil
 }
 
-func (it *impl[T]) send(message message[T]) (closed bool) {
+func (it *impl[T]) send(message message[T]) (ok bool) {
 	select {
 	case it.messages <- message:
-		return false
-	case <-it.context.Done():
 		return true
+	case <-it.context.Done():
+		return false
 	}
 }
 

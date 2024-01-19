@@ -1,12 +1,14 @@
-package iterator
+package traversal_test
 
 import (
 	"errors"
 	"fmt"
+
+	"github.com/tkw1536/pkglib/traversal"
 )
 
 func ExampleEmpty() {
-	thing := Empty[any](nil)
+	thing := traversal.Empty[any](nil)
 	fmt.Println(thing.Next())
 	fmt.Println(thing.Err())
 
@@ -15,7 +17,7 @@ func ExampleEmpty() {
 }
 
 func ExampleEmpty_error() {
-	thing := Empty[any](errors.New("some error"))
+	thing := traversal.Empty[any](errors.New("some error"))
 	fmt.Println(thing.Next())
 	fmt.Println(thing.Err())
 

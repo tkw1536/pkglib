@@ -5,7 +5,7 @@ import (
 
 	"slices"
 
-	"github.com/tkw1536/pkglib/iterator"
+	"github.com/tkw1536/pkglib/traversal"
 	"gopkg.in/yaml.v3"
 )
 
@@ -97,8 +97,8 @@ func Transplant(node, donor *yaml.Node, SkipMissing bool) error {
 }
 
 // Iterate iterates over all paths in node.
-func IteratePaths(node *yaml.Node) iterator.Iterator[Path] {
-	return iterator.New(func(g iterator.Generator[Path]) {
+func IteratePaths(node *yaml.Node) traversal.Iterator[Path] {
+	return traversal.New(func(g traversal.Generator[Path]) {
 		defer g.Return()
 		iterpaths(g, node, nil)
 	})
@@ -106,14 +106,14 @@ func IteratePaths(node *yaml.Node) iterator.Iterator[Path] {
 
 // iterpaths generates all paths in the given node.
 // It returns if the user requested cancellation.
-func iterpaths(g iterator.Generator[Path], node *yaml.Node, path []string) bool {
+func iterpaths(g traversal.Generator[Path], node *yaml.Node, path []string) bool {
 	if node == nil {
-		return false
+		return true
 	}
 
 	// send the node itself
-	if g.Yield(Path{Path: path, Node: node}) {
-		return true
+	if !g.Yield(Path{Path: path, Node: node}) {
+		return false
 	}
 
 	// resolve the alias
@@ -123,7 +123,7 @@ func iterpaths(g iterator.Generator[Path], node *yaml.Node, path []string) bool 
 	}
 
 	if node.Kind != yaml.MappingNode {
-		return false
+		return true
 	}
 
 	for i := 0; i+1 < len(node.Content); i += 2 {

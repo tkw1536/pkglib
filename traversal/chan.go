@@ -1,4 +1,4 @@
-package iterator
+package traversal
 
 import "context"
 
@@ -37,7 +37,7 @@ func FromChannel[T any](in <-chan T) (Iterator[T], context.Context) {
 
 		// yield elements of the generator
 		for elem := range in {
-			if generator.Yield(elem) {
+			if !generator.Yield(elem) {
 				cancel()
 				break
 			}

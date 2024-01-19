@@ -1,14 +1,16 @@
-package iterator
+package traversal_test
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/tkw1536/pkglib/traversal"
 )
 
 func ExampleAsChannel() {
-	it := Slice([]int{0, 1, 2, 3, 4, 5})
+	it := traversal.Slice([]int{0, 1, 2, 3, 4, 5})
 
-	for i := range AsChannel(it, context.Background()) {
+	for i := range traversal.AsChannel(it, context.Background()) {
 		fmt.Print(i, " ")
 	}
 
@@ -25,7 +27,7 @@ func ExampleFromChannel() {
 	close(in)
 
 	// create a channel
-	c, _ := FromChannel(in)
+	c, _ := traversal.FromChannel(in)
 
 	for c.Next() {
 		fmt.Print(c.Datum(), " ")
