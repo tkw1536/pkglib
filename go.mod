@@ -1,6 +1,6 @@
 module github.com/tkw1536/pkglib
 
-go 1.21
+go 1.22.0
 
 require (
 	github.com/Showmax/go-fqdn v1.0.0
