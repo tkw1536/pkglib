@@ -3,8 +3,6 @@ package lreflect
 import (
 	"reflect"
 	"testing"
-
-	"github.com/tkw1536/pkglib/reflectx"
 )
 
 // HasAPrivateField has a private field
@@ -54,40 +52,40 @@ func Test_ImplementsAsStructPointer(t *testing.T) {
 		{
 			"implements method as a pointer",
 			args{
-				reflectx.TypeFor[OtherInterface](),
-				reflectx.TypeFor[*OtherStruct](),
+				reflect.TypeFor[OtherInterface](),
+				reflect.TypeFor[*OtherStruct](),
 			},
 			true,
 		},
 		{
 			"does not implement method",
 			args{
-				reflectx.TypeFor[SomeInterface](),
-				reflectx.TypeFor[*OtherStruct](),
+				reflect.TypeFor[SomeInterface](),
+				reflect.TypeFor[*OtherStruct](),
 			},
 			false,
 		},
 		{
 			"implements but not as pointer",
 			args{
-				reflectx.TypeFor[SomeInterface](),
-				reflectx.TypeFor[SomeStruct](),
+				reflect.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeStruct](),
 			},
 			false,
 		},
 		{
 			"implements but not a struct",
 			args{
-				reflectx.TypeFor[SomeInterface](),
-				reflectx.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeInterface](),
 			},
 			false,
 		},
 		{
 			"non-interface passed",
 			args{
-				reflectx.TypeFor[SomeStruct](),
-				reflectx.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeStruct](),
+				reflect.TypeFor[SomeInterface](),
 			},
 			false,
 		},
@@ -95,14 +93,14 @@ func Test_ImplementsAsStructPointer(t *testing.T) {
 			"nil interface passed",
 			args{
 				nil,
-				reflectx.TypeFor[*SomeStruct](),
+				reflect.TypeFor[*SomeStruct](),
 			},
 			false,
 		},
 		{
 			"nil struct passed",
 			args{
-				reflectx.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeInterface](),
 				nil,
 			},
 			false,

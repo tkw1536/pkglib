@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-
-	"github.com/tkw1536/pkglib/reflectx"
 )
 
 // Collection represents a set of validators.
@@ -60,8 +58,8 @@ func AddSlice[F any](coll Collection, name string, sep string, validator func(va
 }
 
 var (
-	errTyp = reflectx.TypeFor[error]()
-	strTyp = reflectx.TypeFor[string]()
+	errTyp = reflect.TypeFor[error]()
+	strTyp = reflect.TypeFor[string]()
 )
 
 // UnknownValidator is an error returned from Validate if a validator does not exist

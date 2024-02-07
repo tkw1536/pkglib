@@ -3,8 +3,6 @@ package lreflect
 import (
 	"reflect"
 	"testing"
-
-	"github.com/tkw1536/pkglib/reflectx"
 )
 
 func Test_ImplementsAsSliceInterface(t *testing.T) {
@@ -20,40 +18,40 @@ func Test_ImplementsAsSliceInterface(t *testing.T) {
 		{
 			"interface slice implements",
 			args{
-				reflectx.TypeFor[OtherInterface](),
-				reflectx.TypeFor[[]SomeInterface](),
+				reflect.TypeFor[OtherInterface](),
+				reflect.TypeFor[[]SomeInterface](),
 			},
 			true,
 		},
 		{
 			"struct slice does not implement",
 			args{
-				reflectx.TypeFor[SomeInterface](),
-				reflectx.TypeFor[[]OtherStruct](),
+				reflect.TypeFor[SomeInterface](),
+				reflect.TypeFor[[]OtherStruct](),
 			},
 			false,
 		},
 		{
 			"struct slice does implement but isn't an interface",
 			args{
-				reflectx.TypeFor[SomeInterface](),
-				reflectx.TypeFor[[]SomeStruct](),
+				reflect.TypeFor[SomeInterface](),
+				reflect.TypeFor[[]SomeStruct](),
 			},
 			false,
 		},
 		{
 			"non-slice implementing struct passed",
 			args{
-				reflectx.TypeFor[SomeInterface](),
-				reflectx.TypeFor[*SomeStruct](),
+				reflect.TypeFor[SomeInterface](),
+				reflect.TypeFor[*SomeStruct](),
 			},
 			false,
 		},
 		{
 			"non-slice non-implementing struct passed",
 			args{
-				reflectx.TypeFor[SomeInterface](),
-				reflectx.TypeFor[*OtherStruct](),
+				reflect.TypeFor[SomeInterface](),
+				reflect.TypeFor[*OtherStruct](),
 			},
 			false,
 		},
@@ -61,14 +59,14 @@ func Test_ImplementsAsSliceInterface(t *testing.T) {
 			"nil interface passed",
 			args{
 				nil,
-				reflectx.TypeFor[[]*SomeStruct](),
+				reflect.TypeFor[[]*SomeStruct](),
 			},
 			false,
 		},
 		{
 			"nil struct passed",
 			args{
-				reflectx.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeInterface](),
 				nil,
 			},
 			false,
@@ -114,7 +112,7 @@ func Test_FilterSliceInterface(t *testing.T) {
 						somestruct(4),
 					},
 				),
-				reflectx.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeInterface](),
 			},
 			[]SomeInterface{somestruct(1), somestruct(4)},
 		},
@@ -127,7 +125,7 @@ func Test_FilterSliceInterface(t *testing.T) {
 						otherstruct(2),
 					},
 				),
-				reflectx.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeInterface](),
 			},
 			[]SomeInterface{},
 		},
@@ -140,7 +138,7 @@ func Test_FilterSliceInterface(t *testing.T) {
 						otherstruct(2),
 					},
 				),
-				reflectx.TypeFor[string](),
+				reflect.TypeFor[string](),
 			},
 			nil,
 		},
@@ -148,7 +146,7 @@ func Test_FilterSliceInterface(t *testing.T) {
 			"non-slice passed",
 			args{
 				reflect.ValueOf("hello world"),
-				reflectx.TypeFor[SomeInterface](),
+				reflect.TypeFor[SomeInterface](),
 			},
 			nil,
 		},

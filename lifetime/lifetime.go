@@ -2,9 +2,10 @@
 package lifetime
 
 import (
+	"reflect"
+
 	"github.com/tkw1536/pkglib/lazy"
 	"github.com/tkw1536/pkglib/lifetime/interal/souls"
-	"github.com/tkw1536/pkglib/reflectx"
 )
 
 // Lifetime implements a dependency injection framework.
@@ -61,7 +62,7 @@ func (lt *Lifetime[Component, InitParams]) getSouls(params InitParams) *souls.So
 
 		// create a context and call the register function
 		context := &Registry[Component, InitParams]{
-			c: reflectx.TypeFor[Component](),
+			c: reflect.TypeFor[Component](),
 		}
 		lt.Register(context)
 
@@ -115,7 +116,7 @@ func ExportSlice[ConcreteComponentType any, Component any, InitParams any](
 	lt *Lifetime[Component, InitParams],
 	Params InitParams,
 ) []ConcreteComponentType {
-	export, err := lt.getSouls(Params).ExportClass(reflectx.TypeFor[ConcreteComponentType]())
+	export, err := lt.getSouls(Params).ExportClass(reflect.TypeFor[ConcreteComponentType]())
 	if err != nil {
 		panic(err)
 	}
@@ -132,7 +133,7 @@ func Export[ConcreteComponentType any, Component any, InitParams any](
 	lt *Lifetime[Component, InitParams],
 	Params InitParams,
 ) ConcreteComponentType {
-	export, err := lt.getSouls(Params).Export(reflectx.TypeFor[ConcreteComponentType]())
+	export, err := lt.getSouls(Params).Export(reflect.TypeFor[ConcreteComponentType]())
 	if err != nil {
 		panic(err)
 	}

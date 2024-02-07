@@ -7,67 +7,6 @@ import (
 	"testing"
 )
 
-func TestTypeFor(t *testing.T) {
-	tests := []struct {
-		name string
-		got  reflect.Type
-		want reflect.Type
-	}{
-		{
-			"string",
-			TypeFor[string](),
-			reflect.TypeOf(string("")),
-		},
-		{
-			"int",
-			TypeFor[int](),
-			reflect.TypeOf(int(0)),
-		},
-		{
-			"slice",
-			TypeFor[[]string](),
-			reflect.TypeOf([]string(nil)),
-		},
-		{
-			"array",
-			TypeFor[[0]string](),
-			reflect.TypeOf([0]string{}),
-		},
-		{
-			"chan",
-			TypeFor[chan string](),
-			reflect.TypeOf((chan string)(nil)),
-		},
-		{
-			"func",
-			TypeFor[func(string) string](),
-			reflect.TypeOf(func(string) string { return "" }),
-		},
-		{
-			"map",
-			TypeFor[map[string]string](),
-			reflect.TypeOf(map[string]string(nil)),
-		},
-		{
-			"struct",
-			TypeFor[struct{ Thing string }](),
-			reflect.TypeOf(struct{ Thing string }{}),
-		},
-		{
-			"pointer",
-			TypeFor[*struct{ Thing string }](),
-			reflect.TypeOf(&struct{ Thing string }{}),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Errorf("TypeOf() = %v, want %v", tt.got, tt.want)
-			}
-		})
-	}
-}
-
 // Iterate over the fields of a struct
 func ExampleIterateFields() {
 
@@ -88,7 +27,7 @@ func ExampleIterateFields() {
 
 	fmt.Println(
 		"returned:",
-		IterateFields(TypeFor[SomeStruct](), func(f reflect.StructField, index int) (stop bool) {
+		IterateFields(reflect.TypeFor[SomeStruct](), func(f reflect.StructField, index int) (stop bool) {
 			fmt.Println("encountered field", f.Name, "with index", index)
 			return false // do not stop
 		}),
@@ -121,7 +60,7 @@ func ExampleIterateAllFields() {
 
 	fmt.Println(
 		"returned:",
-		IterateAllFields(TypeFor[SomeStruct](), func(f reflect.StructField, index ...int) (stop bool) {
+		IterateAllFields(reflect.TypeFor[SomeStruct](), func(f reflect.StructField, index ...int) (stop bool) {
 			fmt.Println("encountered field", f.Name, "with index", index)
 			return false // do not stop
 		}),
@@ -154,7 +93,7 @@ func ExampleIterateAllFields_cancel() {
 
 	fmt.Println(
 		"returned:",
-		IterateAllFields(TypeFor[SomeStruct](), func(f reflect.StructField, index ...int) (cancel bool) {
+		IterateAllFields(reflect.TypeFor[SomeStruct](), func(f reflect.StructField, index ...int) (cancel bool) {
 			fmt.Println("encountered field", f.Name, "with index", index)
 			return f.Name == "EmbeddedField" // cancel on embedded field
 		}),
@@ -236,33 +175,33 @@ func TestNameOf(t *testing.T) {
 	}{
 		{
 			"built-in type",
-			TypeFor[string](),
+			reflect.TypeFor[string](),
 			".string",
 		},
 		{
 			"package in standard libary",
-			TypeFor[reflect.Type](),
+			reflect.TypeFor[reflect.Type](),
 			"reflect.Type",
 		},
 		{
 			"type in this library",
-			TypeFor[TypeForTesting](),
+			reflect.TypeFor[TypeForTesting](),
 			"github.com/tkw1536/pkglib/reflectx.TypeForTesting",
 		},
 
 		{
 			"non-named type (pointer)",
-			TypeFor[*string](),
+			reflect.TypeFor[*string](),
 			"",
 		},
 		{
 			"non-named type (slice)",
-			TypeFor[[]string](),
+			reflect.TypeFor[[]string](),
 			"",
 		},
 		{
 			"non-named type (map)",
-			TypeFor[map[string]string](),
+			reflect.TypeFor[map[string]string](),
 			"",
 		},
 		{

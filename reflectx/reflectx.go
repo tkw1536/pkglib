@@ -8,11 +8,6 @@ import (
 	"slices"
 )
 
-// TypeFor returns the reflection Type that represents the static type of T.
-func TypeFor[T any]() reflect.Type {
-	return reflect.TypeOf((*T)(nil)).Elem()
-}
-
 // CopyInterface returns a new copy of the interface value I.
 // I must be an interface type.
 //
@@ -24,7 +19,7 @@ func TypeFor[T any]() reflect.Type {
 func CopyInterface[I any](value I) (ptr I, mutable bool) {
 
 	// ensure that we are dealing with an interface
-	iTyp := TypeFor[I]()
+	iTyp := reflect.TypeFor[I]()
 	if iTyp.Kind() != reflect.Interface {
 		panic("CopyInterface: I must be an interface type")
 	}

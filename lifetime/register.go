@@ -41,7 +41,7 @@ func Register[Concrete any, Component any, InitParams any](context *Registry[Com
 	context.m.Lock()
 	defer context.m.Unlock()
 
-	C := reflectx.TypeFor[Concrete]()
+	C := reflect.TypeFor[Concrete]()
 	if b, _ := lreflect.ImplementsAsStructPointer(context.c, C); !b {
 		panic("Register: Attempt to register " + fmt.Sprint(C) + " as non-struct-pointer component")
 	}
