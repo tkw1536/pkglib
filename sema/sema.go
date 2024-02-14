@@ -1,26 +1,25 @@
 // Package sema implements semaphores and semaphore-related scheduling
 package sema
 
-// NewSemaphore creates a new semaphore with the provided limit.
+// New creates a new [Semaphore], guarding a resource of at most the given size.
+// The resource is assumed to be entirely available.
 //
-// A semaphore with limit = 1 is equivalent to a *sync.Mutex.
-// Semaphores with limit <= 0 implement Lock, TryLock and Unlock as no-ops that return immediately.
-func New(limit int) Semaphore {
+// A size <= 0 indicates an infinite limit, and all Lock and Unlock calls are no-ops.
+//
+// Note that if size is statically known to be 1, a Mutex should be used instead.
+func New(size int) Semaphore {
 	var sema Semaphore
-	if limit > 0 {
-		sema.c = make(chan struct{}, limit)
+	if size > 0 {
+		sema.c = make(chan struct{}, size)
 	}
 	return sema
 }
 
 // Semaphore guards parallel access to a shared resource.
-// It should always be created using New().
+// It should always be created using [New].
 //
-// The resource can be acquired using a call to Lock()
-// and released using a call to Unlock().
-// The maximum number of parallel accesses is set by using New().
-//
-// See also New and sync.Locker.
+// The resource can be acquired using a call to [Lock].
+// and released using a call to [Unlock].
 type Semaphore struct {
 	// if the limit is infinite, the channel is nil;
 	// else it is a buffered channel.
@@ -30,7 +29,7 @@ type Semaphore struct {
 	c chan struct{}
 }
 
-// Len returns the length of this semaphore, a.k.a the maximum number of parallel Lock() Unlock() blocks that may be active.
+// Len returns the maximum size of the resource guarded by this semaphore, or 0 if said limit is infinite.
 func (s Semaphore) Len() int {
 	if s.c == nil {
 		return 0
@@ -50,7 +49,7 @@ func (s Semaphore) Lock() {
 // TryLock attempts to atomically acquire the resource without blocking.
 // When it succeeds, it returns true, otherwise it returns false.
 //
-// Calls to TryLock() never block; they always return immediately.
+// Calls to [TryLock] never block; they always return immediately.
 func (s Semaphore) TryLock() bool {
 	if s.c == nil {
 		return true
@@ -65,9 +64,9 @@ func (s Semaphore) TryLock() bool {
 }
 
 // Unlock releases one unit of the resource that has been previously acquired.
-// Calls to Unlock() never block.
+// Calls to Unlock never block.
 //
-// Calls to Unlock() without an acquired resource are a programming error and may block forever.
+// Calls to Unlock without an acquired resource are a programming error and may block forever.
 func (s Semaphore) Unlock() {
 	select {
 	case <-s.c:
