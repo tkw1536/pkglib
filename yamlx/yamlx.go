@@ -2,6 +2,7 @@ package yamlx
 
 import (
 	"fmt"
+	"unsafe"
 
 	"slices"
 
@@ -26,6 +27,7 @@ var (
 	NodeIsNil          = FindError("node is nil")
 	UnexpectedScalar   = FindError("unexpected scalar node")
 	UnexpectedSequence = FindError("unexpected sequence node")
+	CircularAlias      = FindError("circular alias")
 	MappingExpected    = FindError("expected mapping node")
 )
 
@@ -61,10 +63,7 @@ type Path struct {
 }
 
 func (path Path) HasChildren() bool {
-	node := path.Node
-	for node.Kind == yaml.AliasNode {
-		node = node.Alias
-	}
+	node := resolveAlias(path.Node)
 	return node.Kind == yaml.MappingNode
 }
 
@@ -117,10 +116,7 @@ func iterpaths(g traversal.Generator[Path], node *yaml.Node, path []string) bool
 	}
 
 	// resolve the alias
-	// TODO: Implement the limit here
-	for node.Kind == yaml.AliasNode {
-		node = node.Alias
-	}
+	node = resolveAlias(node)
 
 	if node.Kind != yaml.MappingNode {
 		return true
@@ -214,7 +210,17 @@ func Find(node *yaml.Node, path ...string) (*yaml.Node, error) {
 		return nil, lastErr
 	// if we have an alias, find the alias instead
 	case node.Kind == yaml.AliasNode:
-		return Find(node.Alias, path...)
+		// resolve the alias
+		node := resolveAlias(node)
+		if node == nil {
+			return node, NodeIsNil
+		}
+		if node.Kind == yaml.AliasNode {
+			return node, CircularAlias
+		}
+
+		// and find in the resolved node
+		return Find(node, path...)
 
 		// zero length path => return the current child!
 	case len(path) == 0:
@@ -264,4 +270,24 @@ func Child(node *yaml.Node, name string) (index int, err error) {
 		}
 	}
 	return -1, ChildNotFound(name)
+}
+
+// recursively resolves an alias, stopping in case a circular reference is encountered.
+func resolveAlias(node *yaml.Node) *yaml.Node {
+	// a list of visited aliases
+	visited := make(map[uintptr]struct{})
+
+	for node != nil && node.Kind == yaml.AliasNode {
+		// check if we visited before
+		ptr := uintptr(unsafe.Pointer(node))
+		if _, saw := visited[ptr]; saw {
+			return node
+		}
+
+		// make the node as visited and move to the alias
+		visited[ptr] = struct{}{}
+		node = node.Alias
+	}
+
+	return node
 }
