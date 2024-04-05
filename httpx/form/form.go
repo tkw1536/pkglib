@@ -39,6 +39,10 @@ type Form[Data any] struct {
 	// It is passed the return value of [TemplateContext].
 	Template *template.Template
 
+	// LogTemplateError is intended to log a non-nil error being returned from executing the template.
+	// If it is nil, no logging occurs.
+	LogTemplateError func(r *http.Request, err error)
+
 	// TemplateContext is the context to be used for Template.
 	// A nil TemplateContext function returns the FormContext object as-is.
 	TemplateContext func(FormContext, *http.Request) any
@@ -171,8 +175,14 @@ func (form *Form[Data]) renderForm(err error, values map[string]string, w http.R
 		tplctx = form.TemplateContext(ctx, r)
 	}
 
-	// render the form
-	content.WriteHTML(tplctx, nil, form.Template, w, r)
+	// write out the html and log an error (if any)
+	{
+		err := content.WriteHTML(tplctx, nil, form.Template, w, r)
+		if err != nil && form.LogTemplateError != nil {
+			form.LogTemplateError(r, err)
+		}
+	}
+
 }
 
 // FormContext is passed to [Form.TemplateContext] when used

@@ -16,7 +16,6 @@ import (
 )
 
 func ExampleForm() {
-
 	formTemplate := template.Must(template.New("form").Parse("<!doctype html><title>Form</title>{{ if .Error }}<p>Error: {{ .Error }}</p>{{ end }}{{ .Form }}"))
 	successTemplate := template.Must(template.New("success").Parse("<!doctype html><title>Success</title>Welcome {{ . }}"))
 
@@ -45,50 +44,46 @@ func ExampleForm() {
 		},
 
 		Success: func(data string, values map[string]string, w http.ResponseWriter, r *http.Request) error {
-			content.WriteHTML(data, nil, successTemplate, w, r)
-			return nil
+			return content.WriteHTML(data, nil, successTemplate, w, r)
 		},
 	}
 
-	// the below code is not part of the form itself
-	// it is just used for testing
-
-	// a function to make a request to a specific method
-	makeRequest := func(body map[string]string) {
-		var req *http.Request
-		if body == nil {
-			var err error
-			req, err = http.NewRequest(http.MethodGet, "/", nil)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			form := url.Values{}
-			for name, value := range body {
-				form.Set(name, value)
-			}
-
-			var err error
-			req, err = http.NewRequest(http.MethodPost, "/", strings.NewReader(form.Encode()))
-			if err != nil {
-				panic(err)
-			}
-			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		}
-
-		rr := httptest.NewRecorder()
-		form.ServeHTTP(rr, req)
-
-		rrr := rr.Result()
-		result, _ := io.ReadAll(rrr.Body)
-		fmt.Printf("%q returned code %d with %s %q\n", req.Method, rrr.StatusCode, rrr.Header.Get("Content-Type"), string(result))
-	}
-
-	makeRequest(nil)
-	makeRequest(map[string]string{"givenName": "Andrea", "familyName": "", "password": "something"})
-	makeRequest(map[string]string{"givenName": "Andrea", "familyName": "Picard", "password": "something"})
+	fmt.Println(makeFormRequest(&form, nil))
+	fmt.Println(makeFormRequest(&form, map[string]string{"givenName": "Andrea", "familyName": "", "password": "something"}))
+	fmt.Println(makeFormRequest(&form, map[string]string{"givenName": "Andrea", "familyName": "Picard", "password": "something"}))
 
 	// Output: "GET" returned code 200 with text/html; charset=utf-8 "<!doctype html><title>Form</title><input name=givenName placeholder>\n<input name=familyName placeholder>\n<input type=password name=password placeholder>"
 	// "POST" returned code 200 with text/html; charset=utf-8 "<!doctype html><title>Form</title><p>Error: family name must not be empty</p><input value=Andrea name=givenName placeholder>\n<input name=familyName placeholder>\n<input type=password name=password placeholder>"
 	// "POST" returned code 200 with text/html; charset=utf-8 "<!doctype html><title>Success</title>Welcome Picard, Andrea"
+}
+
+// makeFormRequest makes a request to a form
+func makeFormRequest(form http.Handler, body map[string]string) string {
+	var req *http.Request
+	if body == nil {
+		var err error
+		req, err = http.NewRequest(http.MethodGet, "/", nil)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		form := url.Values{}
+		for name, value := range body {
+			form.Set(name, value)
+		}
+
+		var err error
+		req, err = http.NewRequest(http.MethodPost, "/", strings.NewReader(form.Encode()))
+		if err != nil {
+			panic(err)
+		}
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	}
+
+	rr := httptest.NewRecorder()
+	form.ServeHTTP(rr, req)
+
+	rrr := rr.Result()
+	result, _ := io.ReadAll(rrr.Body)
+	return fmt.Sprintf("%q returned code %d with %s %q", req.Method, rrr.StatusCode, rrr.Header.Get("Content-Type"), string(result))
 }

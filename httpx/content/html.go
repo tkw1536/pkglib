@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/rs/zerolog"
 	"github.com/tkw1536/pkglib/httpx"
 	"github.com/tkw1536/pkglib/minify"
 	"github.com/tkw1536/pkglib/recovery"
@@ -18,19 +17,12 @@ import (
 // The response is automatically minified.
 //
 // If err is not nil, an error response is rendered instead, see [httpx.HTMLInterceptor].
-func WriteHTML[C any](context C, err error, template *template.Template, w http.ResponseWriter, r *http.Request) (e error) {
+func WriteHTML[C any](context C, err error, template *template.Template, w http.ResponseWriter, r *http.Request) error {
 	return WriteHTMLI(context, err, template, httpx.HTMLInterceptor, w, r)
 }
 
 // WriteHTMLI is like [WriteHTML], but uses a custom error interceptor.
-func WriteHTMLI[C any](context C, err error, template *template.Template, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) (e error) {
-	// log any error that occurred
-	defer func() {
-		if e != nil {
-			zerolog.Ctx(r.Context()).Err(e).Str("path", r.URL.String()).Msg("error rendering template")
-		}
-	}()
-
+func WriteHTMLI[C any](context C, err error, template *template.Template, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) error {
 	// intercept any errors
 	if interceptor.Intercept(w, r, err) {
 		return nil
