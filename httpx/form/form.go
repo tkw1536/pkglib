@@ -54,7 +54,8 @@ type Form[Data any] struct {
 	Validate func(r *http.Request, values map[string]string) (Data, error)
 
 	// Success is a function that renders a successfully parsed form (either via [Validate] or [SkipForm]) into a response.
-	// A nil [Success] function is assumed to just render the [Template] above.
+	// Upon a non-nil error, the original form is rendered with an appropriate [TemplateContext] is rendered instead.
+	// A nil Success function is an error.
 	Success func(data Data, values map[string]string, w http.ResponseWriter, r *http.Request) error
 }
 
@@ -139,7 +140,7 @@ func (form *Form[Data]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodPost:
 		values, data, err := form.Values(r)
 		if err != nil {
-			form.renderForm(err, values, w, r)
+			form.renderForm(err, false, values, w, r)
 		} else {
 			form.renderSuccess(data, values, w, r)
 		}
@@ -150,17 +151,17 @@ func (form *Form[Data]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		fallthrough
 	case r.Method == http.MethodGet:
-		form.renderForm(nil, nil, w, r)
+		form.renderForm(nil, false, nil, w, r)
 	}
 }
 
-func (form *Form[Data]) renderForm(err error, values map[string]string, w http.ResponseWriter, r *http.Request) {
+func (form *Form[Data]) renderForm(err error, afterSuccess bool, values map[string]string, w http.ResponseWriter, r *http.Request) {
 	template := form.HTML(values, err != nil)
 	if !form.SkipCSRF {
 		template += csrf.TemplateField(r)
 	}
 
-	ctx := FormContext{Err: err, Form: template}
+	ctx := FormContext{Err: err, Form: template, AfterSuccess: afterSuccess}
 
 	// must have a form or a RenderForm
 	if form.Template == nil {
@@ -190,6 +191,10 @@ type FormContext struct {
 	// Error is the underlying error (if any)
 	Err error
 
+	// AfterSuccess indicates if the form is rendered after a call to form.Success.
+	// This typically means that validation passed, but an error occurred in the success function.
+	AfterSuccess bool
+
 	// Template is the underlying template rendered as html
 	Form template.HTML
 }
@@ -206,11 +211,16 @@ func (fc FormContext) Error() string {
 // renderSuccess renders a successful pass of the form
 // if an error occurs during rendering, renderForm is called instead
 func (form *Form[D]) renderSuccess(data D, values map[string]string, w http.ResponseWriter, r *http.Request) {
+	// must have a form Success
+	if form.Success == nil {
+		panic("form.Success is nil")
+	}
+
 	err := form.Success(data, values, w, r)
 	if err == nil {
 		return
 	}
-	form.renderForm(err, values, w, r)
+	form.renderForm(err, true, values, w, r)
 }
 
 //go:embed "form.html"
