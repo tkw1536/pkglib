@@ -4,86 +4,108 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"io"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"strings"
+	"testing"
 
-	"github.com/tkw1536/pkglib/httpx/content"
 	"github.com/tkw1536/pkglib/httpx/form"
 	"github.com/tkw1536/pkglib/httpx/form/field"
 )
 
-func ExampleForm() {
-	formTemplate := template.Must(template.New("form").Parse("<!doctype html><title>Form</title>{{ if .Error }}<p>Error: {{ .Error }}</p>{{ end }}{{ .Form }}"))
-	successTemplate := template.Must(template.New("success").Parse("<!doctype html><title>Success</title>Welcome {{ . }}"))
+func TestForm_logger(t *testing.T) {
+	frm := makeTestForm(t)
+	frm.Template = template.Must(template.New("form").Parse("{{ .ThisIsAnError }}"))
 
-	form := form.Form[string]{
-		Fields: []field.Field{
-			{Name: "givenName", Type: field.Text, Label: "Given Name"},
-			{Name: "familyName", Type: field.Text, Label: "Family Name"},
-			{Name: "password", Type: field.Password, Label: "Password", EmptyOnError: true},
-		},
+	for _, tt := range []struct {
+		ShouldValidate bool
+		ShouldSuccess  bool
+		WantCalled     bool
+	}{
+		{ShouldValidate: true, ShouldSuccess: true, WantCalled: false},
+		{ShouldValidate: true, ShouldSuccess: false, WantCalled: true},
+		{ShouldValidate: false, ShouldSuccess: true, WantCalled: true},
+		{ShouldValidate: false, ShouldSuccess: false, WantCalled: true},
+	} {
+		t.Run(fmt.Sprintf("Validate %t Success %t", tt.ShouldValidate, tt.ShouldSuccess), func(t *testing.T) {
 
-		Template:        formTemplate,
-		TemplateContext: func(fc form.FormContext, r *http.Request) any { return fc },
-
-		Validate: func(r *http.Request, values map[string]string) (string, error) {
-			given, family, password := values["givenName"], values["familyName"], values["password"]
-			if given == "" {
-				return "", errors.New("given name must not be empty")
+			// setup a LogTemplateError that records if it was called or not
+			called := false
+			frm.LogTemplateError = func(r *http.Request, err error) {
+				called = true
 			}
-			if family == "" {
-				return "", errors.New("family name must not be empty")
-			}
-			if password == "" {
-				return "", errors.New("no password provided")
-			}
-			return family + ", " + given, nil
-		},
 
-		Success: func(data string, values map[string]string, w http.ResponseWriter, r *http.Request) error {
-			return content.WriteHTML(data, nil, successTemplate, w, r)
-		},
+			makeFormRequest(t, &frm, map[string]string{"validate": fmt.Sprint(tt.ShouldValidate), "success": fmt.Sprint(tt.ShouldSuccess)})
+
+			if called != tt.WantCalled {
+				t.Errorf("want called = %t, got called = %t", tt.WantCalled, called)
+			}
+		})
 	}
-
-	fmt.Println(makeFormRequest(&form, nil))
-	fmt.Println(makeFormRequest(&form, map[string]string{"givenName": "Andrea", "familyName": "", "password": "something"}))
-	fmt.Println(makeFormRequest(&form, map[string]string{"givenName": "Andrea", "familyName": "Picard", "password": "something"}))
-
-	// Output: "GET" returned code 200 with text/html; charset=utf-8 "<!doctype html><title>Form</title><input name=givenName placeholder>\n<input name=familyName placeholder>\n<input type=password name=password placeholder>"
-	// "POST" returned code 200 with text/html; charset=utf-8 "<!doctype html><title>Form</title><p>Error: family name must not be empty</p><input value=Andrea name=givenName placeholder>\n<input name=familyName placeholder>\n<input type=password name=password placeholder>"
-	// "POST" returned code 200 with text/html; charset=utf-8 "<!doctype html><title>Success</title>Welcome Picard, Andrea"
 }
 
-// makeFormRequest makes a request to a form
-func makeFormRequest(form http.Handler, body map[string]string) string {
-	var req *http.Request
-	if body == nil {
-		var err error
-		req, err = http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		form := url.Values{}
-		for name, value := range body {
-			form.Set(name, value)
-		}
+func TestForm_formcontext_afterSuccess(t *testing.T) {
+	frm := makeTestForm(t)
+	frm.Template = template.Must(template.New("form").Parse("{{ .Form }}"))
 
-		var err error
-		req, err = http.NewRequest(http.MethodPost, "/", strings.NewReader(form.Encode()))
-		if err != nil {
-			panic(err)
-		}
-		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	for _, tt := range []struct {
+		ShouldValidate bool
+		ShouldSuccess  bool
+
+		WantCalled       bool
+		WantAfterSuccess bool
+	}{
+		{ShouldValidate: true, ShouldSuccess: true, WantCalled: false},
+		{ShouldValidate: true, ShouldSuccess: false, WantCalled: true, WantAfterSuccess: true},
+		{ShouldValidate: false, ShouldSuccess: true, WantCalled: true, WantAfterSuccess: false},
+		{ShouldValidate: false, ShouldSuccess: false, WantCalled: true, WantAfterSuccess: false},
+	} {
+		t.Run(fmt.Sprintf("Validate %t Success %t", tt.ShouldValidate, tt.ShouldSuccess), func(t *testing.T) {
+			// record if the TemplateContext function is called
+			// and record what AfterSuccess was like
+			called := false
+			afterSuccess := false
+			frm.TemplateContext = func(fc form.FormContext, r *http.Request) any {
+				called = true
+				afterSuccess = fc.AfterSuccess
+				return fc
+			}
+
+			makeFormRequest(t, &frm, map[string]string{"validate": fmt.Sprint(tt.ShouldValidate), "success": fmt.Sprint(tt.ShouldSuccess)})
+
+			if called != tt.WantCalled {
+				t.Errorf("want called = %t, got called = %t", tt.WantCalled, called)
+			}
+			if called && afterSuccess != tt.WantAfterSuccess {
+				t.Errorf("want afterSuccess = %t, got afterSuccess = %t", tt.WantAfterSuccess, afterSuccess)
+			}
+		})
 	}
+}
 
-	rr := httptest.NewRecorder()
-	form.ServeHTTP(rr, req)
+// testForm makes a form that can pass or fail the validate and success stages
+func makeTestForm(t *testing.T) form.Form[bool] {
+	if t != nil {
+		t.Helper()
+	}
+	return form.Form[bool]{
+		Fields: []field.Field{
+			{Name: "validate", Type: field.Text, Label: "Should the validate stage be passed?"},
+			{Name: "success", Type: field.Text, Label: "Should the success stage be passed?"},
+		},
 
-	rrr := rr.Result()
-	result, _ := io.ReadAll(rrr.Body)
-	return fmt.Sprintf("%q returned code %d with %s %q", req.Method, rrr.StatusCode, rrr.Header.Get("Content-Type"), string(result))
+		Validate: func(r *http.Request, values map[string]string) (bool, error) {
+			if validate := values["validate"]; validate == "" || validate == "false" {
+				return false, errors.New("<validate>")
+			}
+
+			success := values["success"]
+			return success != "" && success != "false", nil
+		},
+
+		Success: func(data bool, values map[string]string, w http.ResponseWriter, r *http.Request) error {
+			if !data {
+				return errors.New("<success>")
+			}
+			return nil
+		},
+	}
 }

@@ -208,6 +208,11 @@ func (fc FormContext) Error() string {
 	return fc.Err.Error()
 }
 
+// Unwrap implements error unwrapping.
+func (fc FormContext) Unwrap() error {
+	return fc.Err
+}
+
 // renderSuccess renders a successful pass of the form
 // if an error occurs during rendering, renderForm is called instead
 func (form *Form[D]) renderSuccess(data D, values map[string]string, w http.ResponseWriter, r *http.Request) {
