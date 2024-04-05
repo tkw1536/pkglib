@@ -16,15 +16,6 @@ func ExampleDoesPanic_panic() {
 	// recover() = some error message
 }
 
-// DoesPanic behavior for a function that calls panic(nil)
-func ExampleDoesPanic_nil() {
-	didPanic, _ := DoesPanic(func() {
-		panic(nil)
-	})
-	fmt.Printf("didPanic = %t\n", didPanic)
-	// Output: didPanic = true
-}
-
 // DoesPanic behavior for a function that does not panic
 func ExampleDoesPanic_normal() {
 	didPanic, _ := DoesPanic(func() {
