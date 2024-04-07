@@ -91,8 +91,7 @@ func IterateAllFields(T reflect.Type, f func(field reflect.StructField, index ..
 
 // iterateFields implements IterateFields and IterateAllFields
 func iterateFields(embeds bool, index []int, T reflect.Type, f func(field reflect.StructField, index ...int) (cancel bool)) (cancelled bool) {
-	nf := T.NumField()
-	for i := 0; i < nf; i++ {
+	for i := range T.NumField() {
 		field := T.Field(i)
 		fieldIndex := append(slices.Clone(index), i)
 		if embeds && field.Anonymous && field.Type.Kind() == reflect.Struct {

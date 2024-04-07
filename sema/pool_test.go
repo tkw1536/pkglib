@@ -83,7 +83,8 @@ func TestPool_Limit(t *testing.T) {
 			}
 
 			// check that each item was destroyed
-			for i := int64(1); i <= int64(tt.Limit); i++ {
+			for i := range int64(tt.Limit) {
+				i := i + 1
 				_, ok := destroyedValues.Load(i)
 				if !ok {
 					t.Errorf("item %d was not destroyed", i)

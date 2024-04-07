@@ -137,7 +137,7 @@ func writeString(w io.Writer) func(string) (int, error) {
 func repeat(w func(string) (int, error), s string, count int) (int, error) {
 	// NOTE(twiesing): This function exists to save having to repeatedly call
 	// io.WriteString; which always rechecks if the passed type fulfils the interface.
-	for i := 0; i < count; i++ {
+	for i := range count {
 		if m, err := w(s); err != nil {
 			return len(s)*i + m, err
 		}

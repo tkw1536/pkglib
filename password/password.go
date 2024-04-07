@@ -56,7 +56,7 @@ func Generate(rand io.Reader, length int, charset Charset) (string, error) {
 	var password strings.Builder
 	password.Grow(length)
 
-	for i := 0; i < length; i++ {
+	for range length {
 
 		// grab a random bIndex!
 		bIndex, err := crand.Int(rand, runeCount)

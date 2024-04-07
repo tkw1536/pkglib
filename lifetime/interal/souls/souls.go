@@ -66,7 +66,7 @@ func (r *Souls) Init() error {
 		r.classes = make(map[reflect.Type]reflect.Value)
 
 		// iterate over all the elements
-		for i := 0; i < l; i += 1 {
+		for i := range l {
 			if err := r.initComponent(i); err != nil {
 				return err
 			}

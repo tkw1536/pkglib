@@ -32,7 +32,7 @@ func TestPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			for i := 0; i < N; i++ {
+			for range N {
 				candidate, err := Generate(rand.Reader, tt.length, tt.charset)
 				if err != nil {
 					t.Error(err)

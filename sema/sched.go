@@ -43,7 +43,7 @@ func Schedule(worker func(int) error, count int, concurrency Concurrency) (err e
 	// create a wait group that waits for all the work to be done!
 	var wg sync.WaitGroup
 	wg.Add(count)
-	for i := 0; i < count; i++ {
+	for range count {
 		go func() {
 			defer wg.Done()
 

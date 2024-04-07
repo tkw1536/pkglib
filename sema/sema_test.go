@@ -23,7 +23,7 @@ func ExampleNew() {
 	var worked atomic.Uint64
 	var wg sync.WaitGroup
 	wg.Add(N)
-	for i := 0; i < N; i++ {
+	for range N {
 		go func() {
 			// accounting: keep track that we did some work and that we're done!
 			defer wg.Done()
@@ -82,7 +82,7 @@ func ExampleNew_zero() {
 	N := 1000
 
 	// so we can call Lock as many times as we want
-	for i := 0; i < N; i++ {
+	for range N {
 		sema.Lock()
 	}
 
@@ -102,7 +102,7 @@ func ExampleNew_two() {
 	N := 1000
 
 	// can lock it twice, before requiring an unlock
-	for i := 0; i < N; i++ {
+	for range N {
 		sema.Lock()
 		sema.Lock()
 
@@ -124,7 +124,7 @@ func ExampleNew_one() {
 	// do a bunch of locks and unlocks
 	N := 1000
 
-	for i := 0; i < N; i++ {
+	for range N {
 		sema.Lock()
 		time.Sleep(nothing)
 		sema.Unlock()
@@ -169,7 +169,7 @@ func TestNewSemaphore_exhausting(t *testing.T) {
 		s := New(n)
 
 		// fully lock it
-		for i := 0; i < n; i++ {
+		for range n {
 			s.Lock()
 		}
 
@@ -183,7 +183,7 @@ func BenchmarkNewSemaphore_uncontested(b *testing.B) {
 	sema := New(2)
 	nothing := time.Nanosecond
 
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		sema.Lock()
 		sema.Lock()
 
@@ -202,7 +202,7 @@ func BenchmarkNewSemaphore_contested(b *testing.B) {
 
 	// contest the semaphore in a concurrent goroutine
 	go func() {
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			sema.Lock()
 			time.Sleep(nothing)
 
@@ -213,7 +213,7 @@ func BenchmarkNewSemaphore_contested(b *testing.B) {
 	}()
 
 	// do the attempting to acquire
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		sema.Lock()
 		time.Sleep(nothing)
 		sema.Unlock()
@@ -223,12 +223,13 @@ func BenchmarkNewSemaphore_contested(b *testing.B) {
 func TestNewSemaphore_TryLock(t *testing.T) {
 	N := 1000
 
-	for limit := 1; limit < N; limit++ {
+	for limit := range N {
+		limit += 1
 		t.Run(fmt.Sprintf("limit = %d", limit), func(t *testing.T) {
 			sema := New(limit)
 
 			// lock the semaphore limit times!
-			for j := 0; j < limit; j++ {
+			for range limit {
 				if !sema.TryLock() {
 					t.Errorf("TryLock() = false, but wanted true")
 				}

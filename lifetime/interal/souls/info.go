@@ -65,8 +65,7 @@ var errNotInjectField = errors.New("not an injected field")
 // they are then written to the cFields and iFields maps.
 // inDependenciesStruct indicates if we are inside a dependency struct
 func (s soul) scanFields(component reflect.Type, structType reflect.Type, inDependenciesStruct bool, cFields map[string]reflect.Type, iFields map[string]reflect.Type) error {
-	count := structType.NumField()
-	for i := 0; i < count; i++ {
+	for i := range structType.NumField() {
 		field := structType.Field(i)
 
 		if !inDependenciesStruct && field.Tag.Get(injectFieldName) != "true" {

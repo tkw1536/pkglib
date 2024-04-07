@@ -21,7 +21,7 @@ func ExampleFromChannel() {
 	// fill a channel with some numbers
 	// and then close it!
 	in := make(chan int, 6)
-	for i := 0; i < 6; i++ {
+	for i := range cap(in) {
 		in <- i
 	}
 	close(in)

@@ -254,7 +254,7 @@ func ExampleServer_echo() {
 	messageCount := 1000
 
 	// send it a lot of times
-	for i := 0; i < messageCount; i++ {
+	for i := range messageCount {
 		// generate an example message to send
 		message := fmt.Sprintf("message %d", i)
 		var kind int

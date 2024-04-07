@@ -72,7 +72,7 @@ func BenchmarkLineBuffer(b *testing.B) {
 
 	data := []byte("world\nhello")
 
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		buffer.Write(data)
 	}
 }

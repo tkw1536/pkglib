@@ -50,7 +50,7 @@ func FilterSliceInterface(slice reflect.Value, I reflect.Type) (reflect.Value, e
 	result := reflect.MakeSlice(reflect.SliceOf(I), 0, len)
 
 	// iterate over the elements and check if they implement the slice
-	for i := 0; i < len; i++ {
+	for i := range len {
 		element := slice.Index(i)
 		if element.Elem().Type().Implements(I) {
 			result = reflect.Append(result, element.Elem().Convert(I))
@@ -83,7 +83,7 @@ func FirstAssignableInterfaceElement(slice reflect.Value, V reflect.Type) (refle
 
 	// find an element that is assignable to V
 	len := slice.Len()
-	for i := 0; i < len; i++ {
+	for i := range len {
 		element := slice.Index(i).Elem()
 		if element.Type().AssignableTo(V) {
 			return element, nil

@@ -120,7 +120,7 @@ func perf() (bytes int64, objects int64) {
 	var prevHeapUse, currentHeapUse uint64
 	var prevGCCount, currentGCCount uint32
 
-	for i := 0; i < measureMaxCycles; i++ {
+	for i := range measureMaxCycles {
 		// read heap statistics
 		runtime.ReadMemStats(&stats)
 		currentGCCount = stats.NumGC
