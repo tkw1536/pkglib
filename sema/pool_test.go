@@ -1,122 +1,94 @@
-package sema
+package sema_test
 
 import (
-	"errors"
-	"fmt"
 	"sync"
 	"sync/atomic"
+	"testing"
 
-	"slices"
+	"github.com/tkw1536/pkglib/sema"
 )
 
-type Thing uint64
+func TestPool_Limit(t *testing.T) {
 
-func (t *Thing) OK() error {
-	fmt.Printf("OK(%d)\n", *t)
-	return nil
-}
+	for _, tt := range []struct {
+		Name              string
+		Limit, Iterations int
+	}{
+		{"single item pool", 1, 1_000},
+		{"small pool", 10, 1_000},
+		{"medium pool", 100, 10_000},
+		{"huge pool", 1000, 100_000},
+	} {
+		t.Run(tt.Name, func(t *testing.T) {
+			t.Parallel()
 
-var errTest = errors.New("test error")
+			var (
+				createdCount atomic.Int64 // count of created items
 
-func (t *Thing) Fail() error {
-	fmt.Printf("Fail(%d)\n", *t)
-	return errTest
-}
+				destroyedCount  atomic.Int64 // count of destroyed items
+				destroyedValues sync.Map     // values having been destroyed
+			)
 
-func (t *Thing) Close() {
-	fmt.Printf("Close(%d)\n", *t)
-}
+			p := sema.Pool[int64]{
+				// setup the limit
+				Limit: tt.Limit,
 
-func ExamplePool() {
-	var counter atomic.Uint64
-	p := Pool[*Thing]{
-		Limit: 1, // at most one item in the pool
-		New: func() *Thing {
-			// create a new thing (and print creating it)
-			id := counter.Add(1)
-			fmt.Printf("New(%d)\n", id)
-			return ((*Thing)(&id))
-		},
-		Discard: (*Thing).Close,
-	}
-	defer p.Close()
+				// creating simply increases the count
+				New: func() int64 {
+					return createdCount.Add(1)
+				},
 
-	// the first time an item from the pool is requested, it is created using New()
-	p.Use((*Thing).OK)
+				// Discard
+				Discard: func(u int64) {
+					destroyedCount.Add(1)
+					destroyedValues.Store(u, struct{}{})
+				},
+			}
 
-	// calling it again, re-uses it
-	p.Use((*Thing).OK)
+			// fill the pool up with N items
+			var wg sync.WaitGroup
+			wg.Add(tt.Limit)
+			done := make(chan struct{})
 
-	// failing causes it to be destroyed
-	p.Use((*Thing).Fail)
+			for range tt.Limit {
+				go p.Use(func(u int64) error {
+					wg.Done() // tell the outer loop an item has been created
+					<-done    // do not return the item to the pool until all have been created
+					return nil
+				})
+			}
+			wg.Wait()
+			close(done)
 
-	// and calling it again re-creates another one
-	p.Use((*Thing).OK)
+			if created := int(createdCount.Load()); created != tt.Limit {
+				t.Errorf("created %d items(s), but expected %d", created, tt.Limit)
+			}
 
-	// Output: New(1)
-	// OK(1)
-	// OK(1)
-	// Fail(1)
-	// Close(1)
-	// New(2)
-	// OK(2)
-	// Close(2)
-}
+			// use the items a bunch of times
+			wg.Add(tt.Iterations)
+			for range tt.Iterations {
+				go func() {
+					defer wg.Done()
+					p.Use(func(u int64) error { return nil })
+				}()
+			}
+			wg.Wait()
 
-func ExamplePool_Limit() {
-	var counter atomic.Uint64
+			// destroy all of them (will record destruction)
+			p.Close()
 
-	N := 10
-	M := 1000
+			// check that the right amount of items was destroyed
+			if dc := int(destroyedCount.Load()); dc != tt.Limit {
+				t.Errorf("destroyed %d items(s), but expected %d", dc, tt.Limit)
+			}
 
-	var destroyedM sync.Mutex
-	var destroyed []uint64
-
-	p := Pool[uint64]{
-		Limit: 10, // at most one item in the pool
-		New: func() uint64 {
-			return counter.Add(1)
-		},
-		Discard: func(u uint64) {
-			destroyedM.Lock()
-			defer destroyedM.Unlock()
-			destroyed = append(destroyed, u)
-		},
-	}
-
-	// fill the pool up with N items
-	var wg sync.WaitGroup
-	wg.Add(N)
-	done := make(chan struct{})
-
-	for i := 0; i < N; i++ {
-		go p.Use(func(u uint64) error {
-			wg.Done() // tell the outer loop an item has been created
-			<-done    // do not return the item to the pool until all have been created
-			return nil
+			// check that each item was destroyed
+			for i := int64(1); i <= int64(tt.Limit); i++ {
+				_, ok := destroyedValues.Load(i)
+				if !ok {
+					t.Errorf("item %d was not destroyed", i)
+				}
+			}
 		})
 	}
-	wg.Wait()
-	close(done)
-
-	// use the items a bunch of times
-	wg.Add(M)
-	for i := 0; i < M; i++ {
-		go func() {
-			defer wg.Done()
-			p.Use(func(u uint64) error { return nil })
-		}()
-	}
-	wg.Wait()
-
-	// destroy all of them
-	// (this will record the items destroyed)
-	p.Close()
-
-	// we never had more than 10 items!
-	slices.Sort(destroyed)
-	fmt.Println(destroyed)
-
-	// Output: [1 2 3 4 5 6 7 8 9 10]
-
 }
