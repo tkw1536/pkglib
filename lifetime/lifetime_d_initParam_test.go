@@ -37,7 +37,7 @@ func ExampleLifetime_dInitParam() {
 
 			// We use the Register function to perform additional initialization.
 			// Here, we store the passed parameter into the secret value.
-			lifetime.Register[*Secret](context, func(s *Secret, secret int) {
+			lifetime.Register(context, func(s *Secret, secret int) {
 				s.value = secret
 			})
 		},
