@@ -32,7 +32,7 @@ func (conn *Connection) serve(ctx context.Context, handler Handler) {
 	// enable compression if requested
 	if enabled := conn.opts.CompressionEnabled(); enabled {
 		conn.conn.EnableWriteCompression(true)
-		conn.conn.SetCompressionLevel(conn.opts.CompressionLevel)
+		_ = conn.conn.SetCompressionLevel(conn.opts.CompressionLevel)
 	}
 
 	// create a context for the connection
@@ -143,7 +143,10 @@ func (conn *Connection) sendMessages() {
 }
 
 func (conn *Connection) writeRaw(message queuedMessage) error {
-	conn.conn.SetWriteDeadline(time.Now().Add(conn.opts.WriteInterval))
+	if err := conn.conn.SetWriteDeadline(time.Now().Add(conn.opts.WriteInterval)); err != nil {
+		return err
+	}
+
 	if message.prep != nil {
 		return conn.conn.WritePreparedMessage(message.prep)
 	}
@@ -210,8 +213,10 @@ func (conn *Connection) recvMessages() {
 	conn.conn.SetReadLimit(conn.opts.ReadLimit)
 
 	// configure a pong handler
-	conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
-	conn.conn.SetPongHandler(func(string) error { conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval)); return nil })
+	_ = conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
+	conn.conn.SetPongHandler(func(string) error {
+		return conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
+	})
 
 	// handle incoming messages
 	go func() {
