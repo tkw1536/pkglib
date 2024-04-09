@@ -311,7 +311,7 @@ func (st *Status) openLogger(id uint64) {
 
 // closeLogger closes the logger for the line with the given id
 func (st *Status) closeLogger(id uint64) {
-	defer func() { recover() }()
+	defer func() { _ = recover() }() // silently ignore errors
 
 	if st == nil {
 		return

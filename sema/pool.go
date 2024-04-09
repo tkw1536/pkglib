@@ -57,7 +57,7 @@ func (pool *Pool[V]) Use(f func(V) error) error {
 
 	// run the actual function
 	ok, err := func() (ok bool, err error) {
-		defer func() { recover() }()
+		defer func() { _ = recover() }() // silently ignore errors
 
 		ok = false
 		err = f(entry)
