@@ -49,7 +49,7 @@ type JSONHandler[T any] struct {
 	Handler func(r *http.Request) (T, error)
 
 	Interceptor        httpx.ErrInterceptor
-	LogJSONEncodeError func(r *http.Request, err error)
+	LogJSONEncodeError httpx.ErrorLogger
 }
 
 // ServeHTTP calls j(r) and returns json

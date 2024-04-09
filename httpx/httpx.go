@@ -63,3 +63,7 @@ func (response Response) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(response.StatusCode)
 	w.Write(response.Body)
 }
+
+// ErrorLogger is a function that can log an error occurred during some http handling process.
+// A nil logger performs no logging.
+type ErrorLogger func(r *http.Request, err error)

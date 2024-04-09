@@ -41,7 +41,7 @@ type Form[Data any] struct {
 
 	// LogTemplateError is intended to log a non-nil error being returned from executing the template.
 	// If it is nil, no logging occurs.
-	LogTemplateError func(r *http.Request, err error)
+	LogTemplateError httpx.ErrorLogger
 
 	// TemplateContext is the context to be used for Template.
 	// A nil TemplateContext function returns the FormContext object as-is.

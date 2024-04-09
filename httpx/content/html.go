@@ -55,7 +55,7 @@ type HTMLHandler[C any] struct {
 	Template *template.Template // Template is the template to be rendered into responses
 
 	Interceptor             httpx.ErrInterceptor
-	LogTemplateExecuteError func(r *http.Request, err error)
+	LogTemplateExecuteError httpx.ErrorLogger
 }
 
 // ServeHTTP calls the handler, and then passes it and the template to WriteHTML.
