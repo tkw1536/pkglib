@@ -61,7 +61,7 @@ func (response Response) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// write only the response with the given content type
 	w.WriteHeader(response.StatusCode)
-	w.Write(response.Body)
+	_, _ = w.Write(response.Body)
 }
 
 // ErrorLogger is a function that can log an error occurred during some http handling process.
