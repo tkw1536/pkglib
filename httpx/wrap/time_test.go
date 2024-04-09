@@ -20,7 +20,7 @@ func ExampleTime() {
 		time.Sleep(delay)         // sleep for a bit
 		took := wrap.TimeSince(r) // record how long it took
 
-		json.NewEncoder(w).Encode(took)
+		_ = json.NewEncoder(w).Encode(took)
 	}))
 
 	// create a new request
@@ -39,7 +39,7 @@ func ExampleTime() {
 
 	// decode the amount of time taken from the request
 	var took time.Duration
-	json.NewDecoder(rr.Result().Body).Decode(&took)
+	_ = json.NewDecoder(rr.Result().Body).Decode(&took)
 
 	if took >= delay {
 		fmt.Println("Handler returned correct delay")

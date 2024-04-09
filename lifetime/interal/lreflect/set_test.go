@@ -10,7 +10,7 @@ func ExampleUnsafeSetAnyValue() {
 
 	// get and set the private field
 	value := reflect.ValueOf(&private).Elem().FieldByName("private")
-	UnsafeSetAnyValue(value, reflect.ValueOf("I was set via reflect"))
+	_ = UnsafeSetAnyValue(value, reflect.ValueOf("I was set via reflect"))
 
 	fmt.Println(private.Private())
 	// Output: I was set via reflect

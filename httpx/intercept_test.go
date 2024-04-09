@@ -49,7 +49,7 @@ func ExampleErrInterceptor() {
 			return
 		}
 
-		w.Write([]byte("Normal response"))
+		_, _ = w.Write([]byte("Normal response"))
 	})
 
 	// a function to make a request to a specific method
@@ -93,7 +93,7 @@ func ExampleTextInterceptor() {
 			return
 		}
 
-		w.Write([]byte("Normal response"))
+		_, _ = w.Write([]byte("Normal response"))
 	})
 
 	// a function to make a request to a specific method
@@ -137,7 +137,7 @@ func ExampleJSONInterceptor() {
 			return
 		}
 
-		w.Write([]byte("Normal response"))
+		_, _ = w.Write([]byte("Normal response"))
 	})
 
 	// a function to make a request to a specific method
@@ -181,7 +181,7 @@ func ExampleHTMLInterceptor() {
 			return
 		}
 
-		w.Write([]byte("Normal response"))
+		_, _ = w.Write([]byte("Normal response"))
 	})
 
 	// a function to make a request to a specific method

@@ -35,7 +35,7 @@ func ExampleSortSliceByRank() {
 			"i",
 		}
 
-		SortSliceByRank(reflect.ValueOf(values))
+		_ = SortSliceByRank(reflect.ValueOf(values))
 		fmt.Println(values)
 	}
 
@@ -46,7 +46,7 @@ func ExampleSortSliceByRank() {
 			RankableStruct("yoda"),
 			RankableStruct("am"),
 		}
-		SortSliceByRank(reflect.ValueOf(values))
+		_ = SortSliceByRank(reflect.ValueOf(values))
 
 		fmt.Println(values)
 	}
@@ -58,7 +58,7 @@ func ExampleSortSliceByRank() {
 			"yoda",
 			"am",
 		}
-		SortSliceByRank(reflect.ValueOf(values))
+		_ = SortSliceByRank(reflect.ValueOf(values))
 
 		fmt.Println(values)
 	}

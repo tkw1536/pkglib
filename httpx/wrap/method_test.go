@@ -14,7 +14,7 @@ func ExampleMethods() {
 	handler := wrap.Methods(
 		// Create a new handler that echoes the appropriate method
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(r.Method))
+			_, _ = w.Write([]byte(r.Method))
 		}),
 
 		// and permit only the GET and POST methods

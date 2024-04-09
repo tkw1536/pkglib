@@ -17,14 +17,14 @@ func ExampleLineBuffer() {
 	}
 
 	// write some text into it, calling Line() with each completed line
-	buffer.WriteString("line 1\npartial")
-	buffer.WriteString(" line 2\n\n line not terminated")
+	_, _ = buffer.WriteString("line 1\npartial")
+	_, _ = buffer.WriteString(" line 2\n\n line not terminated")
 
 	// close the buffer, calling CloseLine()
 	buffer.Close()
 
 	// futures writes are no longer calling Line
-	buffer.WriteString("another\nline\n")
+	_, _ = buffer.WriteString("another\nline\n")
 
 	// Output: Line("line 1")
 	// Line("partial line 2")
@@ -46,14 +46,14 @@ func ExampleLineBuffer_FlushLineOnClose() {
 	}
 
 	// write some text into it, calling Line() with each completed line
-	buffer.WriteString("line 1\npartial")
-	buffer.WriteString(" line 2\n\n line not terminated")
+	_, _ = buffer.WriteString("line 1\npartial")
+	_, _ = buffer.WriteString(" line 2\n\n line not terminated")
 
 	// close the buffer, calling CloseLine()
 	buffer.Close()
 
 	// futures writes are no longer calling Line
-	buffer.WriteString("another\nline\n")
+	_, _ = buffer.WriteString("another\nline\n")
 
 	// Output: Line("line 1")
 	// Line("partial line 2")
@@ -73,6 +73,6 @@ func BenchmarkLineBuffer(b *testing.B) {
 	data := []byte("world\nhello")
 
 	for range b.N {
-		buffer.Write(data)
+		_, _ = buffer.Write(data)
 	}
 }

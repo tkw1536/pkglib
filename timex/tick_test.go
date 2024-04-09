@@ -81,7 +81,7 @@ func ExampleTickUntilFunc() {
 	var counter int
 
 	// keep a counter, and stop when it reaches 3!
-	TickUntilFunc(func(t time.Time) bool {
+	_ = TickUntilFunc(func(t time.Time) bool {
 		counter++
 		fmt.Printf("tick(%d)\n", counter)
 		return counter == 3

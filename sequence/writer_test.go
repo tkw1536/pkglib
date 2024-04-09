@@ -13,8 +13,8 @@ func ExampleWriter() {
 		Writer: os.Stdout,
 	}
 
-	w.Write([]byte("hello world\n"))
-	w.Write([]byte("bye world\n"))
+	_, _ = w.Write([]byte("hello world\n"))
+	_, _ = w.Write([]byte("bye world\n"))
 
 	// the total number of bytes written and any error
 	fmt.Println(w.Sum())

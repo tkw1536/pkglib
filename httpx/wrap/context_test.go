@@ -24,7 +24,7 @@ func ExampleContext() {
 				return
 			}
 
-			w.Write([]byte(content))
+			_, _ = w.Write([]byte(content))
 		}),
 
 		// Wrap it using a function that automatically sets the key
@@ -57,7 +57,7 @@ func ExampleContext_cancel() {
 	handler := wrap.Context(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("calling handler")
-			w.Write(nil)
+			_, _ = w.Write(nil)
 		}),
 
 		// Wrap it using a function that automatically sets the key

@@ -11,7 +11,7 @@ func ExampleSchedule() {
 	var counter atomic.Uint64
 
 	// because we have a parallelism of 1, we run exactly in order!
-	Schedule(func(i int) error {
+	_ = Schedule(func(i int) error {
 		counter.Add(1)
 		return nil
 	}, 1000, Concurrency{
@@ -25,7 +25,7 @@ func ExampleSchedule() {
 
 func ExampleSchedule_order() {
 	// because we have a parallelism of 1, we run exactly in order!
-	Schedule(func(i int) error {
+	_ = Schedule(func(i int) error {
 		fmt.Print(i, ";")
 		return nil
 	}, 4, Concurrency{
