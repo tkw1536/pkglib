@@ -37,7 +37,7 @@ func (code StatusCode) Error() string {
 func (code StatusCode) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", ContentTypeText)
 	w.WriteHeader(int(code))
-	w.Write([]byte(code.String()))
+	_, _ = w.Write([]byte(code.String()))
 }
 
 // Common Errors accepted by most httpx functions.

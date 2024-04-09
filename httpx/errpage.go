@@ -78,7 +78,7 @@ func (err errorPage) FormatHTML(res Response) template.HTML {
 	var builder strings.Builder
 
 	// TODO: Ignores template errors
-	errpageHTMLTemplate.Execute(&builder, errPageContext{Error: err, Original: res})
+	_ = errpageHTMLTemplate.Execute(&builder, errPageContext{Error: err, Original: res})
 
 	return template.HTML(builder.String())
 }
