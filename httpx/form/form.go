@@ -70,7 +70,8 @@ func (form *Form[D]) HTML(values map[string]string, IsError bool) template.HTML 
 			value = ""
 		}
 
-		field.WriteTo(&builder, form.FieldTemplate, value)
+		// TODO: Figure out how to properly handle the error here
+		_ = field.WriteTo(&builder, form.FieldTemplate, value)
 	}
 
 	return template.HTML(builder.String())

@@ -32,11 +32,11 @@ type fieldContext struct {
 	Value string
 }
 
-func (field Field) WriteTo(w io.Writer, template *template.Template, value string) {
+func (field Field) WriteTo(w io.Writer, template *template.Template, value string) error {
 	if template == nil {
 		template = DefaultFieldTemplate
 	}
-	template.Execute(w, fieldContext{Field: field, Value: value})
+	return template.Execute(w, fieldContext{Field: field, Value: value})
 }
 
 // CheckboxChecked is the default value of a checked checkbox
