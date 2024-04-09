@@ -46,7 +46,7 @@ func Format(message string) string {
 		}
 
 		// and put it into the builder for rewriting
-		text.Join(builder, words, "")
+		_, _ = text.Join(builder, words, "")
 		builder.WriteString(suffix)
 	}
 

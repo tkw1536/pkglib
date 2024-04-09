@@ -41,16 +41,16 @@ func ExamplePool() {
 	defer p.Close()
 
 	// the first time an item from the pool is requested, it is created using New()
-	p.Use((*Thing).OK)
+	_ = p.Use((*Thing).OK)
 
 	// calling it again, re-uses it
-	p.Use((*Thing).OK)
+	_ = p.Use((*Thing).OK)
 
 	// failing causes it to be destroyed
-	p.Use((*Thing).Fail)
+	_ = p.Use((*Thing).Fail)
 
 	// and calling it again re-creates another one
-	p.Use((*Thing).OK)
+	_ = p.Use((*Thing).OK)
 
 	// Output: New(1)
 	// OK(1)

@@ -101,7 +101,7 @@ func (r *Souls) initComponent(index int) error {
 		}
 
 		field := elem.FieldByName(field)
-		lreflect.UnsafeSetAnyValue(field, c)
+		_ = lreflect.UnsafeSetAnyValue(field, c)
 	}
 	for field, eType := range m.DCFields {
 		c, err := r.export(eType)
@@ -110,7 +110,7 @@ func (r *Souls) initComponent(index int) error {
 		}
 
 		field := dElem.FieldByName(field)
-		lreflect.UnsafeSetAnyValue(field, c)
+		_ = lreflect.UnsafeSetAnyValue(field, c)
 	}
 
 	// assign the interface subtypes
@@ -121,7 +121,7 @@ func (r *Souls) initComponent(index int) error {
 		}
 
 		field := elem.FieldByName(field)
-		lreflect.UnsafeSetAnyValue(field, cs)
+		_ = lreflect.UnsafeSetAnyValue(field, cs)
 	}
 	for field, eType := range m.DIFields {
 		cs, err := r.exportClass(eType)
@@ -130,7 +130,7 @@ func (r *Souls) initComponent(index int) error {
 		}
 
 		field := dElem.FieldByName(field)
-		lreflect.UnsafeSetAnyValue(field, cs)
+		_ = lreflect.UnsafeSetAnyValue(field, cs)
 	}
 
 	return nil

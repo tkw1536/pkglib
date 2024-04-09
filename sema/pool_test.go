@@ -51,11 +51,13 @@ func TestPool_Limit(t *testing.T) {
 			done := make(chan struct{})
 
 			for range tt.Limit {
-				go p.Use(func(u int64) error {
-					wg.Done() // tell the outer loop an item has been created
-					<-done    // do not return the item to the pool until all have been created
-					return nil
-				})
+				go func() {
+					_ = p.Use(func(u int64) error {
+						wg.Done() // tell the outer loop an item has been created
+						<-done    // do not return the item to the pool until all have been created
+						return nil
+					})
+				}()
 			}
 			wg.Wait()
 			close(done)
@@ -69,7 +71,7 @@ func TestPool_Limit(t *testing.T) {
 			for range tt.Iterations {
 				go func() {
 					defer wg.Done()
-					p.Use(func(u int64) error { return nil })
+					_ = p.Use(func(u int64) error { return nil })
 				}()
 			}
 			wg.Wait()
