@@ -159,7 +159,8 @@ func (group Group[Item, Result]) Use(status *Status, items []Item) ([]Result, []
 			ids[index] = LineOf(writers[index])
 
 			// and write out the result
-			io.WriteString(writers[index], "\n"+group.ResultString(results[index], item, index)+"\n")
+			// TODO: Do we want to handle the error in a smarter way here?
+			_, _ = io.WriteString(writers[index], "\n"+group.ResultString(results[index], item, index)+"\n")
 		}()
 	}
 
