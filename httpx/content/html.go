@@ -30,14 +30,20 @@ func WriteHTMLI[C any](context C, err error, template *template.Template, interc
 
 	// write out the response as html
 	w.Header().Set("Content-Type", httpx.ContentTypeHTML)
-	w.WriteHeader(http.StatusOK)
 
 	// minify html!
 	minifier := minify.Minify(httpx.ContentTypeHTML, w)
 	defer minifier.Close()
 
-	// and return the template
-	return template.Execute(minifier, context)
+	// return it to the client
+	// and if there is an error, write it to the client
+	{
+		err := template.Execute(minifier, context)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return err
+	}
 }
 
 // HTMLHandler is a [http.Handler] that responds to requests with html.
@@ -46,15 +52,20 @@ func WriteHTMLI[C any](context C, err error, template *template.Template, interc
 type HTMLHandler[C any] struct {
 	Handler func(r *http.Request) (C, error)
 
-	// Template is the template to be rendered into responses
-	Template *template.Template
+	Template *template.Template // Template is the template to be rendered into responses
 
-	Interceptor httpx.ErrInterceptor
+	Interceptor             httpx.ErrInterceptor
+	LogTemplateExecuteError func(r *http.Request, err error)
 }
 
 // ServeHTTP calls the handler, and then passes it and the template to WriteHTML.
 func (h HTMLHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// call the function
 	result, err := recovery.Safe(func() (T, error) { return h.Handler(r) })
-	WriteHTMLI(result, err, h.Template, h.Interceptor, w, r)
+	{
+		err := WriteHTMLI(result, err, h.Template, h.Interceptor, w, r)
+		if err != nil && h.LogTemplateExecuteError != nil {
+			h.LogTemplateExecuteError(r, err)
+		}
+	}
 }
