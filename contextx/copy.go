@@ -30,7 +30,7 @@ func Copy(ctx context.Context, dst io.Writer, src io.Reader) (written int64, err
 // In particular, this function sets the read deadline to the current time and closes the reader.
 func CancelRead(reader io.Reader) {
 	if srd, ok := reader.(interface{ SetReadDeadline(time.Time) error }); ok {
-		srd.SetReadDeadline(time.Now())
+		_ = srd.SetReadDeadline(time.Now())
 	}
 
 	if closer, ok := reader.(io.Closer); ok {
@@ -42,7 +42,7 @@ func CancelRead(reader io.Reader) {
 // In particular, this function sets the write deadline to the current time and closes the writer.
 func CancelWrite(writer io.Writer) {
 	if swd, ok := writer.(interface{ SetWriteDeadline(time.Time) error }); ok {
-		swd.SetWriteDeadline(time.Now())
+		_ = swd.SetWriteDeadline(time.Now())
 	}
 
 	if closer, ok := writer.(io.Closer); ok {
