@@ -14,7 +14,7 @@ import (
 // Once a single call to [ServeHTTP] has been called, changes to any fields
 // may be ignored.
 type Server struct {
-	// Context tbd
+	// Context is the context to be used for any requests to the server
 	Context context.Context
 
 	// Handler is called for incoming client connections.
