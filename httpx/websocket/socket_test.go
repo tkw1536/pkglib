@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/tkw1536/pkglib/httpx/websocket"
+	"github.com/tkw1536/pkglib/httpx/websocket/websockettest"
 
 	gwebsocket "github.com/gorilla/websocket"
 )
@@ -24,18 +25,12 @@ func ExampleServer_send() {
 	// The following code below is just for connection to the server.
 	// It is just used to make sure that everything works.
 
-	// create an actual server
-	s := httptest.NewServer(&server)
-	defer s.Close()
+	// create a new test server
+	wss := websockettest.NewServer(&server)
+	defer wss.Close()
 
-	// get the websocket url
-	url := "ws" + strings.TrimPrefix(s.URL, "http")
-
-	// Connect to the server
-	client, _, err := gwebsocket.DefaultDialer.Dial(url, nil)
-	if err != nil {
-		panic(err)
-	}
+	// create a new test client
+	client, _ := wss.Dial(nil)
 	defer client.Close()
 
 	// print text messages
@@ -70,17 +65,10 @@ func ExampleServer_prepared() {
 	// It is just used to make sure that everything works.
 
 	// create an actual server
-	s := httptest.NewServer(&server)
-	defer s.Close()
+	wss := websockettest.NewServer(&server)
+	defer wss.Close()
 
-	// get the websocket url
-	url := "ws" + strings.TrimPrefix(s.URL, "http")
-
-	// Connect to the server
-	client, _, err := gwebsocket.DefaultDialer.Dial(url, nil)
-	if err != nil {
-		panic(err)
-	}
+	client, _ := wss.Dial(nil)
 	defer client.Close()
 
 	// print text messages
@@ -237,17 +225,12 @@ func ExampleServer_echo() {
 	// It is just used to make sure that everything works.
 
 	// create an actual server
-	s := httptest.NewServer(&server)
-	defer s.Close()
+	// create a new test server
+	wss := websockettest.NewServer(&server)
+	defer wss.Close()
 
-	// get the websocket url
-	url := "ws" + strings.TrimPrefix(s.URL, "http")
-
-	// Connect to the server
-	client, _, err := gwebsocket.DefaultDialer.Dial(url, nil)
-	if err != nil {
-		panic(err)
-	}
+	// create a new test client
+	client, _ := wss.Dial(nil)
 	defer client.Close()
 
 	// send a bunch of example messages
