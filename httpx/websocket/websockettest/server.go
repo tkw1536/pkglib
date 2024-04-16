@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 
 	gwebsocket "github.com/gorilla/websocket"
 )
@@ -53,8 +54,16 @@ func NewHandler(handler func(conn *gwebsocket.Conn)) http.Handler {
 
 // Dial creates a new connection to the server.
 // If connecting to the server fails (for instance because it has been shut down), panics.
-func (srv *Server) Dial(requestHeader http.Header) (*gwebsocket.Conn, *http.Response) {
-	conn, response, err := gwebsocket.DefaultDialer.Dial(srv.URL, requestHeader)
+func (srv *Server) Dial(opts func(*gwebsocket.Dialer), requestHeader http.Header) (*gwebsocket.Conn, *http.Response) {
+	wsdialer := &gwebsocket.Dialer{
+		Proxy:            http.ProxyFromEnvironment,
+		HandshakeTimeout: 45 * time.Second,
+	}
+	if opts != nil {
+		opts(wsdialer)
+	}
+
+	conn, response, err := wsdialer.Dial(srv.URL, requestHeader)
 	if err != nil {
 		panic(fmt.Sprintf("websockettest.Server.Dial: Failed to connect: %s", err))
 	}

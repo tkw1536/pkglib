@@ -58,8 +58,9 @@ func TestNewServer(t *testing.T) {
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
+
 			// create a new client
-			client, _ := echo.Dial(nil)
+			client, _ := echo.Dial(nil, nil)
 
 			for _, msg := range tt.Messages {
 				// write the message to the network
