@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"runtime/debug"
 	"sync"
@@ -10,14 +11,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Connection represents a connection to a websocket client
+// Connection represents a connection to a single websocket client.
 type Connection struct {
 	r    *http.Request   // underlying http request
 	conn *websocket.Conn // underlying connection
-	opts Options
+	opts Options         // opts defined for the connection
 
 	context context.Context // context to cancel the connection
-	cancel  context.CancelFunc
+	cancel  context.CancelCauseFunc
 
 	wg sync.WaitGroup // blocks all the ongoing tasks
 
@@ -39,7 +40,7 @@ func (conn *Connection) serve(ctx context.Context, handler Handler) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	conn.context, conn.cancel = context.WithCancel(ctx)
+	conn.context, conn.cancel = context.WithCancelCause(ctx)
 
 	// start receiving and sending messages
 	conn.wg.Add(2)
@@ -62,22 +63,20 @@ func (conn *Connection) serve(ctx context.Context, handler Handler) {
 	conn.wg.Wait()
 }
 
-// Subprotocol returns the negotiated protocol for the connection.
-// If no subprotocol has been negotiated, returns the empty string.
-func (conn *Connection) Subprotocol() string {
-	return conn.conn.Subprotocol()
-}
-
 func (conn *Connection) handle(handler Handler) {
 	defer func() {
+		defer conn.wg.Done()
+
 		// when the handler panic()s, simply print the stack!
 		// to not cause the server to crash!
 		if value := recover(); value != nil {
 			debug.PrintStack()
+
+			conn.cancel(errCloseHandlerPanic)
+			return
 		}
 
-		conn.wg.Done()
-		conn.cancel()
+		conn.cancel(errCloseHandlerReturn)
 	}()
 
 	handler(conn)
@@ -101,7 +100,7 @@ func (conn *Connection) sendMessages() {
 		// close connection when done!
 		defer func() {
 			conn.wg.Done()
-			conn.cancel()
+			conn.cancel(errors.New(""))
 		}()
 
 		// setup a timer for pings!
@@ -127,6 +126,7 @@ func (conn *Connection) sendMessages() {
 
 					err := conn.writeRaw(message)
 					if err != nil {
+						conn.cancel(WriteError{err: err})
 						return
 					}
 					message.done <- struct{}{}
@@ -134,6 +134,7 @@ func (conn *Connection) sendMessages() {
 			// send a ping message
 			case <-ticker.C:
 				if err := conn.writeRaw(queuedMessage{prep: ping}); err != nil {
+					conn.cancel(WriteError{err: err})
 					return
 				}
 			}
@@ -195,16 +196,16 @@ func (conn *Connection) WriteBinary(source []byte) <-chan struct{} {
 	return conn.Write(NewBinaryMessage(source))
 }
 
-// WriteClose is a convenience method to send a CloseMessage.
-// The returned channel is closed once the message has been sent.
-//
-// An empty message is returned for code CloseNoStatusReceived.
-func (conn *Connection) WriteClose(closeCode int, text string) <-chan struct{} {
-	return conn.Write(Message{
-		Type:  CloseMessage,
-		Bytes: websocket.FormatCloseMessage(closeCode, text),
-	})
-}
+// Close constants contain reasons for closing the server
+const (
+	CloseNormalClosure     = websocket.CloseNormalClosure
+	CloseGoingAway         = websocket.CloseGoingAway
+	CloseProtocolError     = websocket.CloseProtocolError
+	CloseNoStatusReceived  = websocket.CloseNoStatusReceived
+	ClosePolicyViolation   = websocket.ClosePolicyViolation
+	CloseInternalServerErr = websocket.CloseInternalServerErr
+	CloseServiceRestart    = websocket.CloseServiceRestart
+)
 
 func (conn *Connection) recvMessages() {
 	conn.incoming = make(chan Message)
@@ -223,12 +224,19 @@ func (conn *Connection) recvMessages() {
 		// close connection when done!
 		defer func() {
 			conn.wg.Done()
-			conn.cancel()
+			conn.cancel(errCloseOther)
 		}()
 
 		for {
 			messageType, messageBytes, err := conn.conn.ReadMessage()
 			if err != nil {
+				// record client close error
+				if err, ok := err.(*websocket.CloseError); ok {
+					conn.cancel(err)
+				}
+
+				// otherwise return a read error
+				conn.cancel(ReadError{err: err})
 				return
 			}
 
@@ -253,15 +261,17 @@ func (conn *Connection) Read() <-chan Message {
 	return conn.incoming
 }
 
-// Context returns a context that is closed once the connection is closed.
-func (conn *Connection) Context() context.Context {
-	return conn.context
+// Subprotocol returns the negotiated protocol for the connection.
+// If no subprotocol has been negotiated, returns the empty string.
+func (conn *Connection) Subprotocol() string {
+	return conn.conn.Subprotocol()
 }
 
-// Close closes the connection to the peer without sending a specific close message.
-// See [WriteClose] for providing the client with a reason for the closure.
-func (conn *Connection) Close() {
-	conn.cancel()
+// Context returns a context that is closed once the connection is closed.
+//
+// Calling context.Cause(ctx) will return a *CloseError, ReadError or WriteError.
+func (conn *Connection) Context() context.Context {
+	return conn.context
 }
 
 // reset resets this connection to be empty

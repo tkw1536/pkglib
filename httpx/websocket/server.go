@@ -14,7 +14,8 @@ import (
 // Once a single call to [ServeHTTP] has been called, changes to any fields
 // may be ignored.
 type Server struct {
-	// Context is the context to be used for any requests to the server
+	// Context is the context to be used for any requests to the server.
+	// It is is nil, uses context.Background() instead.
 	Context context.Context
 
 	// Handler is called for incoming client connections.
