@@ -98,7 +98,6 @@ func (h *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 	// create a new connection
 	var socket Connection
-	defer socket.reset()
 
 	// setup properties for the connection
 	socket.r = r.Clone(r.Context())

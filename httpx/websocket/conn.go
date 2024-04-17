@@ -274,16 +274,6 @@ func (conn *Connection) Context() context.Context {
 	return conn.context
 }
 
-// reset resets this connection to be empty
-func (h *Connection) reset() {
-	h.opts = Options{}
-	h.r = nil
-	h.conn = nil
-	h.incoming = nil
-	h.outgoing = nil
-	h.context, h.cancel = nil, nil
-}
-
 // queuedMessage is a message queued for writing.
 // it is either a regular message or a prepared message.
 type queuedMessage struct {
