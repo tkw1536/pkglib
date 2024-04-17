@@ -65,7 +65,9 @@ func TestServer_subprotocols(t *testing.T) {
 		},
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
-			t.Parallel()
+			// TODO: with this enabled the loopclosure checker flags this code.
+			// So far there is no way of silencing this; as it is correct as of go 1.22+.
+			// t.Parallel()
 
 			// create a server with the specified websocket protocols
 			var server websocket.Server
