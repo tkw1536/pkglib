@@ -3,24 +3,35 @@ package websocket
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-// CloseWith is a convenience method to send a CloseMessage, wait for it to be sent, and then close the connection.
+// CloseWith closes this connection with the given code and text for the client.
+//
+// CloseWith automatically formats a close message, sends it, and waits for the close handshake to complete or timeout.
+// The timeout used is the normal ReadInterval timeout.
+//
 // When closeCode is 0, uses CloseNormalClosure.
 func (conn *Connection) CloseWith(closeCode int, text string) {
 	if closeCode <= 0 {
 		closeCode = CloseNormalClosure
 	}
+
 	// write the close message
 	<-conn.Write(Message{
 		Type:  CloseMessage,
 		Bytes: websocket.FormatCloseMessage(closeCode, text),
 	})
 
-	// and close the connection
-	conn.Close()
+	// wait for the client to close the context
+	// this should automatically happen by receiving a close frame.
+	select {
+	case <-conn.Context().Done():
+	case <-time.After(conn.opts.ReadInterval):
+		conn.conn.Close()
+	}
 }
 
 // Close closes the connection to the peer without sending a specific close message.

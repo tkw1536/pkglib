@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"runtime/debug"
 	"sync"
@@ -100,7 +99,7 @@ func (conn *Connection) sendMessages() {
 		// close connection when done!
 		defer func() {
 			conn.wg.Done()
-			conn.cancel(errors.New(""))
+			conn.cancel(errCloseOther)
 		}()
 
 		// setup a timer for pings!
@@ -131,6 +130,7 @@ func (conn *Connection) sendMessages() {
 					}
 					message.done <- struct{}{}
 				})()
+
 			// send a ping message
 			case <-ticker.C:
 				if err := conn.writeRaw(queuedMessage{prep: ping}); err != nil {
