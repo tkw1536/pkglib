@@ -10,7 +10,6 @@ import (
 	"github.com/tkw1536/pkglib/httpx/websocket"
 )
 
-// test that closing from the server side works as expected
 func TestServer_ServerClose(t *testing.T) {
 	const (
 		sendNothing = -(iota + 1)
@@ -128,7 +127,6 @@ func TestServer_ServerClose(t *testing.T) {
 	}
 }
 
-// test that closing from the server side works as expected
 func TestServer_ClientClose(t *testing.T) {
 	const (
 		sendClose = -(iota + 1)
