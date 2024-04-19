@@ -34,9 +34,9 @@ func (conn *Connection) close(frame CloseError, reason error, force bool) {
 		return
 	}
 
-	// write the close frame
+	// write the close frame; but ignore any failures
 	message := websocket.FormatCloseMessage(frame.Code, frame.Text)
-	conn.conn.WriteControl(websocket.CloseMessage, message, time.Now().Add(conn.opts.HandshakeTimeout))
+	_ = conn.conn.WriteControl(websocket.CloseMessage, message, time.Now().Add(conn.opts.HandshakeTimeout))
 
 	// do the actual close
 	if force {

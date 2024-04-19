@@ -81,7 +81,7 @@ func (conn *Connection) serve() {
 	}
 
 	// setup connection options, then start sending and receiving
-	conn.setConnOpts()
+	_ = conn.setConnOpts()
 	conn.sendMessages()
 	conn.recvMessages()
 
