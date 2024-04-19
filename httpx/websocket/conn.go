@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"runtime/debug"
 	"sync"
@@ -10,75 +11,129 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// accept accepts a websocket connection with the specified handler.
+// The caller should call [connection.serve] to start serving the connection.
+func (handler Handler) accept(r *http.Request, conn *websocket.Conn, opt Options) *Connection {
+	context, cancel := context.WithCancelCause(context.Background())
+
+	return &Connection{
+		state: CONNECTING,
+
+		r:       r.Clone(r.Context()),
+		conn:    conn,
+		opts:    opt,
+		handler: handler,
+
+		context:     context,
+		cancel:      cancel,
+		handlerDone: make(chan struct{}),
+	}
+}
+
 // Connection represents a connection to a single websocket client.
 type Connection struct {
-	r    *http.Request   // underlying http request
-	conn *websocket.Conn // underlying connection
-	opts Options         // opts defined for the connection
+	state  ConnectionState // connection state
+	stateM sync.Mutex
 
-	context context.Context // context to cancel the connection
+	// caller provided settings
+	r       *http.Request
+	conn    *websocket.Conn
+	opts    Options
+	handler Handler
+
+	// holds all internal serve tasks
+	wg          sync.WaitGroup // once the recv and send queues are finished
+	handlerDone chan struct{}  // once the handler has returned
+
+	// context that is open as long as user read/writes are permitted
+	context context.Context
 	cancel  context.CancelCauseFunc
 
-	wg sync.WaitGroup // blocks all the ongoing tasks
-
-	// incoming and outgoing tasks
+	// incoming and outgoing messages
 	incoming chan Message
 	outgoing chan queuedMessage
 }
 
-// serve serves the provided connection
-// r is the original request that has been passed
-func (conn *Connection) serve(ctx context.Context, handler Handler) {
-	// enable compression if requested
-	if enabled := conn.opts.CompressionEnabled(); enabled {
-		conn.conn.EnableWriteCompression(true)
-		_ = conn.conn.SetCompressionLevel(conn.opts.CompressionLevel)
+// ConnectionState is the state of the connection
+type ConnectionState int
+
+// Different connection states
+const (
+	CONNECTING ConnectionState = iota
+	OPEN
+	CLOSING
+	CLOSED
+)
+
+// serve starts serving data on the given connection.
+// Serve returns once the connection has been closed, be it cleanly or non-cleanly.
+// calling serve more than once is an error.
+func (conn *Connection) serve() {
+	// check that serve was only called once
+	// and check that we are in the closed state
+	{
+		conn.stateM.Lock()
+		if conn.state != CONNECTING {
+			panic("Connection.serve: Called more than once")
+		}
+		conn.state = OPEN
+		conn.stateM.Unlock()
 	}
 
-	// create a context for the connection
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	conn.context, conn.cancel = context.WithCancelCause(ctx)
-
-	// start receiving and sending messages
-	conn.wg.Add(2)
+	// setup connection options, then start sending and receiving
+	conn.setConnOpts()
 	conn.sendMessages()
 	conn.recvMessages()
 
-	// wait for the context to be cancelled, then close the connection
-	conn.wg.Add(1)
-	go func() {
-		defer conn.wg.Done()
-		<-conn.context.Done()
-		conn.conn.Close()
-	}()
-
 	// start the application logic
-	conn.wg.Add(1)
-	go conn.handle(handler)
+	conn.handle(conn.handler)
 
-	// wait for closing operations
-	conn.wg.Wait()
+	// wait for all the operations to finish
+	conn.Shutdown()
+}
+
+func (conn *Connection) setConnOpts() error {
+	var errs []error
+
+	// enable compression for the write end of the connection
+	if enabled := conn.opts.CompressionEnabled(); enabled {
+		conn.conn.EnableWriteCompression(true)
+		err := conn.conn.SetCompressionLevel(conn.opts.CompressionLevel)
+		errs = append(errs, err)
+	}
+
+	// set a read handler
+	conn.conn.SetReadLimit(conn.opts.ReadLimit)
+
+	// when receiving a close frame, switch the state over to the close state
+	conn.conn.SetCloseHandler(func(code int, text string) error {
+		conn.close(CloseError{Code: code}, &CloseError{Code: code, Text: text}, true)
+		return nil
+	})
+
+	return errors.Join(errs...)
 }
 
 func (conn *Connection) handle(handler Handler) {
-	defer func() {
-		defer conn.wg.Done()
+	go func() {
+		defer close(conn.handlerDone)
+		defer func() {
+			// when the handler panic()s, simply print the stack!
+			// to not cause the server to crash!
+			if value := recover(); value != nil {
+				debug.PrintStack()
 
-		// when the handler panic()s, simply print the stack!
-		// to not cause the server to crash!
-		if value := recover(); value != nil {
-			debug.PrintStack()
+				// and produce an abnormal close error
+				conn.close(CloseError{Code: websocket.CloseInternalServerErr}, nil, false)
+				return
+			}
 
-			conn.cancel(errCloseHandlerPanic)
-			return
-		}
+			// close regularly
+			conn.close(CloseError{Code: websocket.CloseNormalClosure}, nil, false)
+		}()
 
-		conn.cancel(errCloseHandlerReturn)
+		handler(conn)
 	}()
-
-	handler(conn)
 }
 
 // Request returns a clone of the original request used for upgrading the connection.
@@ -90,17 +145,11 @@ func (conn *Connection) Request() *http.Request {
 }
 
 func (conn *Connection) sendMessages() {
-	// turn on write compression!
-	conn.conn.EnableWriteCompression(true)
-
 	conn.outgoing = make(chan queuedMessage)
 
+	conn.wg.Add(1)
 	go func() {
-		// close connection when done!
-		defer func() {
-			conn.wg.Done()
-			conn.cancel(errCloseOther)
-		}()
+		defer conn.wg.Done()
 
 		// setup a timer for pings!
 		ticker := time.NewTicker(conn.opts.PingInterval)
@@ -125,7 +174,7 @@ func (conn *Connection) sendMessages() {
 
 					err := conn.writeRaw(message)
 					if err != nil {
-						conn.cancel(WriteError{err: err})
+						conn.close(CloseError{Code: CloseNoStatusReceived}, WriteError{err: err}, false)
 						return
 					}
 					message.done <- struct{}{}
@@ -210,33 +259,22 @@ const (
 func (conn *Connection) recvMessages() {
 	conn.incoming = make(chan Message)
 
-	// set a read handler
-	conn.conn.SetReadLimit(conn.opts.ReadLimit)
-
-	// configure a pong handler
-	_ = conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
+	// upon receiving a pong, delay the read interval
 	conn.conn.SetPongHandler(func(string) error {
 		return conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
 	})
 
-	// handle incoming messages
+	conn.wg.Add(1)
 	go func() {
-		// close connection when done!
-		defer func() {
-			conn.wg.Done()
-			conn.cancel(errCloseOther)
-		}()
+		defer conn.wg.Done()
 
 		for {
+			// set a timeout for the next read
+			_ = conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
+
 			messageType, messageBytes, err := conn.conn.ReadMessage()
 			if err != nil {
-				// record client close error
-				if err, ok := err.(*websocket.CloseError); ok {
-					conn.cancel(err)
-				}
-
-				// otherwise return a read error
-				conn.cancel(ReadError{err: err})
+				conn.close(websocket.CloseError{Code: CloseNoStatusReceived}, ReadError{err: err}, false)
 				return
 			}
 
@@ -267,11 +305,23 @@ func (conn *Connection) Subprotocol() string {
 	return conn.conn.Subprotocol()
 }
 
-// Context returns a context that is closed once the connection is closed.
+// Context returns a context for operations on this context.
+// Once it is closed, no more read or write operations are permitted.
 //
-// Calling context.Cause(ctx) will return a *CloseError, ReadError or WriteError.
+// The [context.Cause] of the error will be one of *[CloseError], [ReadError] or [WriteError].
+//
+// The Context may close before the Handler function has returned.
+// To wait for the handler function to return, use Wait() instead.
 func (conn *Connection) Context() context.Context {
 	return conn.context
+}
+
+// Shutdown waits until the connection has been closed and the handler returns.
+//
+// NOTE: This name exists to correspond to the graceful server shutdown.
+func (conn *Connection) Shutdown() {
+	conn.wg.Wait()
+	<-conn.handlerDone
 }
 
 // queuedMessage is a message queued for writing.

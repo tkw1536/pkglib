@@ -8,87 +8,190 @@ import (
 
 	gwebsocket "github.com/gorilla/websocket"
 	"github.com/tkw1536/pkglib/httpx/websocket"
+	"go.uber.org/goleak"
 )
 
-func TestServer_ServerClose(t *testing.T) {
-	const (
-		sendNothing = -(iota + 1)
-		sendForceClose
-	)
+const (
+	// do nothing and simply exit the handler code
+	shutdownDoNothing = -(iota + 1)
 
-	for _, tt := range []struct {
-		Name string
+	// force close the handler without waiting
+	shutdownForceClose
+)
 
-		SendCode int
-		SendText string
+var shutdownTests = []struct {
+	Name string // name of the test
 
-		WantCloseCalled bool
-		WantCode        int
-		WantText        string
-	}{
-		{
-			Name: "normal closure without message",
+	SendCode int    // code to send during shutdown (or special action)
+	SendText string // text to send during shutdown
 
-			SendCode: websocket.CloseNormalClosure,
-			SendText: "",
+	// expectations when closing from the server side
+	WantCloseCalled bool
+	WantCode        int
+	WantText        string
 
-			WantCloseCalled: true,
-			WantCode:        websocket.CloseNormalClosure,
-			WantText:        "",
-		},
+	// expectations when closing from the client side
+	// if omitted, skip the test.
+	WantCloseCause string
+}{
+	{
+		Name: "normal shutdown without message",
 
-		{
-			Name: "normal closure with message",
+		SendCode: websocket.CloseNormalClosure,
+		SendText: "",
 
-			SendCode: websocket.CloseNormalClosure,
-			SendText: "hello world",
+		WantCloseCalled: true,
+		WantCode:        websocket.CloseNormalClosure,
+		WantText:        "",
 
-			WantCloseCalled: true,
-			WantCode:        websocket.CloseNormalClosure,
-			WantText:        "hello world",
-		},
+		WantCloseCause: "websocket: close 1000 (normal)",
+	},
 
-		{
-			Name: "abnormal closure",
+	{
+		Name: "normal shutdown with message",
 
-			SendCode: websocket.CloseProtocolError,
-			SendText: "",
+		SendCode: websocket.CloseNormalClosure,
+		SendText: "hello world",
 
-			WantCloseCalled: true,
-			WantCode:        websocket.CloseProtocolError,
-			WantText:        "",
-		},
+		WantCloseCalled: true,
+		WantCode:        websocket.CloseNormalClosure,
+		WantText:        "hello world",
 
-		{
-			Name: "don't close",
+		WantCloseCause: "websocket: close 1000 (normal): hello world",
+	},
 
-			SendCode: sendNothing,
+	{
+		Name: "abnormal closure",
 
-			WantCloseCalled: false,
-		},
+		SendCode: websocket.CloseProtocolError,
+		SendText: "",
 
-		{
-			Name: "force close",
+		WantCloseCalled: true,
+		WantCode:        websocket.CloseProtocolError,
+		WantText:        "",
 
-			SendCode: sendForceClose,
+		WantCloseCause: "websocket: close 1002 (protocol error)",
+	},
+	{
+		Name: "abnormal closure with message",
 
-			WantCloseCalled: false,
-		},
-	} {
+		SendCode: websocket.CloseProtocolError,
+		SendText: "some message",
+
+		WantCloseCalled: true,
+		WantCode:        websocket.CloseProtocolError,
+		WantText:        "some message",
+
+		WantCloseCause: "websocket: close 1002 (protocol error): some message",
+	},
+	{
+		Name: "don't close",
+
+		SendCode: shutdownDoNothing,
+
+		WantCloseCalled: true,
+		WantCode:        websocket.CloseNormalClosure,
+		WantText:        "",
+	},
+
+	{
+		Name: "force close",
+
+		SendCode: shutdownForceClose,
+
+		WantCloseCalled: false,
+
+		WantCloseCause: "read error: websocket: close 1006 (abnormal closure): unexpected EOF",
+	},
+}
+
+// Tests that calling Shutdown and friends on the server struct
+// actually shuts down the server.
+func TestServer_ServerShutdown(t *testing.T) {
+	defer goleak.VerifyNone(t)
+
+	for _, tt := range shutdownTests {
+		if tt.SendCode == shutdownDoNothing {
+			continue
+		}
+
 		t.Run(tt.Name, func(t *testing.T) {
-			testServer(t, func(server *websocket.Server) websocket.Handler {
-				return func(c *websocket.Connection) {
-					if tt.SendCode == sendNothing {
+			t.Parallel()
+
+			testServer(t, nil, func(client *gwebsocket.Conn, server *websocket.Server) {
+				var gotCode int
+				var gotText string
+				var gotCalled bool
+
+				// get the default close handler
+				handler := client.CloseHandler()
+
+				client.SetCloseHandler(func(code int, text string) error {
+					// store the code we got
+					gotCode = code
+					gotText = text
+					gotCalled = true
+
+					// and invoke the original handler
+					return handler(code, text)
+				})
+
+				done := make(chan struct{})
+				go func() {
+					defer close(done)
+
+					if tt.SendCode == shutdownForceClose {
+						server.Close()
 						return
 					}
-					if tt.SendCode == sendForceClose {
+
+					server.ShutdownWith(websocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
+				}()
+
+				// read the closing message
+				client.ReadMessage()
+				<-done
+
+				if gotCalled != tt.WantCloseCalled {
+					t.Errorf("wanted close called %v, but got close called %v", tt.WantCloseCalled, gotCalled)
+				}
+
+				if !tt.WantCloseCalled {
+					return
+				}
+				if gotCode != tt.WantCode {
+					t.Errorf("got code %d, but want code %d", gotCode, tt.WantCode)
+				}
+				if gotText != tt.WantText {
+					t.Errorf("got text %q, but want text %q", gotText, tt.WantText)
+				}
+			})
+		})
+	}
+}
+
+// Tests that calling shutdown from within the handler
+// does the expected thing.
+func TestServer_HandlerShutdown(t *testing.T) {
+	defer goleak.VerifyNone(t)
+
+	for _, tt := range shutdownTests {
+		t.Run(tt.Name, func(t *testing.T) {
+			t.Parallel()
+
+			testServer(t, func(server *websocket.Server) websocket.Handler {
+				return func(c *websocket.Connection) {
+					if tt.SendCode == shutdownDoNothing {
+						return
+					}
+					if tt.SendCode == shutdownForceClose {
 						c.Close()
 						return
 					}
 
-					c.CloseWith(tt.SendCode, tt.SendText)
+					c.ShutdownWith(websocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
 				}
-			}, func(client *gwebsocket.Conn) {
+			}, func(client *gwebsocket.Conn, _ *websocket.Server) {
 				var gotCode int
 				var gotText string
 				var gotCalled bool
@@ -110,7 +213,7 @@ func TestServer_ServerClose(t *testing.T) {
 				client.ReadMessage()
 
 				if gotCalled != tt.WantCloseCalled {
-					t.Errorf("wanted close called %v, but got close called %v", gotCalled, tt.WantCloseCalled)
+					t.Errorf("wanted close called %v, but got close called %v", tt.WantCloseCalled, gotCalled)
 				}
 
 				if !tt.WantCloseCalled {
@@ -127,55 +230,18 @@ func TestServer_ServerClose(t *testing.T) {
 	}
 }
 
+// Tests that shutting down from the client side does the right thing.
 func TestServer_ClientClose(t *testing.T) {
-	const (
-		sendClose = -(iota + 1)
-	)
+	defer goleak.VerifyNone(t)
 
-	for _, tt := range []struct {
-		Name string
+	for _, tt := range shutdownTests {
+		// skip tests that aren't supported
+		if tt.SendCode == shutdownDoNothing || tt.WantCloseCause == "" {
+			continue
+		}
 
-		SendCode int
-		SendText string
-
-		WantCloseMessage string
-	}{
-		{
-			Name: "normal closure without message",
-
-			SendCode: websocket.CloseNormalClosure,
-			SendText: "",
-
-			WantCloseMessage: "websocket: close 1000 (normal)",
-		},
-
-		{
-			Name: "normal closure with message",
-
-			SendCode: websocket.CloseNormalClosure,
-			SendText: "some message by the client",
-
-			WantCloseMessage: "websocket: close 1000 (normal): some message by the client",
-		},
-
-		{
-			Name: "abnormal closure with message",
-
-			SendCode: websocket.CloseProtocolError,
-			SendText: "some message by the client",
-
-			WantCloseMessage: "websocket: close 1002 (protocol error): some message by the client",
-		},
-
-		{
-			Name: "abruptly close",
-
-			SendCode: sendClose,
-
-			WantCloseMessage: "websocket: close 1006 (abnormal closure): unexpected EOF",
-		},
-	} {
 		t.Run(tt.Name, func(t *testing.T) {
+			t.Parallel()
 
 			var gotCloseCause error
 			testServer(t, func(server *websocket.Server) websocket.Handler {
@@ -185,8 +251,8 @@ func TestServer_ClientClose(t *testing.T) {
 					<-ctx.Done()
 					gotCloseCause = context.Cause(ctx)
 				}
-			}, func(client *gwebsocket.Conn) {
-				if tt.SendCode == sendClose {
+			}, func(client *gwebsocket.Conn, _ *websocket.Server) {
+				if tt.SendCode == shutdownForceClose {
 					client.Close()
 					return
 				}
@@ -202,8 +268,8 @@ func TestServer_ClientClose(t *testing.T) {
 
 			// check that the close cause is as expected
 			gotCloseMessage := fmt.Sprint(gotCloseCause)
-			if gotCloseMessage != tt.WantCloseMessage {
-				t.Errorf("server-side got close cause %q, but want %q", gotCloseMessage, tt.WantCloseMessage)
+			if gotCloseMessage != tt.WantCloseCause {
+				t.Errorf("server-side got close cause %q, but want %q", gotCloseMessage, tt.WantCloseCause)
 			}
 		})
 	}

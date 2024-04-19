@@ -117,7 +117,7 @@ func TestServer_timeout(t *testing.T) {
 		return func(c *websocket.Connection) {
 			<-c.Context().Done()
 		}
-	}, func(c *gwebsocket.Conn) {
+	}, func(c *gwebsocket.Conn, _ *websocket.Server) {
 		// don't send a message during the timeout
 		time.Sleep(timeout)
 	})
@@ -126,16 +126,19 @@ func TestServer_timeout(t *testing.T) {
 const testServerTimeout = time.Minute
 
 // testServer create a new testing server and initiates a cl ient.
-func testServer(t *testing.T, initHandler func(server *websocket.Server) websocket.Handler, doClient func(client *gwebsocket.Conn)) {
+func testServer(t *testing.T, initHandler func(server *websocket.Server) websocket.Handler, doClient func(client *gwebsocket.Conn, server *websocket.Server)) {
 	t.Helper()
 
 	// create the server
 	var server websocket.Server
 
 	// have the test code setup the handler
-	handler := initHandler(&server)
+	var handler websocket.Handler
+	if initHandler != nil {
+		handler = initHandler(&server)
+	}
 	if handler == nil {
-		panic("initHandler return nil (wrong test code: return a non-nil handler)")
+		handler = func(c *websocket.Connection) { <-c.Context().Done() }
 	}
 	if server.Handler != nil {
 		panic("initHandler set server.Handler (wrong test code: return it instead)")
@@ -157,12 +160,12 @@ func testServer(t *testing.T, initHandler func(server *websocket.Server) websock
 	defer client.Close()
 
 	// call the client code
-	doClient(client)
+	doClient(client, &server)
 
 	select {
 	case <-done:
 	case <-time.After(testServerTimeout):
-		t.Error("client connection not closed after timeout")
+		t.Error("handler did not close within the given timeout")
 	}
 }
 
@@ -183,7 +186,7 @@ func TestServer_ReadLimit(t *testing.T) {
 				/* closed connection */
 			}
 		}
-	}, func(client *gwebsocket.Conn) {
+	}, func(client *gwebsocket.Conn, _ *websocket.Server) {
 		// simply send a big message
 		big := make([]byte, biggerThanLimit)
 		client.WriteMessage(gwebsocket.TextMessage, big)

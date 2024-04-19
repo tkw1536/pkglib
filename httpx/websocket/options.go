@@ -12,7 +12,8 @@ import (
 //
 // See [Options.SetDefault] for appropriate defaults.
 type Options struct {
-	// HandshakeTimeout specifies the duration for the handshake to complete.
+	// HandshakeTimeout specifies the duration for the open and close handshakes to complete.
+	// If the handshakes fail within this time, the connection is closed immediately with an error.
 	HandshakeTimeout time.Duration
 
 	// ReadBufferSize and WriteBufferSize specify I/O buffer sizes in bytes. If a buffer
@@ -87,7 +88,7 @@ func (opt Options) CompressionEnabled() bool {
 const (
 	DefaultWriteInterval    = 10 * time.Second
 	DefaultReadInterval     = time.Minute
-	DefaultHandshakeTimeout = time.Minute
+	DefaultHandshakeTimeout = time.Second
 	DefaultPingInterval     = (DefaultReadInterval * 9) / 10
 	DefaultReadLimit        = 2048 // bytes
 )

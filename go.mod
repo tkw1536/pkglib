@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/websocket v1.5.1
 	github.com/gosuri/uilive v0.0.4
 	github.com/tdewolff/minify v2.3.6+incompatible
+	go.uber.org/goleak v1.3.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/term v0.19.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -16,6 +17,7 @@ require (
 
 require (
 	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/tdewolff/parse v2.3.4+incompatible // indirect
 	github.com/tdewolff/test v1.0.7 // indirect
