@@ -65,9 +65,7 @@ func TestServer_subprotocols(t *testing.T) {
 		},
 	} {
 		t.Run(tt.Name, func(t *testing.T) {
-			// TODO: with this enabled the loopclosure checker flags this code.
-			// So far there is no way of silencing this; as it is correct as of go 1.22+.
-			// t.Parallel()
+			t.Parallel()
 
 			// create a server with the specified websocket protocols
 			var server websocket.Server
@@ -189,6 +187,6 @@ func TestServer_ReadLimit(t *testing.T) {
 	}, func(client *gwebsocket.Conn, _ *websocket.Server) {
 		// simply send a big message
 		big := make([]byte, biggerThanLimit)
-		client.WriteMessage(gwebsocket.TextMessage, big)
+		_ = client.WriteMessage(gwebsocket.TextMessage, big)
 	})
 }

@@ -149,7 +149,7 @@ func TestServer_ServerShutdown(t *testing.T) {
 				}()
 
 				// read the closing message
-				client.ReadMessage()
+				_, _, _ = client.ReadMessage()
 				<-done
 
 				if gotCalled != tt.WantCloseCalled {
@@ -210,7 +210,7 @@ func TestServer_HandlerShutdown(t *testing.T) {
 				})
 
 				// read the closing message
-				client.ReadMessage()
+				_, _, _ = client.ReadMessage()
 
 				if gotCalled != tt.WantCloseCalled {
 					t.Errorf("wanted close called %v, but got close called %v", tt.WantCloseCalled, gotCalled)
@@ -258,7 +258,7 @@ func TestServer_ClientClose(t *testing.T) {
 				}
 
 				// write the close message to the server
-				client.WriteControl(websocket.CloseMessage, gwebsocket.FormatCloseMessage(tt.SendCode, tt.SendText), time.Now().Add(time.Second))
+				_ = client.WriteControl(websocket.CloseMessage, gwebsocket.FormatCloseMessage(tt.SendCode, tt.SendText), time.Now().Add(time.Second))
 
 				// receive the close message back
 				if _, _, err := client.ReadMessage(); err == nil {

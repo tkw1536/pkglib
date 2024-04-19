@@ -68,7 +68,7 @@ func TestNewServer(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				writer.Write([]byte(msg.Body))
+				_, _ = writer.Write([]byte(msg.Body))
 				writer.Close()
 
 				// receive the message and check it is of the same type
