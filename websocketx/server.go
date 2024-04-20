@@ -134,13 +134,13 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 	defer server.conns.Done()
 
 	// upgrade the connection or bail out!
-	wsconn, err := server.upgrader.Upgrade(w, r, nil)
+	websocket_conn, err := server.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
 	}
 
 	// Accept the handler
-	conn := server.Handler.accept(r, wsconn, server.Options)
+	conn := server.Handler.accept(r, websocket_conn, server.Options)
 
 	server.conns.Add(1)
 	go func() {

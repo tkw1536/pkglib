@@ -1,5 +1,7 @@
 package websocketx_test
 
+// spellchecker:words twiesing
+
 import (
 	"testing"
 	"time"
@@ -123,7 +125,7 @@ func TestServer_timeout(t *testing.T) {
 
 const testServerTimeout = time.Minute
 
-// testServer create a new testing server and initiates a cl ient.
+// testServer create a new testing server and initiates a client
 func testServer(t *testing.T, initHandler func(server *websocketx.Server) websocketx.Handler, doClient func(client *websocket.Conn, server *websocketx.Server)) {
 	t.Helper()
 

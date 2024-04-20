@@ -187,7 +187,7 @@ func ExampleServer_echo() {
 			panic("incorrect type received")
 		}
 		if string(p) != message {
-			panic("incorrect answer recevied")
+			panic("incorrect answer received")
 		}
 	}
 

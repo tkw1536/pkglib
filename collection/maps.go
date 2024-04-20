@@ -1,5 +1,7 @@
 package collection
 
+// spellchecker:words twiesing
+
 import (
 	"cmp"
 	"maps"

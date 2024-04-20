@@ -2,8 +2,6 @@
 // This package is not intended for production code, and should only be used in tests.
 package websockettest
 
-// spellchecker:words websockettest
-
 import (
 	"fmt"
 	"net/http"
@@ -55,15 +53,15 @@ func NewHandler(handler func(conn *websocket.Conn)) http.Handler {
 // Dial creates a new connection to the server.
 // If connecting to the server fails (for instance because it has been shut down), panics.
 func (srv *Server) Dial(opts func(*websocket.Dialer), requestHeader http.Header) (*websocket.Conn, *http.Response) {
-	wsdialer := &websocket.Dialer{
+	wsDialer := &websocket.Dialer{
 		Proxy:            http.ProxyFromEnvironment,
 		HandshakeTimeout: 45 * time.Second,
 	}
 	if opts != nil {
-		opts(wsdialer)
+		opts(wsDialer)
 	}
 
-	conn, response, err := wsdialer.Dial(srv.URL, requestHeader)
+	conn, response, err := wsDialer.Dial(srv.URL, requestHeader)
 	if err != nil {
 		panic(fmt.Sprintf("websockettest.Server.Dial: Failed to connect: %s", err))
 	}
