@@ -4,13 +4,13 @@ import (
 	"io"
 	"testing"
 
-	gwebsocket "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 	"github.com/tkw1536/pkglib/websocketx/websockettest"
 )
 
 func TestNewServer(t *testing.T) {
 	// Create a simple echo server
-	echo := websockettest.NewServer(websockettest.NewHandler(func(conn *gwebsocket.Conn) {
+	echo := websockettest.NewServer(websockettest.NewHandler(func(conn *websocket.Conn) {
 		for {
 			// read the message from the server
 			mt, message, err := conn.ReadMessage()
@@ -39,20 +39,20 @@ func TestNewServer(t *testing.T) {
 		{
 			"one message",
 			[]Message{
-				{Type: gwebsocket.TextMessage, Body: "hello"},
+				{Type: websocket.TextMessage, Body: "hello"},
 			},
 		},
 
 		{
 			"lots of messages",
 			[]Message{
-				{Type: gwebsocket.TextMessage, Body: "hello"},
-				{Type: gwebsocket.BinaryMessage, Body: "world"},
-				{Type: gwebsocket.TextMessage, Body: "how"},
-				{Type: gwebsocket.BinaryMessage, Body: "are"},
-				{Type: gwebsocket.TextMessage, Body: "you"},
-				{Type: gwebsocket.BinaryMessage, Body: "doing"},
-				{Type: gwebsocket.TextMessage, Body: "today"},
+				{Type: websocket.TextMessage, Body: "hello"},
+				{Type: websocket.BinaryMessage, Body: "world"},
+				{Type: websocket.TextMessage, Body: "how"},
+				{Type: websocket.BinaryMessage, Body: "are"},
+				{Type: websocket.TextMessage, Body: "you"},
+				{Type: websocket.BinaryMessage, Body: "doing"},
+				{Type: websocket.TextMessage, Body: "today"},
 			},
 		},
 	} {

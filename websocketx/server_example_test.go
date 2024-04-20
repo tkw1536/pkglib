@@ -6,7 +6,7 @@ import (
 	"github.com/tkw1536/pkglib/websocketx"
 	"github.com/tkw1536/pkglib/websocketx/websockettest"
 
-	gwebsocket "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 )
 
 // A simple server that sends data to the client.
@@ -101,7 +101,7 @@ func ExampleServer_panic() {
 	defer wss.Close()
 
 	// Connect to the server
-	client, _, err := gwebsocket.DefaultDialer.Dial(wss.URL, nil)
+	client, _, err := websocket.DefaultDialer.Dial(wss.URL, nil)
 	if err != nil {
 		panic(err)
 	}

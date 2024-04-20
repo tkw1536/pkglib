@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	gwebsocket "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 	"github.com/tkw1536/pkglib/websocketx"
 	"github.com/tkw1536/pkglib/websocketx/websockettest"
 )
@@ -83,7 +83,7 @@ func TestServer_subprotocols(t *testing.T) {
 			wss := websockettest.NewServer(&server)
 			defer wss.Close()
 
-			c, _ := wss.Dial(func(d *gwebsocket.Dialer) {
+			c, _ := wss.Dial(func(d *websocket.Dialer) {
 				d.Subprotocols = tt.ClientProto
 			}, nil)
 
@@ -115,7 +115,7 @@ func TestServer_timeout(t *testing.T) {
 		return func(c *websocketx.Connection) {
 			<-c.Context().Done()
 		}
-	}, func(c *gwebsocket.Conn, _ *websocketx.Server) {
+	}, func(c *websocket.Conn, _ *websocketx.Server) {
 		// don't send a message during the timeout
 		time.Sleep(timeout)
 	})
@@ -124,7 +124,7 @@ func TestServer_timeout(t *testing.T) {
 const testServerTimeout = time.Minute
 
 // testServer create a new testing server and initiates a cl ient.
-func testServer(t *testing.T, initHandler func(server *websocketx.Server) websocketx.Handler, doClient func(client *gwebsocket.Conn, server *websocketx.Server)) {
+func testServer(t *testing.T, initHandler func(server *websocketx.Server) websocketx.Handler, doClient func(client *websocket.Conn, server *websocketx.Server)) {
 	t.Helper()
 
 	// create the server
@@ -184,9 +184,9 @@ func TestServer_ReadLimit(t *testing.T) {
 				/* closed connection */
 			}
 		}
-	}, func(client *gwebsocket.Conn, _ *websocketx.Server) {
+	}, func(client *websocket.Conn, _ *websocketx.Server) {
 		// simply send a big message
 		big := make([]byte, biggerThanLimit)
-		_ = client.WriteMessage(gwebsocket.TextMessage, big)
+		_ = client.WriteMessage(websocket.TextMessage, big)
 	})
 }

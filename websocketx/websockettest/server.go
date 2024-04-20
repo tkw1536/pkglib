@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	gwebsocket "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 )
 
 // A Server is a websocket test server listening on a system-chosen port on the
@@ -35,8 +35,8 @@ func NewServer(handler http.Handler) *Server {
 
 // NewHandler returns a new http.Handler that upgrades connections and calls handler.
 // Upon return from the handler function, the connection is automatically closed.
-func NewHandler(handler func(conn *gwebsocket.Conn)) http.Handler {
-	var upgrader gwebsocket.Upgrader
+func NewHandler(handler func(conn *websocket.Conn)) http.Handler {
+	var upgrader websocket.Upgrader
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -54,8 +54,8 @@ func NewHandler(handler func(conn *gwebsocket.Conn)) http.Handler {
 
 // Dial creates a new connection to the server.
 // If connecting to the server fails (for instance because it has been shut down), panics.
-func (srv *Server) Dial(opts func(*gwebsocket.Dialer), requestHeader http.Header) (*gwebsocket.Conn, *http.Response) {
-	wsdialer := &gwebsocket.Dialer{
+func (srv *Server) Dial(opts func(*websocket.Dialer), requestHeader http.Header) (*websocket.Conn, *http.Response) {
+	wsdialer := &websocket.Dialer{
 		Proxy:            http.ProxyFromEnvironment,
 		HandshakeTimeout: 45 * time.Second,
 	}
