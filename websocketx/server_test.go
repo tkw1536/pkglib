@@ -1,12 +1,12 @@
-package websocket_test
+package websocketx_test
 
 import (
 	"testing"
 	"time"
 
 	gwebsocket "github.com/gorilla/websocket"
-	"github.com/tkw1536/pkglib/httpx/websocket"
-	"github.com/tkw1536/pkglib/httpx/websocket/websockettest"
+	"github.com/tkw1536/pkglib/websocketx"
+	"github.com/tkw1536/pkglib/websocketx/websockettest"
 )
 
 func TestServer_subprotocols(t *testing.T) {
@@ -68,13 +68,13 @@ func TestServer_subprotocols(t *testing.T) {
 			t.Parallel()
 
 			// create a server with the specified websocket protocols
-			var server websocket.Server
+			var server websocketx.Server
 			server.Options.Subprotocols = tt.ServerProto
 
 			// record the protocol that we got
 			var gotProto string
 			done := make(chan struct{})
-			server.Handler = func(c *websocket.Connection) {
+			server.Handler = func(c *websocketx.Connection) {
 				defer close(done)
 				gotProto = c.Subprotocol()
 			}
@@ -107,15 +107,15 @@ func TestServer_timeout(t *testing.T) {
 		panic("timeout is too big, pick a smaller one")
 	}
 
-	testServer(t, func(server *websocket.Server) websocket.Handler {
+	testServer(t, func(server *websocketx.Server) websocketx.Handler {
 		server.Options.ReadInterval = timeout
 		server.Options.PingInterval = testServerTimeout // don't send pings (which a sane client would respond to)
 
 		// the handler just wait for the connection to close on it's own
-		return func(c *websocket.Connection) {
+		return func(c *websocketx.Connection) {
 			<-c.Context().Done()
 		}
-	}, func(c *gwebsocket.Conn, _ *websocket.Server) {
+	}, func(c *gwebsocket.Conn, _ *websocketx.Server) {
 		// don't send a message during the timeout
 		time.Sleep(timeout)
 	})
@@ -124,19 +124,19 @@ func TestServer_timeout(t *testing.T) {
 const testServerTimeout = time.Minute
 
 // testServer create a new testing server and initiates a cl ient.
-func testServer(t *testing.T, initHandler func(server *websocket.Server) websocket.Handler, doClient func(client *gwebsocket.Conn, server *websocket.Server)) {
+func testServer(t *testing.T, initHandler func(server *websocketx.Server) websocketx.Handler, doClient func(client *gwebsocket.Conn, server *websocketx.Server)) {
 	t.Helper()
 
 	// create the server
-	var server websocket.Server
+	var server websocketx.Server
 
 	// have the test code setup the handler
-	var handler websocket.Handler
+	var handler websocketx.Handler
 	if initHandler != nil {
 		handler = initHandler(&server)
 	}
 	if handler == nil {
-		handler = func(c *websocket.Connection) { <-c.Context().Done() }
+		handler = func(c *websocketx.Connection) { <-c.Context().Done() }
 	}
 	if server.Handler != nil {
 		panic("initHandler set server.Handler (wrong test code: return it instead)")
@@ -144,7 +144,7 @@ func testServer(t *testing.T, initHandler func(server *websocket.Server) websock
 
 	// update the actual handler
 	done := make(chan struct{})
-	server.Handler = func(c *websocket.Connection) {
+	server.Handler = func(c *websocketx.Connection) {
 		defer close(done)
 		handler(c)
 	}
@@ -173,10 +173,10 @@ func TestServer_ReadLimit(t *testing.T) {
 		biggerThanLimit = readLimit + 10
 	)
 
-	testServer(t, func(server *websocket.Server) websocket.Handler {
+	testServer(t, func(server *websocketx.Server) websocketx.Handler {
 		server.Options.ReadLimit = readLimit
 
-		return func(c *websocket.Connection) {
+		return func(c *websocketx.Connection) {
 			select {
 			case <-c.Read():
 				t.Error("read large package unexpectedly")
@@ -184,7 +184,7 @@ func TestServer_ReadLimit(t *testing.T) {
 				/* closed connection */
 			}
 		}
-	}, func(client *gwebsocket.Conn, _ *websocket.Server) {
+	}, func(client *gwebsocket.Conn, _ *websocketx.Server) {
 		// simply send a big message
 		big := make([]byte, biggerThanLimit)
 		_ = client.WriteMessage(gwebsocket.TextMessage, big)

@@ -1,5 +1,5 @@
 // Package websocket provides a handler for websockets
-package websocket
+package websocketx
 
 import (
 	"context"

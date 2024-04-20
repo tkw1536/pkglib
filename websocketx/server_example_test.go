@@ -1,19 +1,19 @@
-package websocket_test
+package websocketx_test
 
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/httpx/websocket"
-	"github.com/tkw1536/pkglib/httpx/websocket/websockettest"
+	"github.com/tkw1536/pkglib/websocketx"
+	"github.com/tkw1536/pkglib/websocketx/websockettest"
 
 	gwebsocket "github.com/gorilla/websocket"
 )
 
 // A simple server that sends data to the client.
 func ExampleServer_send() {
-	var server websocket.Server
+	var server websocketx.Server
 
-	server.Handler = func(ws *websocket.Connection) {
+	server.Handler = func(ws *websocketx.Connection) {
 		<-ws.WriteText("hello")
 		<-ws.WriteText("world")
 	}
@@ -37,7 +37,7 @@ func ExampleServer_send() {
 		}
 
 		// ignore non-text-messages
-		if tp != websocket.TextMessage {
+		if tp != websocketx.TextMessage {
 			continue
 		}
 		fmt.Println(string(p))
@@ -49,11 +49,11 @@ func ExampleServer_send() {
 
 func ExampleServer_prepared() {
 
-	var server websocket.Server
+	var server websocketx.Server
 
 	// prepare a message to send
-	msg := websocket.NewTextMessage("i am prepared").MustPrepare()
-	server.Handler = func(ws *websocket.Connection) {
+	msg := websocketx.NewTextMessage("i am prepared").MustPrepare()
+	server.Handler = func(ws *websocketx.Connection) {
 		<-ws.WritePrepared(msg)
 	}
 
@@ -75,7 +75,7 @@ func ExampleServer_prepared() {
 		}
 
 		// ignore non-text-messages
-		if tp != websocket.TextMessage {
+		if tp != websocketx.TextMessage {
 			continue
 		}
 		fmt.Println(string(p))
@@ -86,9 +86,9 @@ func ExampleServer_prepared() {
 
 // Demonstrates how panic()ing handlers are handled handler
 func ExampleServer_panic() {
-	var server websocket.Server
+	var server websocketx.Server
 
-	server.Handler = func(ws *websocket.Connection) {
+	server.Handler = func(ws *websocketx.Connection) {
 		<-ws.WriteText("normal message")
 		panic("test panic")
 	}
@@ -115,7 +115,7 @@ func ExampleServer_panic() {
 		}
 
 		// ignore non-text-messages
-		if tp != websocket.TextMessage {
+		if tp != websocketx.TextMessage {
 			continue
 		}
 		fmt.Println(string(p))
@@ -127,10 +127,10 @@ func ExampleServer_panic() {
 // A simple echo server for messages
 func ExampleServer_echo() {
 	// create a very simple websocket server that just echoes back messages
-	var server websocket.Server
+	var server websocketx.Server
 
 	done := make(chan struct{})
-	server.Handler = func(ws *websocket.Connection) {
+	server.Handler = func(ws *websocketx.Connection) {
 		// when finished, print that the handler exited
 		// and close the done channel
 		defer fmt.Println("Handler() returned")
@@ -168,9 +168,9 @@ func ExampleServer_echo() {
 		message := fmt.Sprintf("message %d", i)
 		var kind int
 		if i%2 == 0 {
-			kind = websocket.BinaryMessage
+			kind = websocketx.BinaryMessage
 		} else {
-			kind = websocket.TextMessage
+			kind = websocketx.TextMessage
 		}
 
 		// write it or die

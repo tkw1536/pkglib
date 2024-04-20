@@ -1,4 +1,4 @@
-package websocket_test
+package websocketx_test
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	gwebsocket "github.com/gorilla/websocket"
-	"github.com/tkw1536/pkglib/httpx/websocket"
+	"github.com/gorilla/websocket"
+	"github.com/tkw1536/pkglib/websocketx"
 	"go.uber.org/goleak"
 )
 
@@ -37,11 +37,11 @@ var shutdownTests = []struct {
 	{
 		Name: "normal shutdown without message",
 
-		SendCode: gwebsocket.CloseNormalClosure,
+		SendCode: websocket.CloseNormalClosure,
 		SendText: "",
 
 		WantCloseCalled: true,
-		WantCode:        gwebsocket.CloseNormalClosure,
+		WantCode:        websocket.CloseNormalClosure,
 		WantText:        "",
 
 		WantCloseCause: "websocket: close 1000 (normal)",
@@ -50,11 +50,11 @@ var shutdownTests = []struct {
 	{
 		Name: "normal shutdown with message",
 
-		SendCode: gwebsocket.CloseNormalClosure,
+		SendCode: websocket.CloseNormalClosure,
 		SendText: "hello world",
 
 		WantCloseCalled: true,
-		WantCode:        gwebsocket.CloseNormalClosure,
+		WantCode:        websocket.CloseNormalClosure,
 		WantText:        "hello world",
 
 		WantCloseCause: "websocket: close 1000 (normal): hello world",
@@ -63,11 +63,11 @@ var shutdownTests = []struct {
 	{
 		Name: "abnormal closure",
 
-		SendCode: gwebsocket.CloseProtocolError,
+		SendCode: websocket.CloseProtocolError,
 		SendText: "",
 
 		WantCloseCalled: true,
-		WantCode:        gwebsocket.CloseProtocolError,
+		WantCode:        websocket.CloseProtocolError,
 		WantText:        "",
 
 		WantCloseCause: "websocket: close 1002 (protocol error)",
@@ -75,11 +75,11 @@ var shutdownTests = []struct {
 	{
 		Name: "abnormal closure with message",
 
-		SendCode: gwebsocket.CloseProtocolError,
+		SendCode: websocket.CloseProtocolError,
 		SendText: "some message",
 
 		WantCloseCalled: true,
-		WantCode:        gwebsocket.CloseProtocolError,
+		WantCode:        websocket.CloseProtocolError,
 		WantText:        "some message",
 
 		WantCloseCause: "websocket: close 1002 (protocol error): some message",
@@ -90,7 +90,7 @@ var shutdownTests = []struct {
 		SendCode: shutdownDoNothing,
 
 		WantCloseCalled: true,
-		WantCode:        gwebsocket.CloseNormalClosure,
+		WantCode:        websocket.CloseNormalClosure,
 		WantText:        "",
 	},
 
@@ -118,7 +118,7 @@ func TestServer_ServerShutdown(t *testing.T) {
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
 
-			testServer(t, nil, func(client *gwebsocket.Conn, server *websocket.Server) {
+			testServer(t, nil, func(client *websocket.Conn, server *websocketx.Server) {
 				var gotCode int
 				var gotText string
 				var gotCalled bool
@@ -145,7 +145,7 @@ func TestServer_ServerShutdown(t *testing.T) {
 						return
 					}
 
-					server.ShutdownWith(gwebsocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
+					server.ShutdownWith(websocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
 				}()
 
 				// read the closing message
@@ -179,8 +179,8 @@ func TestServer_HandlerShutdown(t *testing.T) {
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
 
-			testServer(t, func(server *websocket.Server) websocket.Handler {
-				return func(c *websocket.Connection) {
+			testServer(t, func(server *websocketx.Server) websocketx.Handler {
+				return func(c *websocketx.Connection) {
 					if tt.SendCode == shutdownDoNothing {
 						return
 					}
@@ -189,9 +189,9 @@ func TestServer_HandlerShutdown(t *testing.T) {
 						return
 					}
 
-					c.ShutdownWith(gwebsocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
+					c.ShutdownWith(websocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
 				}
-			}, func(client *gwebsocket.Conn, _ *websocket.Server) {
+			}, func(client *websocket.Conn, _ *websocketx.Server) {
 				var gotCode int
 				var gotText string
 				var gotCalled bool
@@ -244,21 +244,21 @@ func TestServer_ClientClose(t *testing.T) {
 			t.Parallel()
 
 			var gotCloseCause error
-			testServer(t, func(server *websocket.Server) websocket.Handler {
+			testServer(t, func(server *websocketx.Server) websocketx.Handler {
 				// record the close cause received
-				return func(c *websocket.Connection) {
+				return func(c *websocketx.Connection) {
 					ctx := c.Context()
 					<-ctx.Done()
 					gotCloseCause = context.Cause(ctx)
 				}
-			}, func(client *gwebsocket.Conn, _ *websocket.Server) {
+			}, func(client *websocket.Conn, _ *websocketx.Server) {
 				if tt.SendCode == shutdownForceClose {
 					client.Close()
 					return
 				}
 
 				// write the close message to the server
-				_ = client.WriteControl(websocket.CloseMessage, gwebsocket.FormatCloseMessage(tt.SendCode, tt.SendText), time.Now().Add(time.Second))
+				_ = client.WriteControl(websocketx.CloseMessage, websocket.FormatCloseMessage(tt.SendCode, tt.SendText), time.Now().Add(time.Second))
 
 				// receive the close message back
 				if _, _, err := client.ReadMessage(); err == nil {
