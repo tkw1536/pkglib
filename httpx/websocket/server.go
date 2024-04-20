@@ -167,7 +167,7 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 			// server is shutting down with a specific code =>
 			// close the server with that specific code
-			if err, ok := cause.(*CloseError); ok {
+			if err, ok := cause.(*websocket.CloseError); ok {
 				conn.ShutdownWith(*err)
 				return
 			}
@@ -182,7 +182,7 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 var (
 	// ErrServerShuttingDown is sent to clients when the server is shutting down
 	// and no other error message has been provided.
-	ErrServerShuttingDown = CloseError{Code: CloseGoingAway, Text: "server shutting down"}
+	ErrServerShuttingDown = websocket.CloseError{Code: websocket.CloseGoingAway, Text: "server shutting down"}
 
 	// codes used to signal specific server shutdown actions
 	errServerShutdown = errors.New("shutting down now")
@@ -207,7 +207,7 @@ func (server *Server) Shutdown() {
 // Finally it waits (indefinitely) for all existing connections to stop.
 //
 // See also [Shutdown] and [Close].
-func (server *Server) ShutdownWith(err CloseError) {
+func (server *Server) ShutdownWith(err websocket.CloseError) {
 	if err.Code == 0 {
 		err = ErrServerShuttingDown
 	}

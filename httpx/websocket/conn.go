@@ -107,7 +107,7 @@ func (conn *Connection) setConnOpts() error {
 
 	// when receiving a close frame, switch the state over to the close state
 	conn.conn.SetCloseHandler(func(code int, text string) error {
-		conn.close(CloseError{Code: code}, &CloseError{Code: code, Text: text}, true)
+		conn.close(websocket.CloseError{Code: code}, &websocket.CloseError{Code: code, Text: text}, true)
 		return nil
 	})
 
@@ -124,12 +124,12 @@ func (conn *Connection) handle(handler Handler) {
 				debug.PrintStack()
 
 				// and produce an abnormal close error
-				conn.close(CloseError{Code: websocket.CloseInternalServerErr}, nil, false)
+				conn.close(websocket.CloseError{Code: websocket.CloseInternalServerErr}, nil, false)
 				return
 			}
 
 			// close regularly
-			conn.close(CloseError{Code: websocket.CloseNormalClosure}, nil, false)
+			conn.close(websocket.CloseError{Code: websocket.CloseNormalClosure}, nil, false)
 		}()
 
 		handler(conn)
@@ -174,7 +174,7 @@ func (conn *Connection) sendMessages() {
 
 					err := conn.writeRaw(message)
 					if err != nil {
-						conn.close(CloseError{Code: CloseNoStatusReceived}, WriteError{err: err}, false)
+						conn.close(websocket.CloseError{Code: websocket.CloseNoStatusReceived}, WriteError{err: err}, false)
 						return
 					}
 					message.done <- struct{}{}
@@ -244,18 +244,6 @@ func (sh *Connection) WriteText(text string) <-chan struct{} {
 func (conn *Connection) WriteBinary(source []byte) <-chan struct{} {
 	return conn.Write(NewBinaryMessage(source))
 }
-
-// Close constants contain reasons for closing the server
-const (
-	CloseNormalClosure     = websocket.CloseNormalClosure
-	CloseGoingAway         = websocket.CloseGoingAway
-	CloseProtocolError     = websocket.CloseProtocolError
-	CloseNoStatusReceived  = websocket.CloseNoStatusReceived
-	ClosePolicyViolation   = websocket.ClosePolicyViolation
-	CloseInternalServerErr = websocket.CloseInternalServerErr
-	CloseServiceRestart    = websocket.CloseServiceRestart
-)
-
 func (conn *Connection) recvMessages() {
 	conn.incoming = make(chan Message)
 
@@ -274,7 +262,7 @@ func (conn *Connection) recvMessages() {
 
 			messageType, messageBytes, err := conn.conn.ReadMessage()
 			if err != nil {
-				conn.close(websocket.CloseError{Code: CloseNoStatusReceived}, ReadError{err: err}, false)
+				conn.close(websocket.CloseError{Code: websocket.CloseNoStatusReceived}, ReadError{err: err}, false)
 				return
 			}
 

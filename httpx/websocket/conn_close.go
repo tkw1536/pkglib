@@ -17,7 +17,7 @@ import (
 // If force is true, also calls forceClose.
 //
 // If the connection is already closed, this function does nothing.
-func (conn *Connection) close(frame CloseError, reason error, force bool) {
+func (conn *Connection) close(frame websocket.CloseError, reason error, force bool) {
 	// cancel the context with the appropriate reason
 	if reason == nil {
 		reason = &frame
@@ -79,9 +79,9 @@ func (conn *Connection) forceClose() error {
 // The timeout used is the normal ReadInterval timeout.
 //
 // When closeCode is 0, uses CloseNormalClosure.
-func (conn *Connection) ShutdownWith(frame CloseError) {
+func (conn *Connection) ShutdownWith(frame websocket.CloseError) {
 	if frame.Code <= 0 {
-		frame.Code = CloseNormalClosure
+		frame.Code = websocket.CloseNormalClosure
 	}
 
 	// write the connection close
@@ -99,9 +99,6 @@ func (conn *Connection) Close() error {
 
 	return conn.forceClose()
 }
-
-// CloseError is the cancel cause of [Connection.Context] if a closing handshake too place.
-type CloseError = websocket.CloseError
 
 // ReadError is the cancel cause of [Connection.Context] if an error occurred during writing.
 type ReadError struct {
