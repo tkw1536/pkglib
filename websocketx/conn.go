@@ -234,7 +234,7 @@ func (conn *Connection) writeRaw(message queuedMessage) (err error) {
 	if message.prep != nil {
 		return conn.conn.WritePreparedMessage(message.prep)
 	}
-	return conn.conn.WriteMessage(message.msg.Type, message.msg.Bytes)
+	return conn.conn.WriteMessage(message.msg.Type, message.msg.Body)
 }
 
 // Write queues the provided message for sending.
@@ -315,8 +315,8 @@ func (conn *Connection) recvMessages() {
 			// try to send a message to the incoming message channel
 			select {
 			case conn.incoming <- Message{
-				Type:  messageType,
-				Bytes: messageBytes,
+				Type: messageType,
+				Body: messageBytes,
 			}:
 			case <-conn.context.Done():
 				return

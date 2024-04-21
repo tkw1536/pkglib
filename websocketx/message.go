@@ -6,8 +6,8 @@ import (
 
 // Message represents a message sent between client and server.
 type Message struct {
-	Type  int
-	Bytes []byte
+	Type int
+	Body []byte
 }
 
 // Binary checks if this message is a binary message
@@ -23,22 +23,22 @@ func (msg Message) Text() bool {
 // NewTextMessage creates a new text message with the given text
 func NewTextMessage(text string) Message {
 	return Message{
-		Type:  websocket.TextMessage,
-		Bytes: []byte(text),
+		Type: websocket.TextMessage,
+		Body: []byte(text),
 	}
 }
 
 // NewBinaryMessage creates a new binary message with the given text
 func NewBinaryMessage(data []byte) Message {
 	return Message{
-		Type:  websocket.BinaryMessage,
-		Bytes: data,
+		Type: websocket.BinaryMessage,
+		Body: data,
 	}
 }
 
 // Prepare prepares a message for sending
 func (msg Message) Prepare() (PreparedMessage, error) {
-	m, err := websocket.NewPreparedMessage(msg.Type, msg.Bytes)
+	m, err := websocket.NewPreparedMessage(msg.Type, msg.Body)
 	if err != nil {
 		return PreparedMessage{}, err
 	}
