@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Server provides a websocket server.
+// Server implements a websocket server.
 type Server struct {
 	m        sync.Mutex // protects modifying context below
 	initDone bool       // true once we have initialized the server
@@ -167,8 +167,8 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 			// server is shutting down with a specific code =>
 			// close the server with that specific code
-			if err, ok := cause.(*websocket.CloseError); ok {
-				conn.ShutdownWith(*err)
+			if cc, ok := cause.(CloseCause); ok {
+				conn.ShutdownWith(cc.Frame)
 				return
 			}
 
@@ -180,13 +180,8 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 }
 
 var (
-	// ErrServerShuttingDown is sent to clients when the server is shutting down
-	// and no other error message has been provided.
-	ErrServerShuttingDown = websocket.CloseError{Code: websocket.CloseGoingAway, Text: "server shutting down"}
-
-	// codes used to signal specific server shutdown actions
-	errServerShutdown = errors.New("shutting down now")
-	errServerClose    = errors.New("closing server now")
+	errServerShutdown = errors.New("server shutting down")
+	errServerClose    = errors.New("server closing")
 )
 
 // Shutdown gracefully shuts down the server.
@@ -200,19 +195,27 @@ func (server *Server) Shutdown() {
 	server.conns.Wait()
 }
 
-// ShutdownWith gracefully shuts down the server by sending each client a CloseError.
+var serverShuttingDown = CloseFrame{
+	Code:   StatusGoingAway,
+	Reason: "server shutting down",
+}
+
+// ShutdownWith gracefully shuts down the server by sending each client the given
+// CloseFrame.
+// If frame is the zero value, uses a default frame indicating that the server
+// is shutting down instead.
 //
 // ShutdownWith first informs the server to stop accepting new connection attempts.
 // Then it closes all existing connections by sending the given error.
 // Finally it waits (indefinitely) for all existing connections to stop.
 //
 // See also [Shutdown] and [Close].
-func (server *Server) ShutdownWith(err websocket.CloseError) {
-	if err.Code == 0 {
-		err = ErrServerShuttingDown
+func (server *Server) ShutdownWith(frame CloseFrame) {
+	if frame.IsZero() {
+		frame = serverShuttingDown
 	}
 
-	server.close(&err)
+	server.close(CloseCause{Frame: frame})
 	server.conns.Wait()
 }
 

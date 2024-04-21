@@ -12,18 +12,18 @@ type Message struct {
 
 // Binary checks if this message is a binary message
 func (msg Message) Binary() bool {
-	return msg.Type == BinaryMessage
+	return msg.Type == websocket.BinaryMessage
 }
 
 // Text checks if this message is a text message
 func (msg Message) Text() bool {
-	return msg.Type == TextMessage
+	return msg.Type == websocket.TextMessage
 }
 
 // NewTextMessage creates a new text message with the given text
 func NewTextMessage(text string) Message {
 	return Message{
-		Type:  TextMessage,
+		Type:  websocket.TextMessage,
 		Bytes: []byte(text),
 	}
 }
@@ -31,7 +31,7 @@ func NewTextMessage(text string) Message {
 // NewBinaryMessage creates a new binary message with the given text
 func NewBinaryMessage(data []byte) Message {
 	return Message{
-		Type:  BinaryMessage,
+		Type:  websocket.BinaryMessage,
 		Bytes: data,
 	}
 }

@@ -4,26 +4,24 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-// close sends a close frame on the underlying network connection.
-// It then sets the connection into the appropriate new closing state.
+// close closes this connection with the given cause.
+// It updates the connection state and sends a closing frame to the remote endpoint.
 //
-// It also cancels the connection context with the given reason.
-// If the reason is nil, it defaults to frame.
+// The frame communicated to the remote endpoint will be the frame found in the cause,
+// unless the caller provides an explicit frame instead.
 //
+// This function also updates the internal connection state.
 // If force is true, also calls forceClose.
 //
 // If the connection is already closed, this function does nothing.
-func (conn *Connection) close(frame websocket.CloseError, reason error, force bool) {
-	// cancel the context with the appropriate reason
-	if reason == nil {
-		reason = &frame
-	}
-	conn.cancel(reason)
+func (conn *Connection) close(cause CloseCause, frame *CloseFrame, force bool) {
+	conn.cancel(cause)
 
 	// modifying the state
 	conn.stateM.Lock()
@@ -36,12 +34,16 @@ func (conn *Connection) close(frame websocket.CloseError, reason error, force bo
 	}
 
 	// write the close frame; but ignore any failures
-	message := websocket.FormatCloseMessage(frame.Code, frame.Text)
-	_ = conn.conn.WriteControl(websocket.CloseMessage, message, time.Now().Add(conn.opts.HandshakeTimeout))
+	cf := cause.Frame
+	if frame != nil {
+		cf = *frame
+	}
+
+	_ = conn.conn.WriteControl(websocket.CloseMessage, cf.Body(), time.Now().Add(conn.opts.HandshakeTimeout))
 
 	// do the actual close
 	if force {
-		conn.forceClose()
+		conn.forceClose(nil)
 		return
 	}
 
@@ -49,13 +51,26 @@ func (conn *Connection) close(frame websocket.CloseError, reason error, force bo
 	conn.state = CLOSING
 }
 
-// forceClose kills the underlying network connection
-// and then updates the state of the connection
+// forceClose kills the underlying network connection.
+// and then updates the state of the connection.
+//
+// # If error is not nil, it also cancels the context with the given context
 //
 // the caller should hold stateM
-func (conn *Connection) forceClose() error {
+func (conn *Connection) forceClose(err error) error {
 	if conn.stateM.TryLock() {
 		panic("conn.forceClose: stateM is not held")
+	}
+
+	// cancel the context if requested
+	if err != nil {
+		conn.cancel(CloseCause{
+			Frame: CloseFrame{
+				Code: StatusAbnormalClosure,
+			},
+			WasClean: false,
+			Err:      err,
+		})
 	}
 
 	errs := make([]error, 3)
@@ -74,19 +89,27 @@ func (conn *Connection) forceClose() error {
 	return errors.Join(errs...)
 }
 
+var (
+	// ErrConnectionShutdownWith indicates the connection closed because connection.ShutdownWith was called.
+	ErrConnectionShutdownWith = errors.New("Connection.ShutdownWith called")
+
+	// ErrConnectionClose indicates that the connection closed because connection.Close was called.
+	ErrConnectionClose = errors.New("connection.Close called")
+)
+
 // ShutdownWith shuts down this connection with the given code and text for the client.
 //
 // ShutdownWith automatically formats a close message, sends it, and waits for the close handshake to complete or timeout.
 // The timeout used is the normal ReadInterval timeout.
 //
 // When closeCode is 0, uses CloseNormalClosure.
-func (conn *Connection) ShutdownWith(frame websocket.CloseError) {
+func (conn *Connection) ShutdownWith(frame CloseFrame) {
 	if frame.Code <= 0 {
 		frame.Code = websocket.CloseNormalClosure
 	}
 
 	// write the connection close
-	conn.close(frame, nil, false)
+	conn.close(CloseCause{Frame: frame, WasClean: true, Err: ErrConnectionShutdownWith}, nil, false)
 
 	// wait for everything to close
 	conn.wg.Wait()
@@ -98,7 +121,7 @@ func (conn *Connection) Close() error {
 	conn.stateM.Lock()
 	defer conn.stateM.Unlock()
 
-	return conn.forceClose()
+	return conn.forceClose(ErrConnectionClose)
 }
 
 // CloseFrame represents a closing control frame of a websocket connection.
@@ -106,6 +129,17 @@ func (conn *Connection) Close() error {
 type CloseFrame struct {
 	Code   StatusCode
 	Reason string
+}
+
+// Message returns the message body used to send this frame to
+// a remote endpoint.
+func (cf CloseFrame) Body() []byte {
+	return websocket.FormatCloseMessage(int(cf.Code), cf.Reason)
+}
+
+// IsZero checks if this CloseFrame has the zero value
+func (cf CloseFrame) IsZero() bool {
+	return cf.Code == 0 && cf.Reason == ""
 }
 
 // StatusCode is a status code as defined in RFC 6455, Section 7.4.
@@ -236,26 +270,66 @@ var statusCodeNames = map[StatusCode]string{
 	StatusTimeout:                 "Timeout",
 }
 
-// ReadError is the cancel cause of [Connection.Context] if an error occurred during writing.
-type ReadError struct {
-	err error
+// CloseCause is returned by calling [close.Cause] on the context of a connection.
+// It indicates the reason why the server was closed.
+type CloseCause struct {
+	// CloseFrame it the close frame that cause the closure.
+	// If no close frame was received, contains the [StatusAbnormalClosure] code.
+	Frame CloseFrame
+
+	// WasClean indicates if the connection is closed after receiving a close frame
+	// from the client, or after having sent a close frame.
+	//
+	// NOTE: This roughly corresponds to the websocket JavaScript API's CloseEvent's wasClean.
+	// However in situations where the server sends a close frame, but never receives a response
+	// the WasClean field may still be true.
+	// This detail is not considered part of the public API of this package, and may change in the future.
+	WasClean bool
+
+	// Err contains the error that caused the closure of this connection.
+	// This may be an error returned from the read or write end of the connection,
+	// or a server-side error.
+	//
+	// A special value contained in this field is ErrShuttingDown.
+	Err error
 }
 
-func (err ReadError) Error() string {
-	return fmt.Sprintf("read error: %v", err.err)
-}
-func (err ReadError) Unwrap() error {
-	return err.err
+// CloseCause implements the error interface.
+func (cc CloseCause) Error() string {
+	var builder strings.Builder
+
+	_, err := fmt.Fprint(&builder, cc.Frame.Code)
+	if err != nil {
+		goto error
+	}
+
+	if cc.Frame.Reason != "" {
+		_, err := fmt.Fprintf(&builder, " (reason: %q)", cc.Frame.Reason)
+		if err != nil {
+			goto error
+		}
+	}
+
+	if !cc.WasClean {
+		_, err := fmt.Fprint(&builder, " (unclean)")
+		if err != nil {
+			goto error
+		}
+	}
+
+	if cc.Err != nil {
+		_, err := fmt.Fprintf(&builder, ": %s", cc.Err)
+		if err != nil {
+			goto error
+		}
+	}
+
+	return builder.String()
+error:
+	return "(error formatting CloseCause)"
 }
 
-// WriteError is the cancel cause of [Connection.Context] if an error occurred during writing.
-type WriteError struct {
-	err error
-}
-
-func (err WriteError) Error() string {
-	return fmt.Sprintf("write error: %v", err.err)
-}
-func (err WriteError) Unwrap() error {
-	return err.err
+// Unwrap implements the underlying Unwrap interface.
+func (cc CloseCause) Unwrap() error {
+	return cc.Err
 }

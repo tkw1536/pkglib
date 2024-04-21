@@ -3,6 +3,7 @@ package websocketx
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"runtime/debug"
 	"sync"
@@ -107,7 +108,21 @@ func (conn *Connection) setConnOpts() error {
 
 	// when receiving a close frame, switch the state over to the close state
 	conn.conn.SetCloseHandler(func(code int, text string) error {
-		conn.close(websocket.CloseError{Code: code}, &websocket.CloseError{Code: code, Text: text}, true)
+		// setup a valid status code
+		// if it is within a valid range
+		sc := StatusNoStatusReceived
+		if code >= 0 && code < (1<<16) {
+			sc = StatusCode(code)
+		}
+
+		conn.close(CloseCause{
+			Frame: CloseFrame{
+				Code:   sc,
+				Reason: text,
+			},
+			WasClean: true,
+			Err:      nil,
+		}, &CloseFrame{Code: StatusCode(code)}, true)
 		return nil
 	})
 
@@ -118,18 +133,26 @@ func (conn *Connection) handle(handler Handler) {
 	go func() {
 		defer close(conn.handlerDone)
 		defer func() {
-			// when the handler panic()s, simply print the stack!
-			// to not cause the server to crash!
-			if value := recover(); value != nil {
-				debug.PrintStack()
 
-				// and produce an abnormal close error
-				conn.close(websocket.CloseError{Code: websocket.CloseInternalServerErr}, nil, false)
+			// if we didn't panic, just close the connection
+			// with a regular close frame
+			value := recover()
+			if value == nil {
+				conn.ShutdownWith(CloseFrame{Code: StatusNormalClosure})
 				return
 			}
 
-			// close regularly
-			conn.close(websocket.CloseError{Code: websocket.CloseNormalClosure}, nil, false)
+			// the handler has panic()ed, so we just print the stack!
+			debug.PrintStack()
+
+			// and cause a non-clean closure
+			conn.close(CloseCause{
+				Frame: CloseFrame{
+					Code: StatusInternalErr,
+				},
+				WasClean: true,
+				Err:      fmt.Errorf("%v", value),
+			}, nil, false)
 		}()
 
 		handler(conn)
@@ -156,7 +179,7 @@ func (conn *Connection) sendMessages() {
 		defer ticker.Stop()
 
 		// prepare a ping message
-		ping, err := websocket.NewPreparedMessage(PingMessage, []byte{})
+		ping, err := websocket.NewPreparedMessage(websocket.PingMessage, []byte{})
 		if err != nil {
 			return
 		}
@@ -174,7 +197,6 @@ func (conn *Connection) sendMessages() {
 
 					err := conn.writeRaw(message)
 					if err != nil {
-						conn.close(websocket.CloseError{Code: websocket.CloseNoStatusReceived}, WriteError{err: err}, false)
 						return
 					}
 					message.done <- struct{}{}
@@ -183,7 +205,6 @@ func (conn *Connection) sendMessages() {
 			// send a ping message
 			case <-ticker.C:
 				if err := conn.writeRaw(queuedMessage{prep: ping}); err != nil {
-					conn.cancel(WriteError{err: err})
 					return
 				}
 			}
@@ -192,7 +213,20 @@ func (conn *Connection) sendMessages() {
 
 }
 
-func (conn *Connection) writeRaw(message queuedMessage) error {
+// writeRaw writes an underlying message to the connection.
+// If an error occurs, closes the connection.
+func (conn *Connection) writeRaw(message queuedMessage) (err error) {
+	defer func() {
+		if err != nil {
+			conn.close(CloseCause{
+				Frame: CloseFrame{
+					Code: websocket.CloseAbnormalClosure,
+				},
+				WasClean: false,
+				Err:      err,
+			}, nil, false)
+		}
+	}()
 	if err := conn.conn.SetWriteDeadline(time.Now().Add(conn.opts.WriteInterval)); err != nil {
 		return err
 	}
@@ -261,8 +295,20 @@ func (conn *Connection) recvMessages() {
 			_ = conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
 
 			messageType, messageBytes, err := conn.conn.ReadMessage()
+
+			// intercept any unexpected CloseErrors
+			// this only has an effect if the context has not yet been closed.
+			if ce, ok := err.(*websocket.CloseError); ok {
+				err = fmt.Errorf("%s", ce.Text)
+			}
 			if err != nil {
-				conn.close(websocket.CloseError{Code: websocket.CloseNoStatusReceived}, ReadError{err: err}, false)
+				conn.close(CloseCause{
+					Frame: CloseFrame{
+						Code: StatusAbnormalClosure,
+					},
+					WasClean: false,
+					Err:      err,
+				}, nil, false)
 				return
 			}
 
@@ -296,7 +342,8 @@ func (conn *Connection) Subprotocol() string {
 // Context returns a context for operations on this context.
 // Once it is closed, no more read or write operations are permitted.
 //
-// The [context.Cause] of the error will be one of *[CloseError], [ReadError] or [WriteError].
+// The [context.Cause] will return an error of type [CloseCause],
+// representing the reason for the closure.
 //
 // The Context may close before the Handler function has returned.
 // To wait for the handler function to return, use Wait() instead.
@@ -320,12 +367,3 @@ type queuedMessage struct {
 
 	done chan<- struct{} // done should be closed when finished
 }
-
-// Common message types see the gorilla websocket package for details.
-const (
-	TextMessage   = websocket.TextMessage
-	BinaryMessage = websocket.BinaryMessage
-	CloseMessage  = websocket.CloseMessage
-	PingMessage   = websocket.PingMessage
-	PongMessage   = websocket.PongMessage
-)

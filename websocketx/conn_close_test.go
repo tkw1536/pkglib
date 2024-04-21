@@ -2,6 +2,7 @@ package websocketx_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -11,9 +12,12 @@ import (
 	"go.uber.org/goleak"
 )
 
+// special status codes for testing
+// these are declared as reserved by the websocket protocol
+// so it is guaranteed that no valid test uses them
 const (
 	// do nothing and simply exit the handler code
-	shutdownDoNothing = -(iota + 1)
+	shutdownDoNothing websocketx.StatusCode = iota + 100
 
 	// force close the handler without waiting
 	shutdownForceClose
@@ -22,86 +26,123 @@ const (
 var shutdownTests = []struct {
 	Name string // name of the test
 
-	SendCode int    // code to send during shutdown (or special action)
-	SendText string // text to send during shutdown
+	// the frame to send to the server
+	SendFrame websocketx.CloseFrame
 
 	// expectations when closing from the server side
 	WantCloseCalled bool
 	WantCode        int
-	WantText        string
+	WantReason      string
 
 	// expectations when closing from the client side
-	// if omitted, skip the test.
-	WantCloseCause string
+	// if the frame is the zero value, omitted.
+	WantCloseCause websocketx.CloseCause
 }{
 	{
 		Name: "normal shutdown without message",
 
-		SendCode: websocket.CloseNormalClosure,
-		SendText: "",
+		SendFrame: websocketx.CloseFrame{
+			Code: websocketx.StatusNormalClosure,
+		},
 
 		WantCloseCalled: true,
 		WantCode:        websocket.CloseNormalClosure,
-		WantText:        "",
+		WantReason:      "",
 
-		WantCloseCause: "websocket: close 1000 (normal)",
+		WantCloseCause: websocketx.CloseCause{
+			Frame: websocketx.CloseFrame{
+				Code: websocketx.StatusNormalClosure,
+			},
+			WasClean: true,
+		},
 	},
 
 	{
 		Name: "normal shutdown with message",
 
-		SendCode: websocket.CloseNormalClosure,
-		SendText: "hello world",
-
+		SendFrame: websocketx.CloseFrame{
+			Code:   websocketx.StatusNormalClosure,
+			Reason: "hello world",
+		},
 		WantCloseCalled: true,
 		WantCode:        websocket.CloseNormalClosure,
-		WantText:        "hello world",
+		WantReason:      "hello world",
 
-		WantCloseCause: "websocket: close 1000 (normal): hello world",
+		WantCloseCause: websocketx.CloseCause{
+			Frame: websocketx.CloseFrame{
+				Code:   websocketx.StatusNormalClosure,
+				Reason: "hello world",
+			},
+			WasClean: true,
+		},
 	},
 
 	{
 		Name: "abnormal closure",
 
-		SendCode: websocket.CloseProtocolError,
-		SendText: "",
+		SendFrame: websocketx.CloseFrame{
+			Code: websocketx.StatusProtocolError,
+		},
 
 		WantCloseCalled: true,
 		WantCode:        websocket.CloseProtocolError,
-		WantText:        "",
+		WantReason:      "",
 
-		WantCloseCause: "websocket: close 1002 (protocol error)",
+		WantCloseCause: websocketx.CloseCause{
+			Frame: websocketx.CloseFrame{
+				Code: websocketx.StatusProtocolError,
+			},
+			WasClean: true,
+		},
 	},
 	{
 		Name: "abnormal closure with message",
 
-		SendCode: websocket.CloseProtocolError,
-		SendText: "some message",
+		SendFrame: websocketx.CloseFrame{
+			Code:   websocketx.StatusProtocolError,
+			Reason: "some message",
+		},
 
 		WantCloseCalled: true,
 		WantCode:        websocket.CloseProtocolError,
-		WantText:        "some message",
+		WantReason:      "some message",
 
-		WantCloseCause: "websocket: close 1002 (protocol error): some message",
+		WantCloseCause: websocketx.CloseCause{
+			Frame: websocketx.CloseFrame{
+				Code:   websocketx.StatusProtocolError,
+				Reason: "some message",
+			},
+			WasClean: true,
+		},
 	},
 	{
 		Name: "don't close",
 
-		SendCode: shutdownDoNothing,
+		SendFrame: websocketx.CloseFrame{
+			Code: shutdownDoNothing,
+		},
 
 		WantCloseCalled: true,
 		WantCode:        websocket.CloseNormalClosure,
-		WantText:        "",
+		WantReason:      "",
 	},
 
 	{
 		Name: "force close",
 
-		SendCode: shutdownForceClose,
+		SendFrame: websocketx.CloseFrame{
+			Code: shutdownForceClose,
+		},
 
 		WantCloseCalled: false,
 
-		WantCloseCause: "read error: websocket: close 1006 (abnormal closure): unexpected EOF",
+		WantCloseCause: websocketx.CloseCause{
+			Frame: websocketx.CloseFrame{
+				Code: websocketx.StatusAbnormalClosure,
+			},
+			WasClean: false,
+			Err:      errors.New("unexpected EOF"),
+		},
 	},
 }
 
@@ -111,7 +152,7 @@ func TestServer_ServerShutdown(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
 	for _, tt := range shutdownTests {
-		if tt.SendCode == shutdownDoNothing {
+		if tt.SendFrame.Code == shutdownDoNothing {
 			continue
 		}
 
@@ -140,12 +181,12 @@ func TestServer_ServerShutdown(t *testing.T) {
 				go func() {
 					defer close(done)
 
-					if tt.SendCode == shutdownForceClose {
+					if tt.SendFrame.Code == shutdownForceClose {
 						server.Close()
 						return
 					}
 
-					server.ShutdownWith(websocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
+					server.ShutdownWith(tt.SendFrame)
 				}()
 
 				// read the closing message
@@ -162,8 +203,8 @@ func TestServer_ServerShutdown(t *testing.T) {
 				if gotCode != tt.WantCode {
 					t.Errorf("got code %d, but want code %d", gotCode, tt.WantCode)
 				}
-				if gotText != tt.WantText {
-					t.Errorf("got text %q, but want text %q", gotText, tt.WantText)
+				if gotText != tt.WantReason {
+					t.Errorf("got text %q, but want text %q", gotText, tt.WantReason)
 				}
 			})
 		})
@@ -181,15 +222,15 @@ func TestServer_HandlerShutdown(t *testing.T) {
 
 			testServer(t, func(server *websocketx.Server) websocketx.Handler {
 				return func(c *websocketx.Connection) {
-					if tt.SendCode == shutdownDoNothing {
+					if tt.SendFrame.Code == shutdownDoNothing {
 						return
 					}
-					if tt.SendCode == shutdownForceClose {
+					if tt.SendFrame.Code == shutdownForceClose {
 						c.Close()
 						return
 					}
 
-					c.ShutdownWith(websocket.CloseError{Code: tt.SendCode, Text: tt.SendText})
+					c.ShutdownWith(tt.SendFrame)
 				}
 			}, func(client *websocket.Conn, _ *websocketx.Server) {
 				var gotCode int
@@ -222,8 +263,8 @@ func TestServer_HandlerShutdown(t *testing.T) {
 				if gotCode != tt.WantCode {
 					t.Errorf("got code %d, but want code %d", gotCode, tt.WantCode)
 				}
-				if gotText != tt.WantText {
-					t.Errorf("got text %q, but want text %q", gotText, tt.WantText)
+				if gotText != tt.WantReason {
+					t.Errorf("got text %q, but want text %q", gotText, tt.WantReason)
 				}
 			})
 		})
@@ -236,29 +277,29 @@ func TestServer_ClientClose(t *testing.T) {
 
 	for _, tt := range shutdownTests {
 		// skip tests that aren't supported
-		if tt.SendCode == shutdownDoNothing || tt.WantCloseCause == "" {
+		if tt.SendFrame.Code == shutdownDoNothing || tt.WantCloseCause.Frame.IsZero() {
 			continue
 		}
 
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
 
-			var gotCloseCause error
+			var gotCancelCause error
 			testServer(t, func(server *websocketx.Server) websocketx.Handler {
 				// record the close cause received
 				return func(c *websocketx.Connection) {
 					ctx := c.Context()
 					<-ctx.Done()
-					gotCloseCause = context.Cause(ctx)
+					gotCancelCause = context.Cause(ctx)
 				}
 			}, func(client *websocket.Conn, _ *websocketx.Server) {
-				if tt.SendCode == shutdownForceClose {
+				if tt.SendFrame.Code == shutdownForceClose {
 					client.Close()
 					return
 				}
 
 				// write the close message to the server
-				_ = client.WriteControl(websocketx.CloseMessage, websocket.FormatCloseMessage(tt.SendCode, tt.SendText), time.Now().Add(time.Second))
+				_ = client.WriteControl(websocket.CloseMessage, tt.SendFrame.Body(), time.Now().Add(time.Second))
 
 				// receive the close message back
 				if _, _, err := client.ReadMessage(); err == nil {
@@ -266,11 +307,20 @@ func TestServer_ClientClose(t *testing.T) {
 				}
 			})
 
-			// check that the close cause is as expected
-			gotCloseMessage := fmt.Sprint(gotCloseCause)
-			if gotCloseMessage != tt.WantCloseCause {
-				t.Errorf("server-side got close cause %q, but want %q", gotCloseMessage, tt.WantCloseCause)
+			gotCloseCause, ok := gotCancelCause.(websocketx.CloseCause)
+			if !ok {
+				t.Errorf("server-side didn't return a close cause")
+				return
+			}
+
+			if !closeCauseEquals(gotCloseCause, tt.WantCloseCause) {
+				t.Errorf("server-side got close cause %q, but want %q", gotCloseCause, tt.WantCloseCause)
 			}
 		})
 	}
+}
+
+// closeCauseEquals compares two [CloseCause]s
+func closeCauseEquals(left, right websocketx.CloseCause) bool {
+	return left.Frame == right.Frame && left.WasClean == right.WasClean && fmt.Sprint(left.Err) == fmt.Sprint(right.Err)
 }

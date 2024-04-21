@@ -37,7 +37,7 @@ func ExampleServer_send() {
 		}
 
 		// ignore non-text-messages
-		if tp != websocketx.TextMessage {
+		if tp != websocket.TextMessage {
 			continue
 		}
 		fmt.Println(string(p))
@@ -75,7 +75,7 @@ func ExampleServer_prepared() {
 		}
 
 		// ignore non-text-messages
-		if tp != websocketx.TextMessage {
+		if tp != websocket.TextMessage {
 			continue
 		}
 		fmt.Println(string(p))
@@ -115,7 +115,7 @@ func ExampleServer_panic() {
 		}
 
 		// ignore non-text-messages
-		if tp != websocketx.TextMessage {
+		if tp != websocket.TextMessage {
 			continue
 		}
 		fmt.Println(string(p))
@@ -168,9 +168,9 @@ func ExampleServer_echo() {
 		message := fmt.Sprintf("message %d", i)
 		var kind int
 		if i%2 == 0 {
-			kind = websocketx.BinaryMessage
+			kind = websocket.BinaryMessage
 		} else {
-			kind = websocketx.TextMessage
+			kind = websocket.TextMessage
 		}
 
 		// write it or die
