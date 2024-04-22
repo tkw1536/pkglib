@@ -14,8 +14,8 @@ func ExampleServer_send() {
 	var server websocketx.Server
 
 	server.Handler = func(ws *websocketx.Connection) {
-		<-ws.WriteText("hello")
-		<-ws.WriteText("world")
+		ws.WriteText("hello")
+		ws.WriteText("world")
 	}
 
 	// The following code below is just for connection to the server.
@@ -54,7 +54,7 @@ func ExampleServer_prepared() {
 	// prepare a message to send
 	msg := websocketx.NewTextMessage("i am prepared").MustPrepare()
 	server.Handler = func(ws *websocketx.Connection) {
-		<-ws.WritePrepared(msg)
+		ws.WritePrepared(msg)
 	}
 
 	// The following code below is just for connection to the server.
@@ -89,7 +89,7 @@ func ExampleServer_panic() {
 	var server websocketx.Server
 
 	server.Handler = func(ws *websocketx.Connection) {
-		<-ws.WriteText("normal message")
+		ws.WriteText("normal message")
 		panic("test panic")
 	}
 
@@ -142,7 +142,7 @@ func ExampleServer_echo() {
 			case <-ws.Context().Done():
 				return
 			case msg := <-ws.Read():
-				<-ws.Write(msg)
+				ws.Write(msg)
 			}
 		}
 	}

@@ -237,19 +237,37 @@ func (conn *Connection) writeRaw(message queuedMessage) (err error) {
 	return conn.conn.WriteMessage(message.msg.Type, message.msg.Body)
 }
 
-// Write queues the provided message for sending.
-// The returned channel is closed once the message has been sent or the connection is closed.
-func (conn *Connection) Write(message Message) <-chan struct{} {
+// Write queues the provided message for sending
+// and blocks until the given message has been sent.
+//
+// Write returns a non-nil error if and only if the message failed to send.
+// In such a case, Write will internally close the connection
+// and return an error of type CancelCause.
+//
+// Call Write concurrently with other read and write calls is safe.
+// When multiple calls to Write are in-progress, all
+// messages will be sent, but their order is undefined
+// unless the callers explicitly coordinate.
+func (conn *Connection) Write(message Message) error {
 	return conn.write(queuedMessage{msg: message})
 }
 
-// WritePrepared queues the provided prepared message for sending.
-// The returned channel is closed once the message has been sent or the connection is closed.
-func (conn *Connection) WritePrepared(message PreparedMessage) <-chan struct{} {
+// WritePrepared is like Write, but sends a PreparedMessage instead.
+func (conn *Connection) WritePrepared(message PreparedMessage) error {
 	return conn.write(queuedMessage{prep: message.m})
 }
 
-func (conn *Connection) write(message queuedMessage) <-chan struct{} {
+// WriteText is like Write, but is sends a TextMessage with the given text.
+func (sh *Connection) WriteText(text string) error {
+	return sh.Write(NewTextMessage(text))
+}
+
+// WriteBinary is like Write, but it sends a BinaryMessage with the given text.
+func (conn *Connection) WriteBinary(source []byte) error {
+	return conn.Write(NewBinaryMessage(source))
+}
+
+func (conn *Connection) write(message queuedMessage) error {
 	done := make(chan struct{}, 1)
 
 	go func() {
@@ -264,20 +282,15 @@ func (conn *Connection) write(message queuedMessage) <-chan struct{} {
 			close(done)
 		}
 	}()
-	return done
+
+	_, ok := <-done
+	if !ok {
+		return context.Cause(conn.context)
+	}
+
+	return nil
 }
 
-// WriteText is a convenience method to send a TextMessage.
-// The returned channel is closed once the message has been sent.
-func (sh *Connection) WriteText(text string) <-chan struct{} {
-	return sh.Write(NewTextMessage(text))
-}
-
-// WriteText is a convenience method to send a BinaryMessage.
-// The returned channel is closed once the message has been sent.
-func (conn *Connection) WriteBinary(source []byte) <-chan struct{} {
-	return conn.Write(NewBinaryMessage(source))
-}
 func (conn *Connection) recvMessages() {
 	conn.incoming = make(chan Message)
 

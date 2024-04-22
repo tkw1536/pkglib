@@ -3,6 +3,8 @@ package websocketx_test
 // spellchecker:words twiesing
 
 import (
+	"strconv"
+	"sync"
 	"testing"
 	"time"
 
@@ -167,6 +169,131 @@ func testServer(t *testing.T, initHandler func(server *websocketx.Server) websoc
 	case <-time.After(testServerTimeout):
 		t.Error("handler did not close within the given timeout")
 	}
+}
+
+// TestServer_concurrent checks that writing and sending
+// a lot of concurrent messages work, even across goroutines.
+//
+// This test may take longer on some older systems and
+// should be skipped in short mode.
+func TestServer_concurrent(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping long concurrent test")
+	}
+
+	// Concurrency determines the number of concurrent messages
+	// to read and write to the channel.
+	concurrency := 100_000
+
+	// messages received on the server side
+	var server_m sync.Mutex
+	got_server := make(map[int]struct{}, concurrency)
+
+	// messages received on the client side
+	got_client := make(map[int]struct{}, concurrency)
+
+	// collect collects a message and the given error
+	collect := func(side string, m map[int]struct{}, l *sync.Mutex, err error, body []byte) {
+		if err != nil {
+			t.Errorf("%s failed to parse message: %v", side, err)
+			return
+		}
+
+		// parse it as an int
+		id, err := strconv.Atoi(string(body))
+		if err != nil {
+			t.Errorf("%s failed to decode body (got: %s)", side, string(body))
+			return
+		}
+
+		// check that we haven't received a message with
+		// this id yet and record that we did
+		if l != nil {
+			l.Lock()
+			defer l.Unlock()
+		}
+
+		i := int(id)
+		if _, ok := m[i]; ok {
+			t.Errorf("%s received %d more than once", side, i)
+			return
+		}
+		m[i] = struct{}{}
+	}
+
+	check := func(side string, m map[int]struct{}) {
+		for i := range m {
+			if _, ok := m[i]; !ok {
+				t.Errorf("%s did not receive %d", side, i)
+			}
+		}
+	}
+
+	testServer(t, func(server *websocketx.Server) websocketx.Handler {
+		return func(c *websocketx.Connection) {
+			var wg sync.WaitGroup
+
+			// receive all the ints
+			wg.Add(concurrency)
+			for range concurrency {
+				go func() {
+					defer wg.Done()
+
+					// read the body
+					msg, ok := <-c.Read()
+					if !ok {
+						t.Error("server failed to receive message")
+						return
+					}
+
+					collect("server", got_server, &server_m, nil, msg.Body)
+				}()
+			}
+
+			// write all the ints
+			wg.Add(concurrency)
+			for i := range concurrency {
+				i := i
+				go func() {
+					defer wg.Done()
+					c.WriteText(strconv.Itoa(i))
+				}()
+			}
+
+			wg.Wait()
+
+			check("server", got_server)
+		}
+	}, func(client *websocket.Conn, server *websocketx.Server) {
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		// send all the messages
+		go func() {
+			defer wg.Done()
+
+			for i := range concurrency {
+				if err := client.WriteMessage(websocket.TextMessage, []byte(strconv.Itoa(i))); err != nil {
+					t.Errorf("client failed to send message: %v", err)
+				}
+			}
+		}()
+
+		// receive the integers
+		go func() {
+			defer wg.Done()
+
+			for range concurrency {
+				_, msg, err := client.ReadMessage()
+				collect("client", got_client, nil, err, msg)
+			}
+		}()
+
+		wg.Wait()
+
+		check("client", got_client)
+	})
+
 }
 
 func TestServer_ReadLimit(t *testing.T) {
