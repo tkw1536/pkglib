@@ -103,6 +103,105 @@ func TestServer_subprotocols(t *testing.T) {
 	}
 }
 
+func TestServer_RequireProtocols(t *testing.T) {
+	for _, tt := range []struct {
+		Name               string
+		ServerProtocols    []string
+		ClientProtocols    []string
+		WantClientProtocol string
+	}{
+		{
+			Name:               "cannot connect with no subprotocols",
+			ServerProtocols:    []string{"my-protocol"},
+			ClientProtocols:    []string{},
+			WantClientProtocol: "",
+		},
+		{
+			Name:               "should connect with known protocol",
+			ServerProtocols:    []string{"my-protocol"},
+			ClientProtocols:    []string{"my-protocol"},
+			WantClientProtocol: "my-protocol",
+		},
+		{
+			Name:               "should connect with one known protocol",
+			ServerProtocols:    []string{"my-protocol"},
+			ClientProtocols:    []string{"i-don't-known-this", "my-protocol", "other_protocol"},
+			WantClientProtocol: "my-protocol",
+		},
+		{
+			Name:               "should connect with first known protocol",
+			ServerProtocols:    []string{"a-protocol", "b-protocol"},
+			ClientProtocols:    []string{"a-protocol"},
+			WantClientProtocol: "a-protocol",
+		},
+		{
+			Name:               "should connect with second known protocol",
+			ServerProtocols:    []string{"a-protocol", "b-protocol"},
+			ClientProtocols:    []string{"b-protocol"},
+			WantClientProtocol: "b-protocol",
+		},
+		{
+			Name:               "should connect with all known protocols",
+			ServerProtocols:    []string{"a-protocol", "b-protocol"},
+			ClientProtocols:    []string{"c-protocol", "b-protocol", "a-protocol"},
+			WantClientProtocol: "a-protocol",
+		},
+	} {
+		t.Run(tt.Name, func(t *testing.T) {
+			t.Parallel()
+
+			// setup the subprotocols and require them
+			var server websocketx.Server
+			server.Options.Subprotocols = tt.ServerProtocols
+			server.RequireProtocols()
+
+			// handler just returns the selected protocol
+			server.Handler = func(ws *websocketx.Connection) {
+				ws.WriteText("selected protocol: " + ws.Subprotocol())
+			}
+
+			// create a new test server
+			wss := websockettest.NewServer(&server)
+			defer wss.Close()
+
+			// if we shouldn't connect test that we didn't
+			if tt.WantClientProtocol == "" {
+				conn, _, err := websocket.DefaultDialer.Dial(wss.URL, nil)
+				if err == websocket.ErrBadHandshake {
+					return
+				}
+				t.Error("connection attempt did not get a bad handshake")
+				if err != nil {
+					return
+				}
+				defer conn.Close()
+
+				return
+			}
+
+			// create a new client
+			client, _ := wss.Dial(func(d *websocket.Dialer) {
+				d.Subprotocols = tt.ClientProtocols
+			}, nil)
+			defer client.Close()
+
+			// read the next text message
+			tp, p, err := client.ReadMessage()
+			if err != nil {
+				t.Error("connection failed with error", err)
+				return
+			}
+			if tp != websocket.TextMessage {
+				t.Error("did not receive text message")
+				return
+			}
+			if string(p) != "selected protocol: "+tt.WantClientProtocol {
+				t.Errorf("got wrong message from server")
+			}
+
+		})
+	}
+}
 func TestServer_timeout(t *testing.T) {
 	// expect to read a message before the timeout expires
 	// NOTE(twiesing): This must be smaller than the server timeout

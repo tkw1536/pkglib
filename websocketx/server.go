@@ -4,6 +4,7 @@ package websocketx
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -30,6 +31,20 @@ type Server struct {
 	// If Fallback is nil, sends an appropriate [http.StatusUpgradeRequired]
 	Fallback http.Handler
 
+	// Check check if additional client requirements are met before establishing
+	// a websocket connection and returns a caller-exposed error if
+	// this is not the case. If Check is nil, every potential client is
+	// allowed to connect.
+	//
+	// A client that is rejected will receive a [http.StatusForbidden] response
+	// with a body of the error returned by this function.
+	//
+	// A typical use case includes enforcing a specific subprotocol,
+	// before even reaching the handler, see [RequireProtocols].
+	//
+	// Check is called before CheckOrigin.
+	Check func(r *http.Request) error
+
 	// CheckOrigin returns true if the request Origin header is acceptable. If
 	// CheckOrigin is nil, then a safe default is used: return false if the
 	// Origin request header is present and the origin host is not equal to
@@ -37,6 +52,8 @@ type Server struct {
 	//
 	// A CheckOrigin function should carefully validate the request origin to
 	// prevent cross-site request forgery.
+	//
+	// CheckOrigin is only called if the Check function passes.
 	CheckOrigin func(r *http.Request) bool
 
 	// Error specifies the function for generating HTTP error responses. If Error
@@ -45,6 +62,60 @@ type Server struct {
 
 	// Options determine further options for future connections.
 	Options Options
+}
+
+// RequireProtocols returns a function which enforces that at least one of the
+// given protocols is used by the given request.
+// It is intended to be used with [Server.Check].
+func RequireProtocols(protocols ...string) func(*http.Request) error {
+	// create a protocol set
+	protocol_set := make(map[string]struct{}, len(protocols))
+	the_protocols := make([]string, 0, len(protocols))
+	for _, proto := range protocols {
+		// skip empty subprotocol
+		if proto == "" {
+			continue
+		}
+		// add the protocol to the list if we saw it for the first time
+		if _, ok := protocol_set[proto]; !ok {
+			the_protocols = append(the_protocols, proto)
+		}
+		// record it in the set
+		protocol_set[proto] = struct{}{}
+	}
+
+	// if we don't have any known protocols
+	// we don't need to check anything
+	if len(protocol_set) == 0 {
+		return nil
+	}
+
+	// generate an error message to return
+	// in case a subprotocol is not supported
+	var errMissingProto error
+	if len(protocol_set) == 1 {
+		errMissingProto = fmt.Errorf("client does not support required %s subprotocol", the_protocols[0])
+	} else {
+		errMissingProto = fmt.Errorf("client does not support any of the required subprotocols %v", the_protocols)
+	}
+
+	// check the actual request
+	return func(r *http.Request) error {
+		for _, proto := range websocket.Subprotocols(r) {
+			if _, ok := protocol_set[proto]; ok {
+				return nil
+			}
+		}
+		return errMissingProto
+	}
+}
+
+// RequireProtocols enforces that for any client to connect,
+// at least one of the subprotocols has to be supported.
+//
+// This overrides the server.Check function.
+func (server *Server) RequireProtocols() {
+	server.Check = RequireProtocols(server.Options.Subprotocols...)
 }
 
 // Handler handles a connection sent to the server.
@@ -132,6 +203,14 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer server.conns.Done()
+
+	// call the check function if it is provided
+	if server.Check != nil {
+		err := server.Check(r)
+		if err != nil {
+			http.Error(w, fmt.Sprint(err), http.StatusForbidden)
+		}
+	}
 
 	// upgrade the connection or bail out!
 	websocket_conn, err := server.upgrader.Upgrade(w, r, nil)
