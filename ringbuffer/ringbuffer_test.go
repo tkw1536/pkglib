@@ -8,6 +8,8 @@ import (
 	"github.com/tkw1536/pkglib/ringbuffer"
 )
 
+// spellchecker:words ringbuffer
+
 // Demonstrates how a ring buffer works by adding to it
 func ExampleRingBuffer() {
 	buffer := ringbuffer.MakeRingBuffer[string](2)
@@ -47,31 +49,125 @@ func ExampleRingBuffer_Push() {
 	// [hello]
 }
 
-func TestRingBuffer_elems(t *testing.T) {
-	for i := range 100 {
-		tt := struct{ iterations, bufsize int }{
-			iterations: 1000,
-			bufsize:    i,
-		}
-		t.Run(fmt.Sprintf("iterations: %d bufsize: %d", tt.iterations, tt.bufsize), func(t *testing.T) {
-			buffer := ringbuffer.MakeRingBuffer[int](tt.bufsize)
-			wantElems := make([]int, tt.bufsize)
-			for i := range tt.iterations {
-				buffer.Add(i)
-				if i < tt.bufsize {
-					continue
-				}
+func TestRingBuffer(t *testing.T) {
 
-				// setup what we want from the elements
-				for e := range wantElems {
-					wantElems[e] = i - (tt.bufsize - 1 - e)
-				}
+	// this function tests everything for the RingBuffer
+	// with the exception of the Push function.
 
-				gotElems := buffer.Elems()
-				if !reflect.DeepEqual(gotElems, wantElems) {
-					t.Errorf("got elems = %v, want elems = %v", gotElems, wantElems)
-				}
+	BufSizeLimit := 10
+	IterationCount := 1000
+
+	for i := range BufSizeLimit {
+		for _, optimized := range []bool{false, true} {
+			tt := struct {
+				iterations, bufferSize int
+				optimized              bool
+			}{
+				iterations: IterationCount,
+				bufferSize: i,
+				optimized:  optimized,
 			}
-		})
+			t.Run(fmt.Sprintf("iterations: %d bufferSize: %d optimized %t", tt.iterations, tt.bufferSize, tt.optimized), func(t *testing.T) {
+				primary := ringbuffer.MakeRingBuffer[int](tt.bufferSize)
+				for iterationNo := range tt.iterations {
+
+					// compute the state we want
+					wantElems := make([]int, 0, tt.bufferSize)
+					if iterationNo >= tt.bufferSize {
+						for e := range tt.bufferSize {
+							// ringbuffer is full
+							// so it should contain the most recent tt.bufferSize elements
+							wantElems = append(wantElems, iterationNo-(tt.bufferSize-1-e))
+						}
+					} else {
+						// ringbuffer is not yet full
+						// so it should contain all elements
+						for i := range iterationNo + 1 {
+							wantElems = append(wantElems, i)
+						}
+					}
+
+					t.Run(fmt.Sprintf("primary buffer iteration %d", iterationNo), func(t *testing.T) {
+						primary.Add(iterationNo)
+						if tt.optimized {
+							primary.Optimize()
+						}
+						checkBufferState(t, BufferState[int]{Elems: wantElems, Cap: tt.bufferSize}, primary)
+					})
+
+					t.Run(fmt.Sprintf("pop buffer iteration %d", iterationNo), func(t *testing.T) {
+						popBuffer := ringbuffer.MakeRingBuffer[int](tt.bufferSize)
+						for i := range iterationNo + 1 {
+							popBuffer.Add(i)
+						}
+
+						// pop all the elements, one by one
+						for i := len(wantElems) - 1; i >= 0; i-- {
+							got := popBuffer.Pop()
+							if wantElems[i] != got {
+								t.Errorf("pop got element = %v, want element = %v", wantElems[i], got)
+							}
+
+							if tt.optimized {
+								popBuffer.Optimize()
+							}
+
+							checkBufferState(t, BufferState[int]{Elems: wantElems[:i], Cap: tt.bufferSize}, popBuffer)
+						}
+
+					})
+				}
+			})
+		}
 	}
+}
+
+type BufferState[T any] struct {
+	Elems []T
+	Cap   int
+}
+
+func checkBufferState[T any](t testing.TB, want BufferState[T], buffer *ringbuffer.RingBuffer[T]) {
+	t.Helper()
+	wantLen := len(want.Elems)
+	wantCap := want.Cap
+
+	gotLen := buffer.Len()
+	if gotLen != wantLen {
+		t.Errorf("got len = %v, want len = %v", gotLen, wantLen)
+	}
+
+	gotCap := buffer.Cap()
+	if gotCap != wantCap {
+		t.Errorf("got cap = %v, want cap = %v", gotCap, wantCap)
+	}
+
+	gotElems := buffer.Elems()
+	if !reflect.DeepEqual(gotElems, want.Elems) {
+		t.Errorf("got elems = %v, want elems = %v", gotElems, want.Elems)
+	}
+
+	var nextIndex int
+	buffer.Iterate(func(elem T, index int) bool {
+		if index != nextIndex {
+			t.Errorf("Iterate called in the wrong order, expected %d but got %d", nextIndex, index)
+		}
+		nextIndex++
+
+		if index < 0 || index >= len(want.Elems) {
+			t.Errorf("Iterate called with unexpected element %v", elem)
+			return true
+		}
+
+		wantElem := want.Elems[index]
+		if !reflect.DeepEqual(elem, wantElem) {
+			t.Errorf("Iterate called with wrong element, expected %v but got %v", wantElem, elem)
+		}
+
+		return true
+	})
+	if nextIndex != len(gotElems) {
+		t.Errorf("Iterate called an unexpected number of times, expected %d but got %d", len(gotElems), nextIndex)
+	}
+
 }
