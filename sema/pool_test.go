@@ -46,20 +46,22 @@ func TestPool_Limit(t *testing.T) {
 			}
 
 			// fill the pool up with N items
-			var wg sync.WaitGroup
-			wg.Add(tt.Limit)
+			var createGroup, useGroup sync.WaitGroup
+			createGroup.Add(tt.Limit)
+			useGroup.Add(tt.Limit)
 			done := make(chan struct{})
 
 			for range tt.Limit {
 				go func() {
+					defer useGroup.Done()
 					_ = p.Use(func(u int64) error {
-						wg.Done() // tell the outer loop an item has been created
-						<-done    // do not return the item to the pool until all have been created
+						createGroup.Done() // tell the outer loop an item has been created
+						<-done             // do not return the item to the pool until all have been created
 						return nil
 					})
 				}()
 			}
-			wg.Wait()
+			createGroup.Wait()
 			close(done)
 
 			if created := int(createdCount.Load()); created != tt.Limit {
@@ -67,16 +69,19 @@ func TestPool_Limit(t *testing.T) {
 			}
 
 			// use the items a bunch of times
-			wg.Add(tt.Iterations)
+			useGroup.Add(tt.Iterations)
 			for range tt.Iterations {
 				go func() {
-					defer wg.Done()
+					defer useGroup.Done()
 					_ = p.Use(func(u int64) error { return nil })
 				}()
 			}
-			wg.Wait()
 
-			// destroy all of them (will record destruction)
+			// wait until all the uses have returned
+			// this should allow close to destroy all of them
+			useGroup.Wait()
+
+			// do the closing, which will record destruction
 			p.Close()
 
 			// check that the right amount of items was destroyed
