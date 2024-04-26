@@ -123,12 +123,14 @@ func TestRingBuffer(t *testing.T) {
 }
 
 type BufferState[T any] struct {
-	Elems []T
-	Cap   int
+	Elems  []T
+	Cap    int
+	CapMin bool
 }
 
 func checkBufferState[T any](t testing.TB, want BufferState[T], buffer *ringbuffer.RingBuffer[T]) {
 	t.Helper()
+
 	wantLen := len(want.Elems)
 	wantCap := want.Cap
 
@@ -138,8 +140,14 @@ func checkBufferState[T any](t testing.TB, want BufferState[T], buffer *ringbuff
 	}
 
 	gotCap := buffer.Cap()
-	if gotCap != wantCap {
-		t.Errorf("got cap = %v, want cap = %v", gotCap, wantCap)
+	if !want.CapMin {
+		if gotCap != wantCap {
+			t.Errorf("got cap = %v, want cap = %v", gotCap, wantCap)
+		}
+	} else {
+		if gotCap < wantCap {
+			t.Errorf("got cap = %v, want cap >= %v", gotCap, wantCap)
+		}
 	}
 
 	gotElems := buffer.Elems()
@@ -168,6 +176,32 @@ func checkBufferState[T any](t testing.TB, want BufferState[T], buffer *ringbuff
 	})
 	if nextIndex != len(gotElems) {
 		t.Errorf("Iterate called an unexpected number of times, expected %d but got %d", len(gotElems), nextIndex)
+	}
+
+}
+
+func TestRingBuffer_Push(t *testing.T) {
+	N := 1000
+	buffer := ringbuffer.MakeRingBuffer[int](0)
+
+	checkBufferState(t, BufferState[int]{
+		Elems: []int{},
+		Cap:   0,
+	}, buffer)
+
+	for i := range N {
+		buffer.Push(i)
+
+		want := make([]int, 0, i+1)
+		for j := range i + 1 {
+			want = append(want, j)
+		}
+
+		checkBufferState(t, BufferState[int]{
+			Elems:  want,
+			Cap:    i + 1,
+			CapMin: true,
+		}, buffer)
 	}
 
 }
