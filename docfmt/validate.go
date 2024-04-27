@@ -16,7 +16,7 @@ type ValidationResult struct {
 }
 
 func (v ValidationResult) Error() string {
-	// NOTE(twiesing): This function is untested because it is used only for developing
+	// NOTE: This function is untested because it is used only for developing
 
 	if v.WordIndex == -1 {
 		return fmt.Sprintf("part %d %q: %s", v.PartIndex, v.Part, v.Kind)
@@ -125,7 +125,7 @@ partloop:
 
 // IsValidWord checks that word fulfills the rules for a valid word
 func validateWord(word string, exceptions map[string]struct{}) ValidationKind {
-	// NOTE(twiesing): Return the exact validation result
+	// NOTE: Return the exact validation result
 	runes := []rune(word)
 
 	// word contained in `' is allowed

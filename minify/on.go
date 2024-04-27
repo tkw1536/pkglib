@@ -16,7 +16,7 @@ import (
 
 // minifier holds the minfier used for all html minification
 //
-// NOTE(twiesing): We can't use an init function for this, because otherwise initialization order is incorrect.
+// NOTE: We can't use an init function for this, because otherwise initialization order is incorrect.
 var minifier = (func() *minify.M {
 	m := minify.New()
 	m.AddFunc("text/html", html.Minify)

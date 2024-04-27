@@ -13,7 +13,7 @@ import (
 // Futhermore appropriate read and write deadlines are set.
 // Either of these calls may not have any effect, depending on the underlying operation.
 func Copy(ctx context.Context, dst io.Writer, src io.Reader) (written int64, err error) {
-	// NOTE(twiesing): This function is not tested
+	// NOTE: This function is not tested
 	// Because there is no good way of testing if cancellation works!
 
 	written, err, _ = Run2(ctx, func(start func()) (int64, error) {

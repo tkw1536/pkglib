@@ -1,7 +1,5 @@
 package websocketx_test
 
-// spellchecker:words twiesing
-
 import (
 	"strconv"
 	"sync"
@@ -204,7 +202,7 @@ func TestServer_RequireProtocols(t *testing.T) {
 }
 func TestServer_timeout(t *testing.T) {
 	// expect to read a message before the timeout expires
-	// NOTE(twiesing): This must be smaller than the server timeout
+	// NOTE: This must be smaller than the server timeout
 	timeout := 500 * time.Millisecond
 	if timeout >= testServerTimeout {
 		panic("timeout is too big, pick a smaller one")

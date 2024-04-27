@@ -4,7 +4,7 @@ package traversal
 // When called as seq(yield), seq calls yield(v) for each value v in the sequence,
 // stopping early if yield returns false.
 //
-// NOTE(twiesing): This corresponds to the "iter".Seq type from the rangefunc experiment.
+// NOTE: This corresponds to the "iter".Seq type from the rangefunc experiment.
 // At some point in the future when rangefunc is stable, and generic aliases are implemented,
 // this will be replaced with an alias to "iter".Seq.
 // See golang issues #61405 and #46477.

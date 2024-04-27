@@ -1,7 +1,5 @@
 package collection
 
-// spellchecker:words twiesing
-
 import (
 	"cmp"
 	"maps"
@@ -58,7 +56,7 @@ func Append[K comparable, V any](mps ...map[K]V) (mp map[K]V) {
 	mp = mps[0]
 
 	// ensure that it is non-nil and has enough space for all of the elements.
-	// NOTE(twiesing): There could be duplicates, so we may be over-allocating here.
+	// NOTE: There could be duplicates, so we may be over-allocating here.
 	if mp == nil {
 		var size int
 		for _, m := range mps {

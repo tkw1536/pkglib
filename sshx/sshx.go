@@ -57,7 +57,7 @@ func ParseKeys(in []byte, limit int) (keys []ssh.PublicKey, comments []string, o
 // Parsing stops if the input is exhausted, or when an equivalent ParseKeys call would return an error.
 // This function exists for convenience; use ParseKeys for more fine-grained control.
 func ParseAllKeys(in []byte) (keys []ssh.PublicKey) {
-	// NOTE(twiesing): We could use ParseKeys() from above
+	// NOTE: We could use ParseKeys() from above
 	// but inlining saves a bunch of memory
 
 	var key ssh.PublicKey

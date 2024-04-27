@@ -66,7 +66,7 @@ func WriterGroup[T any](writer io.Writer, count int, handler func(value T, outpu
 // StreamGroupOption represents an option for [WriterGroup].
 // The boolean indicates if the option is being applied to a status line or not.
 //
-// NOTE(twiesing): This name is here for backwards compatibility reasons.
+// NOTE: This name is here for backwards compatibility reasons.
 type StreamGroupOption[T any] func(bool, Group[T, error]) Group[T, error]
 
 // SmartMessage sets the message to display as a prefix before invoking a handler.

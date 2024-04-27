@@ -75,7 +75,7 @@ func KeepFuncClone[T any, S ~[]T](slice S, filter func(T) bool) (results S) {
 		return []T{}
 	}
 
-	// NOTE(twiesing): We could allocate a slice of the original capacity here.
+	// NOTE: We could allocate a slice of the original capacity here.
 	// But that would waste space for calls where only few operations are required.
 	for _, value := range slice {
 		if filter(value) {
@@ -115,7 +115,7 @@ func Deduplicate[T comparable, S ~[]T](slice S) S {
 
 // AsAny returns a new slice containing the same elements as slice, but as any.
 func AsAny[T any](slice []T) []any {
-	// NOTE(twiesing): This function is untested because MapSlice is tested.
+	// NOTE: This function is untested because MapSlice is tested.
 	return MapSlice(slice, func(t T) any { return t })
 }
 

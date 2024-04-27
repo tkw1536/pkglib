@@ -126,7 +126,7 @@ func Child(node *yaml.Node, name string) (*yaml.Node, error) {
 // resolveAlias resolves an alias recursively.
 // If the node is not an alias, it returns it unchanged.
 func resolveAlias(node *yaml.Node) *yaml.Node {
-	// NOTE(twiesing): The yaml spec forbids circular references.
+	// NOTE: The yaml spec forbids circular references.
 	// Section 7.1 says "The alias refers to the most recent preceding node having the same anchor".
 	// This means this loop should terminate if the node comes from valid yaml.
 	for node != nil && node.Kind == yaml.AliasNode {

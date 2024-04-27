@@ -30,7 +30,7 @@ type ValidationError struct {
 }
 
 func (ve ValidationError) Error() string {
-	// NOTE(twiesing): This function is untested because it is used only for developing
+	// NOTE: This function is untested because it is used only for developing
 
 	messages := make([]string, len(ve.Results))
 	for i, res := range ve.Results {
