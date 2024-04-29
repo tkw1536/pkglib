@@ -7,8 +7,6 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
-// spellchecker:words httpx
-
 // Redirect creates a new [RedirectHandler] based on the given function.
 // The Interceptor will be [httpx.TextInterceptor].
 func Redirect(Handler RedirectFunc) RedirectHandler {

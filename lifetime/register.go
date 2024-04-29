@@ -1,7 +1,5 @@
 package lifetime
 
-// spellchecker:words reflectx
-
 import (
 	"fmt"
 	"reflect"

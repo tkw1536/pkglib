@@ -1,12 +1,12 @@
 package wrap
 
-// spellchecker:words timewrap
-
 import (
 	"context"
 	"net/http"
 	"time"
 )
+
+// spellchecker:words timewrap
 
 // requestTime is a type for storing the request time
 type requestTime struct{}

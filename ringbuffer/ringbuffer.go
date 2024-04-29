@@ -3,8 +3,6 @@ package ringbuffer
 
 import "strings"
 
-// spellchecker:words ringbuffer
-
 // RingBuffer is a buffer holding a finite number of elements.
 // Adding an element beyond the buffer's capacity, overwrites the least recently added elements.
 //

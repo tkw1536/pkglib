@@ -1,8 +1,6 @@
 // Package httpx provides additional [http.Handler]s and utility functions
 package httpx
 
-// spellchecker:words httpx modtime
-
 import (
 	"bytes"
 	"net/http"
@@ -10,6 +8,8 @@ import (
 
 	"github.com/tkw1536/pkglib/minify"
 )
+
+// spellchecker:words modtime
 
 // Response represents a static http Response.
 // It implements [http.Handler].

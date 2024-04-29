@@ -2,8 +2,6 @@
 // It supports both references and merges.
 package yamlx
 
-// spellchecker:words iterpaths yamlx
-
 import (
 	"gopkg.in/yaml.v3"
 )

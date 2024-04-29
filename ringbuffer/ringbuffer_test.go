@@ -8,8 +8,6 @@ import (
 	"github.com/tkw1536/pkglib/ringbuffer"
 )
 
-// spellchecker:words ringbuffer
-
 // Demonstrates how a ring buffer works by adding to it
 func ExampleRingBuffer() {
 	buffer := ringbuffer.MakeRingBuffer[string](2)

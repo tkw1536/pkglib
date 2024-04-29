@@ -1,11 +1,11 @@
 package lreflect
 
-// spellchecker:words Rankable
-
 import (
 	"fmt"
 	"reflect"
 )
+
+// spellchecker:words rankable
 
 type RankableStruct string
 

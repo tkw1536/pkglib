@@ -9,7 +9,7 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
-// spellchecker:words HTMLI httpx websockets
+// spellchecker:words HTMLI websockets
 
 // WriteHTML writes an html response to r into w.
 //
