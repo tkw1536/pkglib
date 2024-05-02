@@ -1,6 +1,9 @@
 // Package httpx provides additional [http.Handler]s and utility functions
+//
+//spellchecker:words httpx
 package httpx
 
+//spellchecker:words bytes http time github pkglib minify
 import (
 	"bytes"
 	"net/http"
@@ -9,7 +12,7 @@ import (
 	"github.com/tkw1536/pkglib/minify"
 )
 
-// spellchecker:words modtime
+//spellchecker:words modtime
 
 // Response represents a static http Response.
 // It implements [http.Handler].

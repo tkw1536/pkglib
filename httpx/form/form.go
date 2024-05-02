@@ -1,6 +1,9 @@
 // Package form provides a form abstraction for http
+//
+//spellchecker:words form
 package form
 
+//spellchecker:words html template http strings embed github gorilla csrf pkglib httpx content form field
 import (
 	"html/template"
 	"net/http"

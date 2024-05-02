@@ -1,7 +1,10 @@
 // websockettest provides a server for testing.
 // This package is not intended for production code, and should only be used in tests.
+//
+//spellchecker:words websockettest
 package websockettest
 
+//spellchecker:words http httptest strings time github gorilla websocket
 import (
 	"fmt"
 	"net/http"

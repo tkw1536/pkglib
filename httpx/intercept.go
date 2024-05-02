@@ -1,5 +1,7 @@
+//spellchecker:words httpx
 package httpx
 
+//spellchecker:words encoding json errors http
 import (
 	"encoding/json"
 	"errors"

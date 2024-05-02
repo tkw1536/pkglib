@@ -1,5 +1,7 @@
+//spellchecker:words yamlx
 package yamlx
 
+//spellchecker:words errors gopkg yaml
 import (
 	"errors"
 	"fmt"

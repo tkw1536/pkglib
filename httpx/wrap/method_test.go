@@ -1,5 +1,7 @@
+//spellchecker:words wrap
 package wrap_test
 
+//spellchecker:words http httptest github pkglib httpx wrap
 import (
 	"fmt"
 	"io"

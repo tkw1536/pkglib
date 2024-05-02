@@ -1,5 +1,7 @@
+//spellchecker:words lreflect
 package lreflect
 
+//spellchecker:words reflect sort
 import (
 	"reflect"
 	"sort"

@@ -1,6 +1,9 @@
 // Package traversal provides generic Iterator and Generator interfaces.
+//
+//spellchecker:words traversal
 package traversal
 
+//spellchecker:words context runtime
 import (
 	"context"
 	"runtime"

@@ -1,5 +1,7 @@
+//spellchecker:words password
 package password
 
+//spellchecker:words bufio embed strings sync
 import (
 	"bufio"
 	"embed"

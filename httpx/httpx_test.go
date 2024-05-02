@@ -1,6 +1,9 @@
 // Package httpx provides additional [http.Handler]s and utility functions
+//
+//spellchecker:words httpx
 package httpx_test
 
+//spellchecker:words http httptest time github pkglib httpx
 import (
 	"fmt"
 	"io"

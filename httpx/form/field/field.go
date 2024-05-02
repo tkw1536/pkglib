@@ -1,5 +1,7 @@
+//spellchecker:words field
 package field
 
+//spellchecker:words html template
 import (
 	"html/template"
 	"io"

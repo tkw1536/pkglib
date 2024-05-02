@@ -1,5 +1,7 @@
+//spellchecker:words traversal
 package traversal
 
+//spellchecker:words context
 import "context"
 
 // AsChannel returns a channel that receives each element of the underlying iterator.

@@ -1,6 +1,9 @@
 // Package stream defines input and output streams.
+//
+//spellchecker:words stream
 package stream
 
+//spellchecker:words github pkglib nobufio
 import (
 	"fmt"
 	"io"

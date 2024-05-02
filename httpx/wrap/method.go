@@ -1,5 +1,7 @@
+//spellchecker:words wrap
 package wrap
 
+//spellchecker:words http github pkglib httpx
 import (
 	"net/http"
 

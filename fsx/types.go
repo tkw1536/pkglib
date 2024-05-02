@@ -1,5 +1,6 @@
 package fsx
 
+//spellchecker:words errors
 import (
 	"errors"
 	"io/fs"

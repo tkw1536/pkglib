@@ -1,3 +1,4 @@
+//spellchecker:words traversal
 package traversal
 
 // Empty returns a new iterator that contains no elements.

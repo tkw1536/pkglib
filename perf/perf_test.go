@@ -1,5 +1,7 @@
+//spellchecker:words perf
 package perf_test
 
+//spellchecker:words reflect testing time github pkglib perf
 import (
 	"fmt"
 	"reflect"

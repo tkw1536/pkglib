@@ -1,6 +1,9 @@
 // Package lifetime provides a dependency injection framework called [Lifetime].
+//
+//spellchecker:words lifetime
 package lifetime
 
+//spellchecker:words reflect github pkglib lazy lifetime interal souls
 import (
 	"reflect"
 

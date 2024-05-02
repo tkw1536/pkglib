@@ -1,5 +1,7 @@
+//spellchecker:words content
 package content
 
+//spellchecker:words encoding json http github pkglib httpx recovery
 import (
 	"encoding/json"
 	"net/http"
@@ -8,7 +10,7 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
-// spellchecker: words httpx jsoni
+//spellchecker:words httpx jsoni
 
 // JSON creates a new [JSONHandler] based on the given function.
 // The Interceptor will be [httpx.JSONInterceptor].

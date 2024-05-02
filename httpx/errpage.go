@@ -1,5 +1,7 @@
+//spellchecker:words httpx
 package httpx
 
+//spellchecker:words html template http runtime debug strings embed
 import (
 	"fmt"
 	"html/template"
@@ -10,7 +12,7 @@ import (
 	_ "embed"
 )
 
-// spellchecker:words errpage
+//spellchecker:words errpage
 
 // RenderErrorPage renders a debug error page instead of the fallback response res.
 // The error page is intended to replace error pages for debugging and should not be used in production.

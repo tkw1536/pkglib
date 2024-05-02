@@ -1,6 +1,9 @@
 // Package websocket provides a handler for websockets
+//
+//spellchecker:words websocketx
 package websocketx
 
+//spellchecker:words context errors http sync github gorilla websocket
 import (
 	"context"
 	"errors"

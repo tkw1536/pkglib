@@ -1,6 +1,9 @@
 // Package validator provides Validate
+//
+//spellchecker:words validator
 package validator
 
+//spellchecker:words errors reflect
 import (
 	"errors"
 	"fmt"

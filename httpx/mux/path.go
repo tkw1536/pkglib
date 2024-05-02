@@ -1,5 +1,6 @@
 package mux
 
+//spellchecker:words path
 import (
 	"path"
 )

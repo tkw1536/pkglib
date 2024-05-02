@@ -1,5 +1,7 @@
+//spellchecker:words status
 package status
 
+//spellchecker:words strings sync
 import (
 	"fmt"
 	"io"

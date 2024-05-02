@@ -1,5 +1,7 @@
+//spellchecker:words collection
 package collection
 
+//spellchecker:words reflect strings testing slices
 import (
 	"fmt"
 	"reflect"

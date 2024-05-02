@@ -1,7 +1,10 @@
 // Package yamlx provides extended YAML parsing functionalities.
 // It supports both references and merges.
+//
+//spellchecker:words yamlx
 package yamlx
 
+//spellchecker:words gopkg yaml
 import (
 	"gopkg.in/yaml.v3"
 )

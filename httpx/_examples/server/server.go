@@ -1,5 +1,7 @@
+//spellchecker:words main
 package main
 
+//spellchecker:words http github pkglib httpx recovery
 import (
 	"net/http"
 

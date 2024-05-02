@@ -1,5 +1,7 @@
+//spellchecker:words sqlx
 package sqlx
 
+//spellchecker:words testing
 import (
 	"testing"
 )

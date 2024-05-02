@@ -1,3 +1,4 @@
+//spellchecker:words field
 package field
 
 // InputType represents the type of input

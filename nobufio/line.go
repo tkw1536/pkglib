@@ -1,5 +1,7 @@
+//spellchecker:words nobufio
 package nobufio
 
+//spellchecker:words strings
 import (
 	"io"
 	"strings"

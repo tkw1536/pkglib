@@ -1,5 +1,7 @@
+//spellchecker:words websocketx
 package websocketx_test
 
+//spellchecker:words github pkglib websocketx websockettest gorilla websocket
 import (
 	"fmt"
 

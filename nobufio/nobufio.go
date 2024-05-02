@@ -1,6 +1,9 @@
 // Package nobufio provides non-buffered io operations.
+//
+//spellchecker:words nobufio
 package nobufio
 
+//spellchecker:words unicode
 import (
 	"io"
 	"unicode/utf8"

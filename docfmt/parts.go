@@ -1,5 +1,7 @@
+//spellchecker:words docfmt
 package docfmt
 
+//spellchecker:words strconv unicode
 import (
 	"strconv"
 	"unicode"

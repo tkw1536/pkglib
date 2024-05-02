@@ -1,5 +1,7 @@
+//spellchecker:words lifetime
 package lifetime_test
 
+//spellchecker:words reflect github pkglib lifetime
 import (
 	"fmt"
 	"reflect"

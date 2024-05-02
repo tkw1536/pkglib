@@ -1,5 +1,7 @@
+//spellchecker:words stream
 package stream
 
+//spellchecker:words github pkglib nobufio
 import "github.com/tkw1536/pkglib/nobufio"
 
 // ReadLine is like [nobufio.ReadLine] on the standard input

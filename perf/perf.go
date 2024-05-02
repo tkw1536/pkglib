@@ -1,6 +1,9 @@
 // Package perf provides a means of capturing performance metrics
+//
+//spellchecker:words perf
 package perf
 
+//spellchecker:words math runtime time github dustin humanize
 import (
 	"fmt"
 	"math"

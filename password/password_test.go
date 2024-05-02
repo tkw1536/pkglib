@@ -1,6 +1,9 @@
 // Package password allows generating random passwords
+//
+//spellchecker:words password
 package password
 
+//spellchecker:words crypto rand testing
 import (
 	"crypto/rand"
 	"testing"

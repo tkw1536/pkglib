@@ -1,4 +1,6 @@
 // Package stream provides NullStream
+//
+//spellchecker:words stream
 package stream
 
 import (

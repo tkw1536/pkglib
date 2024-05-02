@@ -1,5 +1,7 @@
+//spellchecker:words httpx
 package httpx_test
 
+//spellchecker:words embed http httptest github pkglib httpx recovery
 import (
 	_ "embed"
 	"fmt"

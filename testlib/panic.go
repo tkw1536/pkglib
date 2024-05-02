@@ -1,4 +1,6 @@
 // Package testlib provides utilities for testing
+//
+//spellchecker:words testlib
 package testlib
 
 // DoesPanic runs f and checks if it panicked or not.

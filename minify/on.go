@@ -1,7 +1,9 @@
 //go:build !nominify
 
+//spellchecker:words minify
 package minify
 
+//spellchecker:words regexp github tdewolff minify html pkglib noop
 import (
 	"io"
 	"regexp"

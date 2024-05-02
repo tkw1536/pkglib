@@ -1,6 +1,9 @@
 // Package status provides Status, LineBuffer and Group
+//
+//spellchecker:words status
 package status
 
+//spellchecker:words maps sync atomic time github gosuri uilive pkglib nobufio noop stream
 import (
 	"fmt"
 	"io"

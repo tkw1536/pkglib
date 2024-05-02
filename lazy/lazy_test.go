@@ -1,3 +1,4 @@
+//spellchecker:words lazy
 package lazy
 
 import "fmt"

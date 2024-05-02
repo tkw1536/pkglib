@@ -1,5 +1,7 @@
+//spellchecker:words testlib
 package testlib
 
+//spellchecker:words path filepath testing
 import (
 	"path/filepath"
 	"testing"

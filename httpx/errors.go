@@ -1,5 +1,7 @@
+//spellchecker:words httpx
 package httpx
 
+//spellchecker:words http
 import (
 	"fmt"
 	"net/http"

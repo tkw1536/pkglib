@@ -1,5 +1,7 @@
+//spellchecker:words validator
 package validator
 
+//spellchecker:words reflect strings
 import (
 	"fmt"
 	"reflect"

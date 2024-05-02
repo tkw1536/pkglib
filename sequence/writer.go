@@ -1,4 +1,6 @@
 // Package sequence provides Writer.
+//
+//spellchecker:words sequence
 package sequence
 
 import (

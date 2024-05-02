@@ -1,6 +1,9 @@
 // Package lreflect provides reflect extensions for use by the lifetime package.
+//
+//spellchecker:words lreflect
 package lreflect
 
+//spellchecker:words reflect
 import (
 	"reflect"
 )

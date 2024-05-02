@@ -1,5 +1,7 @@
+//spellchecker:words docfmt
 package docfmt
 
+//spellchecker:words reflect testing github pkglib testlib
 import (
 	"reflect"
 	"testing"

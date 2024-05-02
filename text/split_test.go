@@ -1,5 +1,7 @@
+//spellchecker:words text
 package text
 
+//spellchecker:words reflect testing
 import (
 	"reflect"
 	"testing"

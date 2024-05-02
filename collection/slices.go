@@ -1,5 +1,7 @@
+//spellchecker:words collection
 package collection
 
+//spellchecker:words slices
 import (
 	"slices"
 

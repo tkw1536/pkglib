@@ -1,5 +1,7 @@
+//spellchecker:words websocketx
 package websocketx
 
+//spellchecker:words errors strconv strings time github gorilla websocket
 import (
 	"errors"
 	"fmt"

@@ -1,3 +1,4 @@
+//spellchecker:words password
 package password
 
 import "fmt"

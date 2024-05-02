@@ -1,5 +1,7 @@
+//spellchecker:words traversal
 package traversal_test
 
+//spellchecker:words errors github pkglib traversal
 import (
 	"errors"
 	"fmt"

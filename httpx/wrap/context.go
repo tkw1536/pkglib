@@ -1,6 +1,9 @@
 // Package wrap provides wrappers for [http.Handler]s.
+//
+//spellchecker:words wrap
 package wrap
 
+//spellchecker:words context http
 import (
 	"context"
 	"net/http"

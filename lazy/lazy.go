@@ -1,5 +1,7 @@
+//spellchecker:words lazy
 package lazy
 
+//spellchecker:words sync
 import (
 	"sync"
 )

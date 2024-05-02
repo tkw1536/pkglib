@@ -1,3 +1,4 @@
+//spellchecker:words contextx
 package contextx
 
 import "fmt"

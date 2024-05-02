@@ -1,5 +1,7 @@
+//spellchecker:words stream
 package stream
 
+//spellchecker:words testing
 import (
 	"io"
 	"testing"

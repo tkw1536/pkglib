@@ -1,3 +1,4 @@
+//spellchecker:words traversal
 package traversal
 
 // RangeFunc is an iterator over sequences of individual values.

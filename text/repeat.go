@@ -1,4 +1,6 @@
 // Package text provides functions similar to strings.Join, but based on writers as opposed to strings
+//
+//spellchecker:words text
 package text
 
 import (

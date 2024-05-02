@@ -1,6 +1,9 @@
 // Package timex manages various timer-related functions.
+//
+//spellchecker:words timex
 package timex
 
+//spellchecker:words context time
 import (
 	"context"
 	"fmt"

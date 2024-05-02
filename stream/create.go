@@ -1,3 +1,4 @@
+//spellchecker:words stream
 package stream
 
 import "os"

@@ -1,5 +1,7 @@
+//spellchecker:words docfmt
 package docfmt
 
+//spellchecker:words strings
 import (
 	"fmt"
 	"strings"

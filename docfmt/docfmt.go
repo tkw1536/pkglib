@@ -3,8 +3,11 @@
 // Strings are checked at runtime for proper formatting, or by a (simple) static analyzer.
 // Checking is disabled by default, but can be enabled by building with the "doccheck" tag.
 // See Check.
+//
+//spellchecker:words docfmt
 package docfmt
 
+//spellchecker:words strings sync unicode github pkglib text
 import (
 	"strings"
 	"sync"

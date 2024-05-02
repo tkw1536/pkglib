@@ -1,5 +1,6 @@
 package fsx
 
+//spellchecker:words path filepath
 import (
 	"os"
 	"path/filepath"

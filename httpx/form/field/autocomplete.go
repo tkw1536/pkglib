@@ -1,3 +1,4 @@
+//spellchecker:words field
 package field
 
 // Autocomplete represents different autocomplete options

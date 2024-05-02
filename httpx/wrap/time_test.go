@@ -1,5 +1,7 @@
+//spellchecker:words wrap
 package wrap_test
 
+//spellchecker:words encoding json http httptest time github pkglib httpx wrap
 import (
 	"encoding/json"
 	"fmt"

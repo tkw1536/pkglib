@@ -1,5 +1,7 @@
+//spellchecker:words websockettest
 package websockettest_test
 
+//spellchecker:words testing github gorilla websocket pkglib websocketx websockettest
 import (
 	"io"
 	"testing"

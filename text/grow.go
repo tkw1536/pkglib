@@ -1,3 +1,4 @@
+//spellchecker:words text
 package text
 
 import "io"

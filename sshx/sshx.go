@@ -1,5 +1,7 @@
+//spellchecker:words sshx
 package sshx
 
+//spellchecker:words bytes unicode golang crypto
 import (
 	"bytes"
 	"unicode"

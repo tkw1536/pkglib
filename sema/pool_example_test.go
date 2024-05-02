@@ -1,5 +1,7 @@
+//spellchecker:words sema
 package sema_test
 
+//spellchecker:words errors sync atomic github pkglib sema
 import (
 	"errors"
 	"fmt"

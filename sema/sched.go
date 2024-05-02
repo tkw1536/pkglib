@@ -1,5 +1,7 @@
+//spellchecker:words sema
 package sema
 
+//spellchecker:words sync atomic
 import (
 	"sync"
 	"sync/atomic"

@@ -1,5 +1,7 @@
+//spellchecker:words status
 package status
 
+//spellchecker:words testing
 import (
 	"fmt"
 	"testing"

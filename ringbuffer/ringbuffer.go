@@ -1,6 +1,9 @@
 // Package ringbuffer provides RingBuffer.
+//
+//spellchecker:words ringbuffer
 package ringbuffer
 
+//spellchecker:words strings
 import "strings"
 
 // RingBuffer is a buffer holding a finite number of elements.

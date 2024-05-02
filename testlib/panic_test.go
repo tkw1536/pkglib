@@ -1,4 +1,6 @@
 // Package testlib contains functions useful for testing
+//
+//spellchecker:words testlib
 package testlib
 
 import (

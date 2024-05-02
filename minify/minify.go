@@ -1,5 +1,7 @@
+//spellchecker:words minify
 package minify
 
+//spellchecker:words bytes
 import (
 	"bytes"
 )

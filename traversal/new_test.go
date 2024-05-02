@@ -1,6 +1,9 @@
 // Package iterator provides Generic Iterator and Generator Interfaces.
+//
+//spellchecker:words traversal
 package traversal_test
 
+//spellchecker:words errors github pkglib traversal
 import (
 	"errors"
 	"fmt"

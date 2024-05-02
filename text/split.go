@@ -1,5 +1,7 @@
+//spellchecker:words text
 package text
 
+//spellchecker:words strings
 import "strings"
 
 // Splitter returns a function that acts like [strings.Split],

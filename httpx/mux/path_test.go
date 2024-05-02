@@ -1,5 +1,6 @@
 package mux_test
 
+//spellchecker:words testing github pkglib httpx
 import (
 	"testing"
 

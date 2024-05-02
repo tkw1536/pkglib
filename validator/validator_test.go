@@ -1,5 +1,7 @@
+//spellchecker:words validator
 package validator
 
+//spellchecker:words errors strconv
 import (
 	"errors"
 	"fmt"

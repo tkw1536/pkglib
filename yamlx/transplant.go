@@ -1,5 +1,7 @@
+//spellchecker:words yamlx
 package yamlx
 
+//spellchecker:words gopkg yaml
 import "gopkg.in/yaml.v3"
 
 // Transplant transplants all nodes found inside donor onto node.

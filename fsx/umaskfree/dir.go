@@ -1,3 +1,4 @@
+//spellchecker:words umaskfree
 package umaskfree
 
 import (

@@ -1,5 +1,7 @@
+//spellchecker:words sema
 package sema
 
+//spellchecker:words errors sync atomic time
 import (
 	"errors"
 	"fmt"

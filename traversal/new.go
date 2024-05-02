@@ -1,3 +1,4 @@
+//spellchecker:words traversal
 package traversal
 
 // New creates a new iterator generator pair and returns the iterator.

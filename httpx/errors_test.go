@@ -1,5 +1,7 @@
+//spellchecker:words httpx
 package httpx_test
 
+//spellchecker:words http httptest github pkglib httpx
 import (
 	"fmt"
 	"io"

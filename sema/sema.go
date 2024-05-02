@@ -1,4 +1,6 @@
 // Package sema implements semaphores and semaphore-related scheduling
+//
+//spellchecker:words sema
 package sema
 
 // New creates a new [Semaphore], guarding a resource of at most the given size.

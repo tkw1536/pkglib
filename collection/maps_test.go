@@ -1,3 +1,4 @@
+//spellchecker:words collection
 package collection
 
 import (

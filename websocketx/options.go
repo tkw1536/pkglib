@@ -1,5 +1,7 @@
+//spellchecker:words websocketx
 package websocketx
 
+//spellchecker:words compress flate time github gorilla websocket
 import (
 	"compress/flate"
 	"time"

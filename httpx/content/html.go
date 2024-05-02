@@ -1,5 +1,7 @@
+//spellchecker:words content
 package content
 
+//spellchecker:words html template http github pkglib httpx minify recovery
 import (
 	"html/template"
 	"net/http"
@@ -9,7 +11,7 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
-// spellchecker:words HTMLI websockets
+//spellchecker:words HTMLI websockets
 
 // WriteHTML writes an html response to r into w.
 //

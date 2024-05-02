@@ -1,5 +1,7 @@
+//spellchecker:words nobufio
 package nobufio
 
+//spellchecker:words golang term
 import (
 	"os"
 

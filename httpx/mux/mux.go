@@ -1,6 +1,7 @@
 // Package mux provides [Mux]
 package mux
 
+//spellchecker:words http
 import (
 	"net/http"
 )

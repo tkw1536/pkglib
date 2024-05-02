@@ -1,6 +1,9 @@
 // Package souls implements component storage retrieval using the [Souls] struct.
+//
+//spellchecker:words souls
 package souls
 
+//spellchecker:words errors math rand reflect github pkglib lazy lifetime interal lreflect
 import (
 	"errors"
 	"fmt"

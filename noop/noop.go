@@ -1,4 +1,6 @@
 // noop provides reader and writer
+//
+//spellchecker:words noop
 package noop
 
 import "io"

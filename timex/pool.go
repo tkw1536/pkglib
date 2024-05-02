@@ -1,5 +1,7 @@
+//spellchecker:words timex
 package timex
 
+//spellchecker:words sync time
 import (
 	"sync"
 	"time"

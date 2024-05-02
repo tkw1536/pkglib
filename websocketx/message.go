@@ -1,5 +1,7 @@
+//spellchecker:words websocketx
 package websocketx
 
+//spellchecker:words github gorilla websocket
 import (
 	"github.com/gorilla/websocket"
 )

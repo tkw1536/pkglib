@@ -1,5 +1,7 @@
+//spellchecker:words contextx
 package contextx
 
+//spellchecker:words context sync
 import (
 	"context"
 	"sync"

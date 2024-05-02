@@ -1,6 +1,9 @@
 // Package recover provides [Recover] and [Safe]
+//
+//spellchecker:words recovery
 package recovery
 
+//spellchecker:words runtime debug
 import (
 	"fmt"
 	"runtime/debug"

@@ -1,5 +1,7 @@
+//spellchecker:words traversal
 package traversal_test
 
+//spellchecker:words context github pkglib traversal
 import (
 	"context"
 	"fmt"

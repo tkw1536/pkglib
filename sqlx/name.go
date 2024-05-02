@@ -1,5 +1,7 @@
+//spellchecker:words sqlx
 package sqlx
 
+//spellchecker:words strings unicode
 import (
 	"strings"
 	"unicode"

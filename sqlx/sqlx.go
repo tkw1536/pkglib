@@ -1,5 +1,7 @@
+//spellchecker:words sqlx
 package sqlx
 
+//spellchecker:words github feiin sqlstring
 import (
 	"github.com/feiin/sqlstring"
 )

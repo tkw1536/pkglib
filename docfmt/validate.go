@@ -1,5 +1,7 @@
+//spellchecker:words docfmt
 package docfmt
 
+//spellchecker:words strconv strings unicode slices
 import (
 	"fmt"
 	"strconv"

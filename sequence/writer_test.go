@@ -1,6 +1,9 @@
 // Package sequence provides Writer.
+//
+//spellchecker:words sequence
 package sequence
 
+//spellchecker:words errors
 import (
 	"errors"
 	"fmt"

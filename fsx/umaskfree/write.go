@@ -1,5 +1,7 @@
+//spellchecker:words umaskfree
 package umaskfree
 
+//spellchecker:words errors time
 import (
 	"errors"
 	"io/fs"
