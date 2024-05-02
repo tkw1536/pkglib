@@ -44,7 +44,7 @@ func TestForm_logger(t *testing.T) {
 	}
 }
 
-func TestForm_formcontext_afterSuccess(t *testing.T) {
+func TestForm_formContext_afterSuccess(t *testing.T) {
 	frm := makeTestForm(t)
 	frm.Template = template.Must(template.New("form").Parse("{{ .Form }}"))
 

@@ -62,13 +62,13 @@ const (
 //
 // Furthermore, words inside of exceptions are always permitted.
 func Validate(message string, exceptions ...string) (errors []ValidationResult) {
-	emap := make(map[string]struct{}, len(exceptions))
+	exceptionsMap := make(map[string]struct{}, len(exceptions))
 	for _, exception := range exceptions {
-		emap[exception] = struct{}{}
+		exceptionsMap[exception] = struct{}{}
 	}
 
 	parts := SplitParts(message)
-partloop:
+partLoop:
 	for pI, part := range parts {
 		if pI != len(parts)-1 && part == "" {
 			errors = append(errors, ValidationResult{
@@ -77,11 +77,11 @@ partloop:
 				WordIndex: -1,
 				Kind:      PartIsEmpty,
 			})
-			continue partloop
+			continue partLoop
 		}
 
 		words, _ := SplitWords(part)
-	wordloop:
+	wordLoop:
 		for wI, word := range words {
 			if word == "" {
 				errors = append(errors, ValidationResult{
@@ -91,7 +91,7 @@ partloop:
 					Word:      word,
 					Kind:      WordIsEmpty,
 				})
-				continue wordloop
+				continue wordLoop
 			}
 
 			// every non-last word *must* end with a ' '  or '\n' character
@@ -110,7 +110,7 @@ partloop:
 			word = strings.TrimSpace(word)
 
 			// check word for appropriate letters
-			if typ := validateWord(word, emap); typ != ValidationOK {
+			if typ := validateWord(word, exceptionsMap); typ != ValidationOK {
 				errors = append(errors, ValidationResult{
 					PartIndex: pI,
 					Part:      part,

@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+//spellchecker:words unassignable unaddressable
+
 // UnsafeSetAnyValue is like v.Set(x) except that it permits a value obtained from an unexported field to be set.
 // It never panics, and instead returns an error.
 //
@@ -26,7 +28,7 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 	xT := x.Type()
 	vT := v.Type()
 	if !xT.AssignableTo(vT) {
-		return errTypeUnsassignable{X: xT, V: vT}
+		return errTypeUnassignable{X: xT, V: vT}
 	}
 
 	// check if the value was obtained from an unexported field
@@ -44,11 +46,11 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 	return nil
 }
 
-type errTypeUnsassignable struct {
+type errTypeUnassignable struct {
 	X, V reflect.Type
 }
 
-func (err errTypeUnsassignable) Error() string {
+func (err errTypeUnassignable) Error() string {
 	return fmt.Sprintf("value of type %s not assignable to type %s", err.X, err.V)
 }
 

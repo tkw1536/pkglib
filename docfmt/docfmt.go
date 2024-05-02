@@ -7,6 +7,8 @@
 //spellchecker:words docfmt
 package docfmt
 
+//spellchecker:words doccheck
+
 //spellchecker:words strings sync unicode github pkglib text
 import (
 	"strings"
@@ -57,7 +59,7 @@ func Format(message string) string {
 }
 
 // Capitalize capitalizes word that passes validation of individual words.
-// A word is capitalized by uppercasing the first non-whitespace rune in the word.
+// A word is capitalized by upper-casing the first non-whitespace rune in the word.
 //
 // Returns the capitalized word, and a boolean true if capitalization was performed,
 // or the unchanged word and false if the word contained only whitespace.

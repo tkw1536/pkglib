@@ -13,6 +13,8 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
+//spellchecker:words inuse
+
 // Snapshot holds metrics at a specific instance
 type Snapshot struct {
 	// Time the snapshot was captured

@@ -136,7 +136,7 @@ func init() {
 		return res
 	})
 	HTMLInterceptor = commonInterceptor(ContentTypeHTML, func(code StatusCode) []byte {
-		cstring := code.String()
-		return []byte(`<!DOCTYPE HTML><title>` + cstring + `</title>` + cstring)
+		codeString := code.String()
+		return []byte(`<!DOCTYPE HTML><title>` + codeString + `</title>` + codeString)
 	})
 }

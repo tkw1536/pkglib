@@ -73,7 +73,7 @@ func Connect[Element1, Element2 any](source Iterator[Element1], f func(element E
 // Pipe pipes elements from src into dst.
 // If any error occurs in src, the same error is sent to dst.
 //
-// A return value of false indicates that the iterator requested cancellation, ok an error occured.
+// A return value of false indicates that the iterator requested cancellation, ok an error occurred.
 // In such a case, the caller should not continue the use of dst.
 func Pipe[Element any](dst Generator[Element], src Iterator[Element]) (ok bool) {
 	for src.Next() {

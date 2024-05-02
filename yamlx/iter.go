@@ -16,7 +16,7 @@ import (
 func Iterate(node *yaml.Node) traversal.Iterator[Path] {
 	return traversal.New(func(g traversal.Generator[Path]) {
 		defer g.Return()
-		iterpaths(g, node, nil, nil)
+		iterPaths(g, node, nil, nil)
 	})
 }
 
@@ -31,10 +31,10 @@ func (path Path) HasChildren() bool {
 	return node.Kind == yaml.MappingNode
 }
 
-// iterpaths generates all paths in the given node.
+// iterPaths generates all paths in the given node.
 // merge_keys contains the keys already encountered during a merge
 // the return value indicates if the caller should continue
-func iterpaths(g traversal.Generator[Path], node *yaml.Node, path []string, merge_keys map[string]struct{}) bool {
+func iterPaths(g traversal.Generator[Path], node *yaml.Node, path []string, merge_keys map[string]struct{}) bool {
 	// resolve the alias
 	node = resolveAlias(node)
 	if node == nil {
@@ -45,7 +45,7 @@ func iterpaths(g traversal.Generator[Path], node *yaml.Node, path []string, merg
 	// and directly iterate on the children
 	if node.Kind == yaml.DocumentNode {
 		for _, doc := range node.Content {
-			if !iterpaths(g, doc, path, nil) {
+			if !iterPaths(g, doc, path, nil) {
 				return false
 			}
 		}
@@ -91,7 +91,7 @@ func iterpaths(g traversal.Generator[Path], node *yaml.Node, path []string, merg
 
 			// recursively iterate the children
 			path := append(slices.Clone(path), key.Value)
-			if !iterpaths(g, value, path, nil) {
+			if !iterPaths(g, value, path, nil) {
 				return false
 			}
 			merge_keys[key.Value] = struct{}{}
@@ -99,7 +99,7 @@ func iterpaths(g traversal.Generator[Path], node *yaml.Node, path []string, merg
 
 		// iterate through the merged children
 		for _, node := range merged {
-			if !iterpaths(g, node, path, merge_keys) {
+			if !iterPaths(g, node, path, merge_keys) {
 				return false
 			}
 		}

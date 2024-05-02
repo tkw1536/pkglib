@@ -18,8 +18,8 @@ import (
 // See [io.RuneReader].
 func ReadRune(reader io.Reader) (r rune, size int, err error) {
 	// try to directly read the rune
-	if rreader, ok := reader.(io.RuneReader); ok {
-		return rreader.ReadRune()
+	if reader, ok := reader.(io.RuneReader); ok {
+		return reader.ReadRune()
 	}
 
 	runeBuffer := make([]byte, 0, utf8.MaxRune)

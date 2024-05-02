@@ -1,6 +1,8 @@
 //spellchecker:words traversal
 package traversal
 
+//spellchecker:words rangefunc
+
 // RangeFunc is an iterator over sequences of individual values.
 // When called as seq(yield), seq calls yield(v) for each value v in the sequence,
 // stopping early if yield returns false.

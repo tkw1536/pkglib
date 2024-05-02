@@ -40,10 +40,10 @@ func (f *finWrites) Write(d []byte) (int, error) {
 
 func ExampleWriter_fail() {
 	// create a writer that can only be written to once
-	writeonce := finWrites(1)
+	writeOnce := finWrites(1)
 
 	w := Writer{
-		Writer: &writeonce,
+		Writer: &writeOnce,
 	}
 
 	// write to it twice

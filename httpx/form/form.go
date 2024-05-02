@@ -173,16 +173,16 @@ func (form *Form[Data]) renderForm(err error, afterSuccess bool, values map[stri
 	}
 
 	// get the template context
-	var tplctx any
+	var tplContext any
 	if form.TemplateContext == nil {
-		tplctx = ctx
+		tplContext = ctx
 	} else {
-		tplctx = form.TemplateContext(ctx, r)
+		tplContext = form.TemplateContext(ctx, r)
 	}
 
 	// write out the html and log an error (if any)
 	{
-		err := content.WriteHTML(tplctx, nil, form.Template, w, r)
+		err := content.WriteHTML(tplContext, nil, form.Template, w, r)
 		if err != nil && form.LogTemplateError != nil {
 			form.LogTemplateError(r, err)
 		}

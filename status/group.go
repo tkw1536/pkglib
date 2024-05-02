@@ -10,6 +10,8 @@ import (
 	"sync"
 )
 
+//spellchecker:words logfile
+
 // Group represents a concurrent set of operations.
 // Each operation takes an Item as a parameter, as well as an [io.Writer].
 // Each operation returns a Result.
@@ -125,7 +127,7 @@ func (group Group[Item, Result]) Use(status *Status, items []Item) ([]Result, []
 		}
 	}
 
-	// prepare a waitgroup for all the tasks.
+	// prepare a waitGroup for all the tasks.
 	var wg sync.WaitGroup
 	wg.Add(len(items))
 
@@ -224,10 +226,10 @@ func UseErrorGroup[Item any](status *Status, group Group[Item, error], items []I
 
 	var final ErrGroupErrors
 	for i, err := range errors {
-		file, fileexists := filenames[ids[i]]
+		file, fileExists := filenames[ids[i]]
 		if err != nil { // non-nil error, keep the file!
 			final = append(final, ErrorGroupError{Err: err, Logfile: file})
-		} else if fileexists { // nil error, delete the file!
+		} else if fileExists { // nil error, delete the file!
 			os.Remove(file)
 		}
 	}
@@ -269,7 +271,7 @@ func (errs ErrGroupErrors) Error() string {
 	return strings.Join(messages, "\n")
 }
 
-// ErrorGroupError represents an error of an errorgroup
+// ErrorGroupError represents an error of an error group
 type ErrorGroupError struct {
 	Err     error  // Err is the error produced
 	Logfile string // Path to the detailed logfile

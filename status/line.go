@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+//spellchecker:words annot
+
 // LineBuffer is an [io.Writer] that calls a function Line for every newline-delimited line written to it.
 // Do not copy a non-zero LineBuffer.
 type LineBuffer struct {

@@ -5,6 +5,8 @@
 // Users should take care that no other code in their application uses these functions.
 //
 // On windows, using this package has no effect over the normal functions.
+//
+//spellchecker:words umaskfree
 package umaskfree
 
 // mask is the global mask lock

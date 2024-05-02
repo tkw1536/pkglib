@@ -85,11 +85,11 @@ func Test_ImplementsAsSliceInterface(t *testing.T) {
 
 func Test_FilterSliceInterface(t *testing.T) {
 
-	somestruct := func(i int) *SomeStruct {
+	someStruct := func(i int) *SomeStruct {
 		v := SomeStruct{Value: i}
 		return &v
 	}
-	otherstruct := func(i int) *OtherStruct {
+	otherStruct := func(i int) *OtherStruct {
 		v := OtherStruct{Value: i}
 		return &v
 	}
@@ -108,23 +108,23 @@ func Test_FilterSliceInterface(t *testing.T) {
 			args{
 				reflect.ValueOf(
 					[]any{
-						somestruct(1),
-						otherstruct(2),
-						otherstruct(3),
-						somestruct(4),
+						someStruct(1),
+						otherStruct(2),
+						otherStruct(3),
+						someStruct(4),
 					},
 				),
 				reflect.TypeFor[SomeInterface](),
 			},
-			[]SomeInterface{somestruct(1), somestruct(4)},
+			[]SomeInterface{someStruct(1), someStruct(4)},
 		},
 		{
 			"slice with no matching elements",
 			args{
 				reflect.ValueOf(
 					[]any{
-						otherstruct(1),
-						otherstruct(2),
+						otherStruct(1),
+						otherStruct(2),
 					},
 				),
 				reflect.TypeFor[SomeInterface](),
@@ -136,8 +136,8 @@ func Test_FilterSliceInterface(t *testing.T) {
 			args{
 				reflect.ValueOf(
 					[]any{
-						otherstruct(1),
-						otherstruct(2),
+						otherStruct(1),
+						otherStruct(2),
 					},
 				),
 				reflect.TypeFor[string](),

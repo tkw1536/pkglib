@@ -10,6 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+//spellchecker:words bref
+
 func TestFind(t *testing.T) {
 	node := mustUnmarshal(t, "a: 0\nb: &bref\n    c: 2\n    d: 3\n    e:\n        f: 5\ng: 6\nh:\n    - 7\n    - 8\ni: *bref\n")
 
@@ -39,9 +41,9 @@ func TestFind(t *testing.T) {
 
 		{
 			name:    "get non-existent level-1 node",
-			args:    args{node: node, path: []string{"noexist"}},
+			args:    args{node: node, path: []string{"noExist"}},
 			want:    nil,
-			wantErr: `child not found: "noexist"`,
+			wantErr: `child not found: "noExist"`,
 		},
 		{
 			name:    "get non-existent level-3 node",
@@ -84,9 +86,9 @@ func TestFind(t *testing.T) {
 		},
 		{
 			name:    "get non-existing level-2 node via alias",
-			args:    args{node: node, path: []string{"i", "noexist"}},
+			args:    args{node: node, path: []string{"i", "noExist"}},
 			want:    nil,
-			wantErr: `Node "i": child not found: "noexist"`,
+			wantErr: `Node "i": child not found: "noExist"`,
 		},
 	}
 	for _, tt := range tests {

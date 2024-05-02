@@ -66,10 +66,10 @@ func TestSameFile(t *testing.T) {
 
 		{"identical existing directories", d1, d1, true},
 		{"identical linked directories", d2, alsoD2, true},
-		{"non-identical existing direcories (1)", d2, d1, false},
-		{"non-identical existing direcories (2)", d1, d2, false},
-		{"non-identical existing direcories (3)", d1, alsoD2, false},
-		{"non-identical existing direcories (4)", alsoD2, d1, false},
+		{"non-identical existing directories (1)", d2, d1, false},
+		{"non-identical existing directories (2)", d1, d2, false},
+		{"non-identical existing directories (3)", d1, alsoD2, false},
+		{"non-identical existing directories (4)", alsoD2, d1, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

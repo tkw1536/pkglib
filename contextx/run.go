@@ -37,9 +37,9 @@ func Run2[T1, T2 any](ctx context.Context, f func(start func()) (T1, T2), cancel
 
 	cancelled := make(chan struct{}, 1)
 
-	fdone := make(chan struct{})
+	fDone := make(chan struct{})
 	go func() {
-		defer close(fdone)
+		defer close(fDone)
 		defer close(cancelled)
 
 		var cancelOnce sync.Once
@@ -53,7 +53,7 @@ func Run2[T1, T2 any](ctx context.Context, f func(start func()) (T1, T2), cancel
 	}()
 
 	select {
-	case <-fdone: // normal exit
+	case <-fDone: // normal exit
 	case <-ctx.Done(): // context was cancelled
 
 		// call the cancel function once start() has been called
@@ -64,7 +64,7 @@ func Run2[T1, T2 any](ctx context.Context, f func(start func()) (T1, T2), cancel
 
 		// wait for the function to be done
 		// and set the error
-		<-fdone
+		<-fDone
 		err = ctx.Err()
 	}
 	return

@@ -14,6 +14,8 @@ import (
 	"github.com/tkw1536/pkglib/httpx"
 )
 
+//spellchecker:words modtime
+
 // Using a response with a plain http status
 func ExampleResponse() {
 	response := httpx.Response{

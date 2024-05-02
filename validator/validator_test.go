@@ -23,33 +23,33 @@ func ExampleValidate() {
 	collection := make(Collection, 2)
 
 	// positive checks if a number is positive
-	Add(collection, "positive", func(value *int, dflt string) error {
+	Add(collection, "positive", func(Value *int, Default string) error {
 		// if value is unset, parse the default as a string
-		if *value == 0 {
-			i, err := strconv.ParseInt(dflt, 10, 64)
+		if *Value == 0 {
+			i, err := strconv.ParseInt(Default, 10, 64)
 			if err != nil {
 				return err
 			}
-			*value = int(i)
+			*Value = int(i)
 			return nil
 		}
 
 		// check that we are actually positive!
-		if *value < 0 {
+		if *Value < 0 {
 			return errors.New("not positive")
 		}
 		return nil
 	})
 
 	// nonempty checks that a string is not empty
-	Add(collection, "nonempty", func(value *string, dflt string) error {
+	Add(collection, "nonempty", func(Value *string, Default string) error {
 		// set the default
-		if *value == "" {
-			*value = dflt
+		if *Value == "" {
+			*Value = Default
 		}
 
 		// check that it is not empty
-		if *value == "" {
+		if *Value == "" {
 			return errors.New("empty string")
 		}
 		return nil
@@ -69,33 +69,33 @@ func ExampleValidate_fail() {
 	collection := make(Collection, 2)
 
 	// positive checks if a number is positive
-	Add(collection, "positive", func(value *int, dflt string) error {
+	Add(collection, "positive", func(Value *int, Default string) error {
 		// if value is unset, parse the default as a string
-		if *value == 0 {
-			i, err := strconv.ParseInt(dflt, 10, 64)
+		if *Value == 0 {
+			i, err := strconv.ParseInt(Default, 10, 64)
 			if err != nil {
 				return err
 			}
-			*value = int(i)
+			*Value = int(i)
 			return nil
 		}
 
 		// check that we are actually positive!
-		if *value < 0 {
+		if *Value < 0 {
 			return errors.New("not positive")
 		}
 		return nil
 	})
 
 	// nonempty checks that a string is not empty
-	Add(collection, "nonempty", func(value *string, dflt string) error {
+	Add(collection, "nonempty", func(Value *string, Default string) error {
 		// set the default
-		if *value == "" {
-			*value = dflt
+		if *Value == "" {
+			*Value = Default
 		}
 
 		// check that it is not empty
-		if *value == "" {
+		if *Value == "" {
 			return errors.New("empty string")
 		}
 		return nil
@@ -120,7 +120,7 @@ func ExampleValidate_fail() {
 }
 
 // Demonstrates that Validate cannot be called on a non-struct type.
-func ExampleValidate_notastruct() {
+func ExampleValidate_notAStruct() {
 	var value int
 	err := Validate(&value, nil)
 
@@ -129,7 +129,7 @@ func ExampleValidate_notastruct() {
 }
 
 // Demonstrates that non-validators cause an error.
-func ExampleValidate_notavalidator() {
+func ExampleValidate_notAValidator() {
 
 	// create a collection with something that isn't a validator
 	collection := make(Collection, 2)
@@ -151,7 +151,7 @@ func ExampleValidate_invalid() {
 
 	// create a collection with a string validator
 	collection := make(Collection, 2)
-	collection["string"] = func(value *string, dflt string) error {
+	collection["string"] = func(Value *string, Default string) error {
 		panic("never reached")
 	}
 

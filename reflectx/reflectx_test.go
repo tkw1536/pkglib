@@ -10,6 +10,8 @@ import (
 	"testing"
 )
 
+//spellchecker:words pkglib
+
 // Iterate over the fields of a struct
 func ExampleIterateFields() {
 
@@ -182,7 +184,7 @@ func TestNameOf(t *testing.T) {
 			".string",
 		},
 		{
-			"package in standard libary",
+			"package in standard library",
 			reflect.TypeFor[reflect.Type](),
 			"reflect.Type",
 		},

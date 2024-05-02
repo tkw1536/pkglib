@@ -15,6 +15,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+//spellchecker:words upgrader
+
 // A Server is a websocket test server listening on a system-chosen port on the
 // local loopback interface, for use in end-to-end Websocket tests.
 type Server struct {

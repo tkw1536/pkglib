@@ -9,6 +9,8 @@ import (
 	"github.com/tkw1536/pkglib/yamlx"
 )
 
+//spellchecker:words bref
+
 func TestIteratePaths(t *testing.T) {
 	for _, tt := range []struct {
 		Name      string

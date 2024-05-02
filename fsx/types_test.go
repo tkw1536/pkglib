@@ -21,9 +21,9 @@ func makePaths(t *testing.T) (paths struct {
 	paths.Dir = filepath.Join(base, "dir")
 	paths.File = filepath.Join(base, "file")
 	paths.Missing = filepath.Join(base, "missing")
-	paths.LinkToDir = filepath.Join(base, "dirlink")
-	paths.LinkToFile = filepath.Join(base, "filelink")
-	paths.BrokenLink = filepath.Join(base, "brokenlink")
+	paths.LinkToDir = filepath.Join(base, "dirLink")
+	paths.LinkToFile = filepath.Join(base, "fileLink")
+	paths.BrokenLink = filepath.Join(base, "brokenLink")
 
 	if err := os.Mkdir(paths.Dir, fs.ModeDir); err != nil {
 		panic(err)

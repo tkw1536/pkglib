@@ -9,6 +9,8 @@ import (
 	"github.com/tkw1536/pkglib/stream"
 )
 
+//spellchecker:words compat
+
 // WriterGroup intelligently runs handler over items concurrently.
 //
 // Count determines the number of concurrent invocations to run.
@@ -91,12 +93,12 @@ func SmartMessage[T any](handler func(value T) string) StreamGroupOption[T] {
 // When underlying operations are non-interactive, use WriterGroup instead.
 func StreamGroup[T any](str stream.IOStream, count int, handler func(value T, str stream.IOStream) error, items []T, opts ...StreamGroupOption[T]) error {
 	return WriterGroup(str.Stdout, count, func(value T, output io.Writer) error {
-		var gstr stream.IOStream
+		var groupStream stream.IOStream
 		if output != str.Stdout {
-			gstr = stream.NonInteractive(output)
+			groupStream = stream.NonInteractive(output)
 		} else {
-			gstr = str
+			groupStream = str
 		}
-		return handler(value, gstr)
+		return handler(value, groupStream)
 	}, items, opts...)
 }

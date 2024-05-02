@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+//spellchecker:words noth
+
 // partTests are tests where an entire part is checked against the Validate() or Check() function.
 // These are outlined because they are reuse between parts
 var partTests = []struct {

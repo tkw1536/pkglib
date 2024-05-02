@@ -6,10 +6,10 @@ import (
 	"bytes"
 )
 
-func MinifyBytes(mediatype string, in []byte) []byte {
-	// create a new minifier
+func MinifyBytes(mediaType string, in []byte) []byte {
+	// create a new writer
 	var buffer bytes.Buffer
-	writer := Minify(mediatype, &buffer)
+	writer := Minify(mediaType, &buffer)
 
 	// write and then close it!
 	if _, err := writer.Write(in); err != nil {

@@ -14,6 +14,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+//spellchecker:words upgrader websockets
+
 // Server implements a websocket server.
 type Server struct {
 	m        sync.Mutex // protects modifying context below

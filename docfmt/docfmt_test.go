@@ -10,6 +10,8 @@ package docfmt
 //spellchecker:words testing
 import "testing"
 
+//spellchecker:words doccheck
+
 func TestFormat(t *testing.T) {
 	tests := []struct {
 		input string

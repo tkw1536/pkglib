@@ -11,7 +11,7 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
-//spellchecker:words HTMLI websockets
+//spellchecker:words HTMLI websockets minifier
 
 // WriteHTML writes an html response to r into w.
 //

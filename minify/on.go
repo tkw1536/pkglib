@@ -16,7 +16,9 @@ import (
 	"github.com/tkw1536/pkglib/noop"
 )
 
-// minifier holds the minfier used for all html minification
+//spellchecker:words minifier nominify
+
+// minifier holds the minifier used for all html minification
 //
 // NOTE: We can't use an init function for this, because otherwise initialization order is incorrect.
 var minifier = (func() *minify.M {
@@ -28,14 +30,14 @@ var minifier = (func() *minify.M {
 	return m
 })()
 
-// Minifiy returns a minifier that writes minification to dest.
-// If minification is disabled, or no minifier for the given mediatype type exists, it returns a no-op wrapper around src.
+// Minify returns a minifier that writes minification to dest.
+// If minification is disabled, or no minifier for the given media type exists, it returns a no-op wrapper around src.
 //
 // The caller must close the returned closer upon completion of writing.
-func Minify(mediatype string, dest io.Writer) io.WriteCloser {
-	_, _, f := minifier.Match(mediatype)
+func Minify(mediaType string, dest io.Writer) io.WriteCloser {
+	_, _, f := minifier.Match(mediaType)
 	if f == nil {
 		return noop.Writer{Writer: dest}
 	}
-	return minifier.Writer(mediatype, dest)
+	return minifier.Writer(mediaType, dest)
 }

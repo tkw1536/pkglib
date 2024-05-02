@@ -19,6 +19,8 @@ import (
 	"github.com/tkw1536/pkglib/stream"
 )
 
+//spellchecker:words annot compat
+
 // Status represents an interactive status display that can write to multiple lines at once.
 //
 // A Status must be initialized using [New], then started (and stopped again) to write messages.
@@ -35,7 +37,7 @@ import (
 //
 // Using the status to Write messages outside of the Start / Stop process results in no-ops.
 //
-// In addition to writing to lines directly, a status keeps separate logfiles for each line.
+// In addition to writing to lines directly, a status keeps separate log files for each line.
 // These are automatically deleted once the Stop method is called, unless a separate call to the Keep() method is made.
 //
 // Status should only be used on interactive terminals.
@@ -49,7 +51,7 @@ type Status struct {
 	w      *uilive.Writer // underlying uilive writer
 	compat bool           // compatibility mode enabled
 
-	logPath      string                    // temporary path for log files (passed when creating logwriters)
+	logPath      string                    // temporary path for log files (passed when creating logWriters)
 	logWriters   map[uint64]io.WriteCloser // writers for the backup loggers
 	logNamesLock sync.RWMutex              // protects the below
 	logNames     map[uint64]string         // the names of the log files
@@ -192,7 +194,7 @@ func (st *Status) flushCompat(changed uint64) {
 	fmt.Fprintln(st.w.Out, line)
 }
 
-// flushLogs flushes to the given logfile
+// flushLogs flushes to the given log file
 func (st *Status) flushLogs(changed uint64) {
 	line, ok := st.messages[changed]
 	if !ok {
@@ -247,7 +249,7 @@ func (st *Status) Keep() map[uint64]string {
 
 // Stop blocks until all updates to finish processing.
 // It then stops writing updates to the underlying writer.
-// It then deletes all logfiles, unless a call to Keep() has been made.
+// It then deletes all log files, unless a call to Keep() has been made.
 //
 // Stop must be called after [Start] has been called.
 // Start may not be called more than once.

@@ -1,17 +1,21 @@
 //go:build nominify
 
+//spellchecker:words minify
 package minify
 
+//spellchecker:words github pkglib noop
 import (
 	"io"
 
 	"github.com/tkw1536/pkglib/noop"
 )
 
-// Minifiy returns a minifier that writes minification to dest.
-// If minification is disabled, or no minifier for the given mediatype exists, it returns a no-op wrapper around src.
+// spellchecker:words minifier nominify
+
+// Minify returns a minifier that writes minification to dest.
+// If minification is disabled, or no minifier for the given mediaType exists, it returns a no-op wrapper around src.
 //
 // The caller must close the returned closer upon completion of writing.
-func Minify(mediatype string, dest io.Writer) io.WriteCloser {
+func Minify(mediaType string, dest io.Writer) io.WriteCloser {
 	return noop.Writer{Writer: dest}
 }

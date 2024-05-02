@@ -29,8 +29,8 @@ func ExampleRun() {
 	}
 
 	// create a context that is stopped after 100 milliseconds
-	ctx, ctxcancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer ctxcancel()
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer ctxCancel()
 
 	// and run the function with the context and explicit cancel!
 	result, err := Run(ctx, func(start func()) int {

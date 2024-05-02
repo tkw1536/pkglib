@@ -4,6 +4,7 @@ package field
 // Autocomplete represents different autocomplete options
 type Autocomplete string
 
+//spellchecker:words Impp bday
 const (
 	Off                 Autocomplete = "off"
 	On                  Autocomplete = "on"

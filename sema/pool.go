@@ -10,6 +10,8 @@ import (
 	"github.com/tkw1536/pkglib/lazy"
 )
 
+//spellchecker:words finalizer
+
 // Pool holds a finite set of lazily created objects.
 type Pool[V any] struct {
 	// New creates a new item in the pool.

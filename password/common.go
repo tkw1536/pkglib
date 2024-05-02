@@ -12,6 +12,8 @@ import (
 	"sync"
 )
 
+//spellchecker:words fsys
+
 // PasswordSource represents a source of passwords.
 type PasswordSource interface {
 	// Name returns the name of this source
@@ -150,8 +152,8 @@ func Passwords(sources ...PasswordSource) <-chan CommonPassword {
 // - an error returned by check (assuming some check went wrong)
 // - or nil (when a password is not a common password
 func CheckCommonPassword(check func(candidate string) (bool, error), sources ...PasswordSource) error {
-	for commmon := range Passwords(sources...) {
-		ok, err := check(commmon.Password)
+	for common := range Passwords(sources...) {
+		ok, err := check(common.Password)
 		if err != nil {
 			return err
 		}
@@ -159,7 +161,7 @@ func CheckCommonPassword(check func(candidate string) (bool, error), sources ...
 		// password validation passed
 		if ok {
 			return CommonPasswordError{
-				CommonPassword: commmon,
+				CommonPassword: common,
 			}
 		}
 	}

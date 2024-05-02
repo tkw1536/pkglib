@@ -13,7 +13,7 @@ import (
 const (
 	validateTag = "validate"
 	recurseTag  = "recurse"
-	dfltTag     = "default"
+	defaultTag  = "default"
 )
 
 // Validate validates an object of type T, setting defaults where appropriate.
@@ -81,7 +81,7 @@ func validate(datum reflect.Value, validators Collection) error {
 		if err := validators.Call(
 			validator,
 			datum.FieldByName(field.Name),
-			field.Tag.Get(dfltTag),
+			field.Tag.Get(defaultTag),
 		); err != nil {
 			return FieldError{Field: field.Name, Err: err}
 		}

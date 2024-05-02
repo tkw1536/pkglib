@@ -5,7 +5,7 @@ import (
 	"path"
 )
 
-// NormalizePath normalizes a path sent to a webserver.
+// NormalizePath normalizes a path sent to a web server.
 //
 // - Any "." and ".." in path are removed lexicographically
 // - If any path does not start with "/", it is prepended to the string

@@ -127,12 +127,12 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		}
 
 		// determine the real target path
-		var relpath string
-		relpath, err = filepath.Rel(src, path)
+		var relPath string
+		relPath, err = filepath.Rel(src, path)
 		if err != nil {
 			return err
 		}
-		dst := filepath.Join(dst, relpath)
+		dst := filepath.Join(dst, relPath)
 
 		// call the hook
 		if onCopy != nil {

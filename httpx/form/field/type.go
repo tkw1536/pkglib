@@ -4,6 +4,7 @@ package field
 // InputType represents the type of input
 type InputType string
 
+//spellchecker:words datetime
 const (
 	Button        InputType = "button"
 	Checkbox      InputType = "checkbox"

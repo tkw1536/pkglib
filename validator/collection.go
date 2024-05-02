@@ -11,11 +11,11 @@ import (
 // Collection represents a set of validators.
 // The zero value is not ready to use; it should be created using make().
 //
-// A validator is a non-nil function with signature func(value *F, dflt string) error.
+// A validator is a non-nil function with signature func(Value *F, Default string) error.
 // Here F is the type of a value of a field.
 // The value is the initialized value to be validated.
 // The validator may perform arbitrary normalization on the value.
-// dflt is the default value (read from the 'default' tag).
+// Default is the default value (read from the 'default' tag).
 // error should be an appropriate error that occurred.
 //
 // A validator function is applied by calling it.
@@ -23,17 +23,17 @@ type Collection map[string]any
 
 // Add adds a Validator to the provided collection of validators.
 // Any previously validator of the same name is overwritten.
-func Add[F any](coll Collection, name string, validator func(value *F, dflt string) error) {
+func Add[F any](coll Collection, name string, validator func(Value *F, Default string) error) {
 	coll[name] = validator
 }
 
 // AddSlice adds a Validator to the provided collection of validators that validates a slice of the given type. The default is separated by sep.
-func AddSlice[F any](coll Collection, name string, sep string, validator func(value *F, dflt string) error) {
-	Add(coll, name, func(value *[]F, dflt string) error {
+func AddSlice[F any](coll Collection, name string, sep string, validator func(Value *F, Default string) error) {
+	Add(coll, name, func(Value *[]F, Default string) error {
 		// some value is set, so we do not need to set the default!
-		if *value != nil {
-			for i := range *value {
-				if err := validator(&(*value)[i], ""); err != nil {
+		if *Value != nil {
+			for i := range *Value {
+				if err := validator(&(*Value)[i], ""); err != nil {
 					return err
 				}
 			}
@@ -41,16 +41,16 @@ func AddSlice[F any](coll Collection, name string, sep string, validator func(va
 		}
 
 		// no default provided => set if to an empty slice
-		if dflt == "" {
-			*value = make([]F, 0)
+		if Default == "" {
+			*Value = make([]F, 0)
 			return nil
 		}
 
 		// some default provided => iterate over the underlying validator
-		dflts := strings.Split(dflt, sep)
-		*value = make([]F, len(dflts))
-		for i := range *value {
-			if err := validator(&(*value)[i], dflts[i]); err != nil {
+		defaults := strings.Split(Default, sep)
+		*Value = make([]F, len(defaults))
+		for i := range *Value {
+			if err := validator(&(*Value)[i], defaults[i]); err != nil {
 				return err
 			}
 		}
@@ -91,7 +91,7 @@ func (iv IncompatibleValidator) Error() string {
 
 // Call calls the validator with the given name, on the given value, and with the provided default.
 // See documentation of [Validate] for details.
-func (coll Collection) Call(name string, field reflect.Value, dflt string) error {
+func (coll Collection) Call(name string, field reflect.Value, Default string) error {
 	validator, ok := coll[name]
 	if !ok {
 		return UnknownValidator(name)
@@ -120,7 +120,7 @@ func (coll Collection) Call(name string, field reflect.Value, dflt string) error
 	}
 
 	// call the validator function, and return an error
-	results := vFunc.Call([]reflect.Value{field.Addr(), reflect.ValueOf(dflt)})
+	results := vFunc.Call([]reflect.Value{field.Addr(), reflect.ValueOf(Default)})
 
 	// turn the result into an error
 	// NOTE: We can't just .(error) here because that panic()s on err == nil
