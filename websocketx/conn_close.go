@@ -141,7 +141,8 @@ func (cf CloseFrame) Body() []byte {
 
 // IsZero checks if this CloseFrame has the zero value
 func (cf CloseFrame) IsZero() bool {
-	return cf.Code == 0 && cf.Reason == ""
+	var zero CloseFrame
+	return zero == cf
 }
 
 // StatusCode is a status code as defined in RFC 6455, Section 7.4.
@@ -275,7 +276,7 @@ var statusCodeNames = map[StatusCode]string{
 // CloseCause is returned by calling [close.Cause] on the context of a connection.
 // It indicates the reason why the server was closed.
 type CloseCause struct {
-	// CloseFrame it the close frame that cause the closure.
+	// CloseFrame is the close frame that cause the closure.
 	// If no close frame was received, contains the [StatusAbnormalClosure] code.
 	Frame CloseFrame
 
