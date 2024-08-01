@@ -12,11 +12,19 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const MsgFailedCloseFrame = "error writing close frame"
+
+var failedCloseFrameMessage = websocket.FormatCloseMessage(websocket.CloseInternalServerErr, MsgFailedCloseFrame)
+
 // close closes this connection with the given cause.
 // It updates the connection state and sends a closing frame to the remote endpoint.
 //
 // The frame communicated to the remote endpoint will be the frame found in the cause,
 // unless the caller provides an explicit frame instead.
+//
+// When the close frame fails to be written to the connection, sends an internal server error
+// close frame with [MsgFailedCloseFrame] instead.
+// Such a failure is typically caused by the close frame exceeding a certain size.
 //
 // This function also updates the internal connection state.
 // If force is true, also calls forceClose.
@@ -41,7 +49,11 @@ func (conn *Connection) close(cause CloseCause, frame *CloseFrame, force bool) {
 		cf = *frame
 	}
 
-	_ = conn.conn.WriteControl(websocket.CloseMessage, cf.Body(), time.Now().Add(conn.opts.HandshakeTimeout))
+	err := conn.conn.WriteControl(websocket.CloseMessage, cf.Body(), time.Now().Add(conn.opts.HandshakeTimeout))
+	if err != nil {
+		// if the close frame failed to encode (probably it's too big) write a generic error instead
+		conn.conn.WriteControl(websocket.CloseMessage, failedCloseFrameMessage, time.Now().Add(conn.opts.HandshakeTimeout))
+	}
 
 	// do the actual close
 	if force {

@@ -28,6 +28,11 @@ const (
 var shutdownTests = []struct {
 	Name string // name of the test
 
+	// set any of these to skip the test in the corresponding section
+	SkipServerTest  bool
+	SkipHandlerTest bool
+	SkipClientTest  bool
+
 	// the frame to send to the server
 	SendFrame websocketx.CloseFrame
 
@@ -74,6 +79,27 @@ var shutdownTests = []struct {
 			Frame: websocketx.CloseFrame{
 				Code:   websocketx.StatusNormalClosure,
 				Reason: "hello world",
+			},
+			WasClean: true,
+		},
+	},
+
+	{
+		Name:           "normal shutdown with huge message",
+		SkipClientTest: true,
+
+		SendFrame: websocketx.CloseFrame{
+			Code:   websocketx.StatusNormalClosure,
+			Reason: string(make([]byte, 1000)),
+		},
+		WantCloseCalled: true,
+		WantCode:        websocket.CloseInternalServerErr,
+		WantReason:      websocketx.MsgFailedCloseFrame,
+
+		WantCloseCause: websocketx.CloseCause{
+			Frame: websocketx.CloseFrame{
+				Code:   websocketx.StatusNormalClosure,
+				Reason: string(make([]byte, 1000)),
 			},
 			WasClean: true,
 		},
@@ -154,7 +180,7 @@ func TestServer_ServerShutdown(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
 	for _, tt := range shutdownTests {
-		if tt.SendFrame.Code == shutdownDoNothing {
+		if tt.SendFrame.Code == shutdownDoNothing || tt.SkipServerTest {
 			continue
 		}
 
@@ -219,6 +245,9 @@ func TestServer_HandlerShutdown(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
 	for _, tt := range shutdownTests {
+		if tt.SkipHandlerTest {
+			continue
+		}
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -279,7 +308,7 @@ func TestServer_ClientClose(t *testing.T) {
 
 	for _, tt := range shutdownTests {
 		// skip tests that aren't supported
-		if tt.SendFrame.Code == shutdownDoNothing || tt.WantCloseCause.Frame.IsZero() {
+		if tt.SendFrame.Code == shutdownDoNothing || tt.WantCloseCause.Frame.IsZero() || tt.SkipClientTest {
 			continue
 		}
 
@@ -301,7 +330,7 @@ func TestServer_ClientClose(t *testing.T) {
 				}
 
 				// write the close message to the server
-				_ = client.WriteControl(websocket.CloseMessage, tt.SendFrame.Body(), time.Now().Add(time.Second))
+				client.WriteControl(websocket.CloseMessage, tt.SendFrame.Body(), time.Now().Add(time.Second))
 
 				// receive the close message back
 				if _, _, err := client.ReadMessage(); err == nil {
