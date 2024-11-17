@@ -32,7 +32,7 @@ type Concurrency struct {
 // It then returns the non-nil error which triggered the error stop.
 //
 // If no error occurs, schedule returns nil.
-func Schedule(worker func(int) error, count int, concurrency Concurrency) (err error) {
+func Schedule(worker func(uint64) error, count uint64, concurrency Concurrency) (err error) {
 	if count <= 0 {
 		return nil
 	}
@@ -44,8 +44,8 @@ func Schedule(worker func(int) error, count int, concurrency Concurrency) (err e
 
 	// create a wait group that waits for all the work to be done!
 	var wg sync.WaitGroup
-	wg.Add(count)
 	for range count {
+		wg.Add(1)
 		go func() {
 			defer wg.Done()
 
@@ -60,7 +60,7 @@ func Schedule(worker func(int) error, count int, concurrency Concurrency) (err e
 			}
 
 			// grab the next id to work on
-			id := int(next.Add(1) - 1)
+			id := next.Add(1) - 1
 
 			// do the work!
 			res := worker(id)

@@ -18,5 +18,7 @@ func main() {
 		panic("stuff")
 	})
 
-	log.Fatal(http.ListenAndServe("localhost:3000", nil))
+	log.Fatal(http.ListenAndServe("localhost:3000", nil)) // #nosec G114 -- this is example code and doesn't need timeouts
 }
+
+// spellchecker:words nosec

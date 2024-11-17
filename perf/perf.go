@@ -148,5 +148,7 @@ func perf() (bytes int64, objects int64) {
 	}
 
 	// compute the overall memory used, and the given number of objects on the heap
-	return int64(stats.HeapInuse + stats.StackInuse), int64(stats.HeapObjects)
+	return int64(stats.HeapInuse + stats.StackInuse), int64(stats.HeapObjects) // #nosec G115 all stats are guaranteed to be positive
 }
+
+// spellchecker:words nosec

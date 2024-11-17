@@ -77,7 +77,7 @@ func (form *Form[D]) HTML(values map[string]string, IsError bool) template.HTML 
 		_ = field.WriteTo(&builder, form.FieldTemplate, value)
 	}
 
-	return template.HTML(builder.String())
+	return template.HTML(builder.String()) // #nosec G203 -- template is safe
 }
 
 // Values validates values inside the given request, and returns parsed out form values from a post request.
@@ -237,3 +237,5 @@ var formBytes []byte
 
 // FormTemplate is a template to embed a form
 var FormTemplate = template.Must(template.New("form.html").Parse(string(formBytes)))
+
+// spellchecker:words nosec

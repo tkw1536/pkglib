@@ -82,7 +82,7 @@ func (err errorPage) FormatHTML(res Response) template.HTML {
 	// TODO: Ignores template errors
 	_ = errpageHTMLTemplate.Execute(&builder, errPageContext{Error: err, Original: res})
 
-	return template.HTML(builder.String())
+	return template.HTML(builder.String()) // #nosec G203 -- template not attacker controlled
 }
 
 // sError represents a stringified error
@@ -123,3 +123,5 @@ func newSError(err error) sError {
 	// and we've built the error
 	return e
 }
+
+// spellchecker:words nosec

@@ -30,7 +30,7 @@ func CopyFile(ctx context.Context, dst, src string) error {
 	}
 
 	// open the source
-	srcFile, err := os.Open(src)
+	srcFile, err := os.Open(src) // #nosec G304 -- src is an explicit parameter
 	if err != nil {
 		return err
 	}
@@ -171,3 +171,5 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		return err
 	})
 }
+
+// spellchecker:words nosec

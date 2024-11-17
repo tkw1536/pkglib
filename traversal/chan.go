@@ -19,7 +19,7 @@ func AsChannel[T any](it Iterator[T], ctx context.Context) <-chan T {
 			select {
 			case out <- it.Datum():
 			case <-ctx.Done():
-				it.Close()
+				_ = it.Close() // ignore any error during close
 			}
 		}
 	}(out)

@@ -114,7 +114,7 @@ func (conn *Connection) setConnOpts() error {
 		// if it is within a valid range
 		sc := StatusNoStatusReceived
 		if code >= 0 && code < (1<<16) {
-			sc = StatusCode(code)
+			sc = StatusCode(code) // #nosec G115 -- explicit bounds check
 		}
 
 		conn.close(CloseCause{
@@ -124,7 +124,7 @@ func (conn *Connection) setConnOpts() error {
 			},
 			WasClean: true,
 			Err:      nil,
-		}, &CloseFrame{Code: StatusCode(code)}, true)
+		}, &CloseFrame{Code: sc}, true)
 		return nil
 	})
 
@@ -382,3 +382,5 @@ type queuedMessage struct {
 
 	done chan<- struct{} // done should be closed when finished
 }
+
+// spellchecker:words nosec

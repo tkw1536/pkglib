@@ -14,7 +14,7 @@ func Create(path string, mode fs.FileMode) (*os.File, error) {
 	m.Lock()
 	defer m.Unlock()
 
-	return os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
+	return os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode) // #nosec G304 -- path is an explicit parameter
 }
 
 // WriteFile is like [os.WriteFile].
@@ -60,3 +60,5 @@ func Touch(path string, perm fs.FileMode) error {
 		return os.Chtimes(path, now, now)
 	}
 }
+
+// spellchecker:words nosec
