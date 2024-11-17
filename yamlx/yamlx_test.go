@@ -40,7 +40,8 @@ func mustMarshal(t testing.TB, node *yaml.Node) string {
 	if err != nil {
 		msg := fmt.Sprintf("unable to marshal: %v", err)
 		if t != nil {
-			t.Fatalf(msg)
+			t.Error(msg)
+			t.Fail()
 		}
 		panic(msg)
 	}
@@ -53,7 +54,8 @@ func mustUnmarshal(t testing.TB, source string) *yaml.Node {
 	if err != nil {
 		msg := fmt.Sprintf("unable to unmarshal: %v", err)
 		if t != nil {
-			t.Fatalf(msg)
+			t.Error(msg)
+			t.Fail()
 		}
 		panic(msg)
 	}
