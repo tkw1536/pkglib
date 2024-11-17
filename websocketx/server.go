@@ -245,7 +245,7 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 			// server is closing =>
 			// close the connection
 			if cause == errServerClose {
-				conn.Close()
+				_ = conn.Close() // try our best to close the connection, and ignore errors
 				return
 			}
 

@@ -58,7 +58,7 @@ func (conn *Connection) close(cause CloseCause, frame *CloseFrame, force bool) {
 
 	// do the actual close
 	if force {
-		conn.forceClose(nil)
+		_ = conn.forceClose(nil) // ignore any error; we did our best!
 		return
 	}
 
