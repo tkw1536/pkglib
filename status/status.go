@@ -97,7 +97,7 @@ type action struct {
 // The ids of the status lines are guaranteed to be 0...(count-1).
 // When count is less than 0, it is set to 0.
 func New(writer io.Writer, count int) *Status {
-	if int(uint64(count)) != count {
+	if int(uint64(count)) /* #nosec G115 -- explicit check if it fits */ != count {
 		panic("Status: count does not fit into uint64")
 	}
 
@@ -124,11 +124,11 @@ func New(writer io.Writer, count int) *Status {
 		done:    make(chan struct{}),
 	}
 	st.state.Store(stateNewCalled)
-	st.counter.Store(uint64(count))
+	st.counter.Store(uint64(count)) // #nosec G115 -- count fits into uint64
 
 	// setup new ids
 	for index := range st.ids {
-		i := uint64(index)
+		i := uint64(index) // #nosec G115 -- index < count which fits into uint64
 		st.ids[index] = i
 		st.idsI[i] = index
 
@@ -176,13 +176,13 @@ const minFlushDelay = 50 * time.Millisecond
 
 // flush flushes the output of this Status to the underlying writer.
 // see [flushCompat] and [flushNormal]
-func (st *Status) flush(force bool, changed uint64) {
+func (st *Status) flush(force bool, changed uint64) error {
 	st.flushLogs(changed)
 	if st.compat {
 		st.flushCompat(changed)
-		return
+		return nil
 	}
-	st.flushNormal(force)
+	return st.flushNormal(force)
 }
 
 // flushCompat flushes the provided updated message, if it is valid.
@@ -209,11 +209,11 @@ func (st *Status) flushLogs(changed uint64) {
 
 // flushNormal implements flushing in normal mode.
 // Respects [minFlushDelay], unless force is set to true.
-func (st *Status) flushNormal(force bool) {
+func (st *Status) flushNormal(force bool) error {
 
 	now := time.Now()
 	if !force && now.Sub(st.lastFlush) < minFlushDelay {
-		return
+		return nil
 	}
 	st.lastFlush = now
 
@@ -230,7 +230,7 @@ func (st *Status) flushNormal(force bool) {
 	}
 
 	// flush the output
-	st.w.Flush()
+	return st.w.Flush()
 }
 
 // Keep instructs this Status to not keep any log files, and returns a map from ids to file names.
@@ -265,11 +265,11 @@ func (st *Status) Stop() {
 
 	close(st.actions)
 	<-st.done
-	st.flush(true, st.counter.Add(1)) // force an invalid flush!
+	_ = st.flush(true, st.counter.Add(1)) // force an invalid flush!
 
 	// close the remaining loggers
 	for _, id := range st.ids {
-		st.closeLogger(id)
+		_ = st.closeLogger(id) // closing the logger is low priority, so ignore closing errors
 	}
 
 	// if we requested for the log files to be deleted, do it!
@@ -278,7 +278,7 @@ func (st *Status) Stop() {
 		defer st.logNamesLock.Unlock()
 
 		for _, name := range st.logNames {
-			os.Remove(name)
+			_ = os.Remove(name) // deleting the logs is low priority, so ignore the error
 		}
 	}
 
@@ -315,12 +315,8 @@ func (st *Status) openLogger(id uint64) {
 }
 
 // closeLogger closes the logger for the line with the given id
-func (st *Status) closeLogger(id uint64) {
+func (st *Status) closeLogger(id uint64) error {
 	defer func() { _ = recover() }() // silently ignore errors
-
-	if st == nil {
-		return
-	}
 
 	// get and delete the log writer
 	handle, ok := st.logWriters[id]
@@ -328,8 +324,9 @@ func (st *Status) closeLogger(id uint64) {
 
 	// delete it if ok
 	if ok {
-		handle.Close()
+		return handle.Close()
 	}
+	return nil
 }
 
 // Set sets the status line with the given id to contain message.
@@ -485,7 +482,7 @@ func (st *Status) listen() {
 
 			// store the message, and do a normal flush!
 			st.messages[msg.id] = msg.message
-			st.flush(false, msg.id)
+			_ = st.flush(false, msg.id) // no way to report error, so ignore it
 		case openAction:
 			// duplicate id, shouldn't occur
 			if _, ok := st.idsI[msg.id]; ok {
@@ -503,7 +500,7 @@ func (st *Status) listen() {
 			st.openLogger(msg.id)
 
 			// force a flush so that we see it
-			st.flush(true, msg.id)
+			_ = st.flush(true, msg.id) // no way to report error
 		case closeAction:
 			// make sure that the line exists!
 			index, ok := st.idsI[msg.id]
@@ -512,7 +509,7 @@ func (st *Status) listen() {
 			}
 
 			// close the logger
-			st.closeLogger(msg.id)
+			_ = st.closeLogger(msg.id) // logging is low priority, so ignore errors
 
 			// update the list of active ids
 			// and rebuild the inverse index map
@@ -527,7 +524,7 @@ func (st *Status) listen() {
 			delete(st.messages, msg.id)
 
 			// and flush all the other lines
-			st.flush(true, msg.id)
+			_ = st.flush(true, msg.id) // ignore errors
 		}
 	}
 }
@@ -542,3 +539,5 @@ func (st *Status) Bypass() io.Writer {
 
 	return st.w.Bypass()
 }
+
+// spellchecker:words nosec

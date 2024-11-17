@@ -180,7 +180,7 @@ func (group Group[Item, Result]) Use(status *Status, items []Item) ([]Result, []
 	// then we still need to close them all!
 	if group.WaitString != nil {
 		for _, w := range writers {
-			w.Close()
+			_ = w.Close() // no way to report the error, so ignore it
 		}
 	}
 
@@ -230,7 +230,9 @@ func UseErrorGroup[Item any](status *Status, group Group[Item, error], items []I
 		if err != nil { // non-nil error, keep the file!
 			final = append(final, ErrorGroupError{Err: err, Logfile: file})
 		} else if fileExists { // nil error, delete the file!
-			os.Remove(file)
+			if err := os.Remove(file); err != nil {
+				final = append(final, ErrorGroupError{Err: err, Logfile: file})
+			}
 		}
 	}
 
