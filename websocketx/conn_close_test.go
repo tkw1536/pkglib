@@ -330,7 +330,9 @@ func TestServer_ClientClose(t *testing.T) {
 				}
 
 				// write the close message to the server
-				client.WriteControl(websocket.CloseMessage, tt.SendFrame.Body(), time.Now().Add(time.Second))
+				if err := client.WriteControl(websocket.CloseMessage, tt.SendFrame.Body(), time.Now().Add(time.Second)); err != nil {
+					t.Error("error writing close message")
+				}
 
 				// receive the close message back
 				if _, _, err := client.ReadMessage(); err == nil {

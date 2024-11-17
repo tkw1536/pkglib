@@ -52,7 +52,8 @@ func (conn *Connection) close(cause CloseCause, frame *CloseFrame, force bool) {
 	err := conn.conn.WriteControl(websocket.CloseMessage, cf.Body(), time.Now().Add(conn.opts.HandshakeTimeout))
 	if err != nil {
 		// if the close frame failed to encode (probably it's too big) write a generic error instead
-		conn.conn.WriteControl(websocket.CloseMessage, failedCloseFrameMessage, time.Now().Add(conn.opts.HandshakeTimeout))
+		// explicitly ignore the error cause we're in a fallback situation already
+		_ = conn.conn.WriteControl(websocket.CloseMessage, failedCloseFrameMessage, time.Now().Add(conn.opts.HandshakeTimeout))
 	}
 
 	// do the actual close

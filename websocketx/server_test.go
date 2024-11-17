@@ -157,7 +157,9 @@ func TestServer_RequireProtocols(t *testing.T) {
 
 			// handler just returns the selected protocol
 			server.Handler = func(ws *websocketx.Connection) {
-				ws.WriteText("selected protocol: " + ws.Subprotocol())
+				if err := ws.WriteText("selected protocol: " + ws.Subprotocol()); err != nil {
+					panic(err)
+				}
 			}
 
 			// create a new test server
@@ -355,7 +357,9 @@ func TestServer_concurrent(t *testing.T) {
 				i := i
 				go func() {
 					defer wg.Done()
-					c.WriteText(strconv.Itoa(i))
+					if err := c.WriteText(strconv.Itoa(i)); err != nil {
+						panic(err)
+					}
 				}()
 			}
 
