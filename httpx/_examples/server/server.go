@@ -3,6 +3,7 @@ package main
 
 //spellchecker:words http github pkglib httpx recovery
 import (
+	"log"
 	"net/http"
 
 	"github.com/tkw1536/pkglib/httpx"
@@ -17,5 +18,5 @@ func main() {
 		panic("stuff")
 	})
 
-	http.ListenAndServe("localhost:3000", nil)
+	log.Fatal(http.ListenAndServe("localhost:3000", nil))
 }
