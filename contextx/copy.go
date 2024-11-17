@@ -4,6 +4,7 @@ package contextx
 //spellchecker:words context time
 import (
 	"context"
+	"errors"
 	"io"
 	"time"
 )
@@ -22,32 +23,43 @@ func Copy(ctx context.Context, dst io.Writer, src io.Reader) (written int64, err
 		start()
 		return io.Copy(dst, src)
 	}, func() {
-		CancelRead(src)
-		CancelWrite(dst)
+		// ignore any errors trying to cancel
+		_ = CancelRead(src)
+		_ = CancelWrite(dst)
 	})
 	return written, err
 }
 
 // CancelRead attempts to cancel any in-progress and future reads on the given reader.
 // In particular, this function sets the read deadline to the current time and closes the reader.
-func CancelRead(reader io.Reader) {
+func CancelRead(reader io.Reader) error {
+	var errDeadline error
+	var errCloser error
+
 	if srd, ok := reader.(interface{ SetReadDeadline(time.Time) error }); ok {
-		_ = srd.SetReadDeadline(time.Now())
+		errDeadline = srd.SetReadDeadline(time.Now())
 	}
 
 	if closer, ok := reader.(io.Closer); ok {
-		closer.Close()
+		errCloser = closer.Close()
 	}
+
+	return errors.Join(errDeadline, errCloser)
 }
 
 // CancelWrite attempts to cancel any in-progress and future writes on the given writer.
 // In particular, this function sets the write deadline to the current time and closes the writer.
-func CancelWrite(writer io.Writer) {
+func CancelWrite(writer io.Writer) error {
+	var errDeadline error
+	var errCloser error
+
 	if swd, ok := writer.(interface{ SetWriteDeadline(time.Time) error }); ok {
-		_ = swd.SetWriteDeadline(time.Now())
+		errDeadline = swd.SetWriteDeadline(time.Now())
 	}
 
 	if closer, ok := writer.(io.Closer); ok {
-		closer.Close()
+		errCloser = closer.Close()
 	}
+
+	return errors.Join(errDeadline, errCloser)
 }
