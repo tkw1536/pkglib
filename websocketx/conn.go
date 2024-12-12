@@ -20,7 +20,7 @@ func (handler Handler) accept(r *http.Request, conn *websocket.Conn, opt Options
 	context, cancel := context.WithCancelCause(context.Background())
 
 	return &Connection{
-		state: CONNECTING,
+		state: stateConnecting,
 
 		r:       r.Clone(r.Context()),
 		conn:    conn,
@@ -35,7 +35,7 @@ func (handler Handler) accept(r *http.Request, conn *websocket.Conn, opt Options
 
 // Connection represents a connection to a single websocket client.
 type Connection struct {
-	state  ConnectionState // connection state
+	state  state // connection state
 	stateM sync.Mutex
 
 	// caller provided settings
@@ -57,15 +57,15 @@ type Connection struct {
 	outgoing chan queuedMessage
 }
 
-// ConnectionState is the state of the connection
-type ConnectionState int
+// state is the state of the connection
+type state int32
 
 // Different connection states
 const (
-	CONNECTING ConnectionState = iota
-	OPEN
-	CLOSING
-	CLOSED
+	stateConnecting state = iota
+	stateOpen
+	stateClosing
+	stateClosed
 )
 
 // serve starts serving data on the given connection.
@@ -76,10 +76,10 @@ func (conn *Connection) serve() {
 	// and check that we are in the closed state
 	{
 		conn.stateM.Lock()
-		if conn.state != CONNECTING {
+		if conn.state != stateConnecting {
 			panic("Connection.serve: Called more than once")
 		}
-		conn.state = OPEN
+		conn.state = stateOpen
 		conn.stateM.Unlock()
 	}
 

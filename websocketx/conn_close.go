@@ -39,7 +39,7 @@ func (conn *Connection) close(cause CloseCause, frame *CloseFrame, force bool) {
 
 	// if we are already closed, don't bother sending another frame back.
 	// because we are closed!
-	if conn.state == CLOSED {
+	if conn.state == stateClosed {
 		return
 	}
 
@@ -63,7 +63,7 @@ func (conn *Connection) close(cause CloseCause, frame *CloseFrame, force bool) {
 	}
 
 	// now in closing state
-	conn.state = CLOSING
+	conn.state = stateClosing
 }
 
 // forceClose kills the underlying network connection.
@@ -99,7 +99,7 @@ func (conn *Connection) forceClose(err error) error {
 	errs[2] = conn.conn.SetWriteDeadline(now)
 
 	// we're now in closed state
-	conn.state = CLOSED
+	conn.state = stateClosed
 
 	return errors.Join(errs...)
 }
