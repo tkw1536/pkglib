@@ -10,8 +10,8 @@ require (
 	github.com/gosuri/uilive v0.0.4
 	github.com/tdewolff/minify v2.3.6+incompatible
 	go.uber.org/goleak v1.3.0
-	golang.org/x/crypto v0.29.0
-	golang.org/x/term v0.26.0
+	golang.org/x/crypto v0.36.0
+	golang.org/x/term v0.30.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -21,5 +21,5 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/tdewolff/parse v2.3.4+incompatible // indirect
 	github.com/tdewolff/test v1.0.7 // indirect
-	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 )
