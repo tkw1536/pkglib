@@ -5,23 +5,21 @@ import (
 	"fmt"
 )
 
-func ExampleIterateSorted() {
+func ExampleIterSorted() {
 	m := map[int]string{
 		0: "hello",
 		1: "world",
 	}
 
-	IterateSorted(m, func(k int, v string) bool {
+	for k, v := range IterSorted(m) {
 		fmt.Printf("%d: %v\n", k, v)
-		return true
-	})
+	}
 
 	// Output: 0: hello
 	// 1: world
 }
 
-// Demonstrates how to stop an iteration early.
-func ExampleIterateSorted_early() {
+func ExampleIterateSorted() {
 	m := map[int]string{
 		0: "hello",
 		1: "world",
@@ -32,6 +30,7 @@ func ExampleIterateSorted_early() {
 
 	IterateSorted(m, func(k int, v string) bool {
 		fmt.Printf("%d: %v\n", k, v)
+
 		// We return false to stop the iteration.
 		// Here this happens at k = 1.
 		return k < 1

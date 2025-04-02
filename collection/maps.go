@@ -4,26 +4,39 @@ package collection
 //spellchecker:words maps slices
 import (
 	"cmp"
+	"iter"
 	"maps"
 	"slices"
 )
 
+// IterSorted returns an iterator that iterates over the map in ascending order of keys.
+func IterSorted[K cmp.Ordered, V any](M map[K]V) iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		// get the keys of the map and sort them
+		keys := make([]K, 0, len(M))
+		for k := range M {
+			keys = append(keys, k)
+		}
+		slices.Sort(keys)
+
+		// and do the iteration
+		for _, key := range keys {
+			if !yield(key, M[key]) {
+				return
+			}
+		}
+		return
+	}
+}
+
 // IterateSorted iterates over the map, calling f for each element.
-// Iteration is performed in ascending order of the keys.
-//
 // If f returns false, iteration is stopped early.
 // IterateSorted returns false if the iteration was stopped early, and true otherwise.
+//
+// Deprecated: Use [IterSorted] instead.
 func IterateSorted[K cmp.Ordered, V any](M map[K]V, f func(k K, v V) bool) bool {
-	// get the keys of the map and sort them
-	keys := make([]K, 0, len(M))
-	for k := range M {
-		keys = append(keys, k)
-	}
-	slices.Sort(keys)
-
-	// and do the iteration
-	for _, key := range keys {
-		if !f(key, M[key]) {
+	for key, value := range IterSorted(M) {
+		if !f(key, value) {
 			return false
 		}
 	}
