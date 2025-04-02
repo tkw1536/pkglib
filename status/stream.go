@@ -43,10 +43,18 @@ func WriterGroup[T any](writer io.Writer, count int, handler func(value T, outpu
 	// then just iterate over the items
 	if !isParallel {
 		for index, item := range items {
-			fmt.Fprintln(writer, group.PrefixString(item, index))
-			err := handler(item, writer)
-			if err != nil {
-				return err
+			{
+				_, err := fmt.Fprintln(writer, group.PrefixString(item, index))
+				if err != nil {
+					return err
+				}
+			}
+
+			{
+				err := handler(item, writer)
+				if err != nil {
+					return err
+				}
 			}
 		}
 

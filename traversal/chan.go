@@ -13,13 +13,15 @@ func AsChannel[T any](it Iterator[T], ctx context.Context) <-chan T {
 	out := make(chan T)
 	go func(out chan<- T) {
 		defer close(out)
-		defer it.Close()
+		defer func() {
+			_ = it.Close() // ignore any error during close
+		}()
 
 		for it.Next() {
 			select {
 			case out <- it.Datum():
 			case <-ctx.Done():
-				_ = it.Close() // ignore any error during close
+				return
 			}
 		}
 	}(out)

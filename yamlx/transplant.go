@@ -12,9 +12,14 @@ import "gopkg.in/yaml.v3"
 //	Find(donor, path...)
 //
 // does not return an error should also not return an error in node.
-func Transplant(node, donor *yaml.Node, SkipMissing bool) error {
+func Transplant(node, donor *yaml.Node, SkipMissing bool) (err error) {
 	it := Iterate(donor)
-	defer it.Close()
+	defer func() {
+		errClose := it.Close()
+		if err != nil {
+			err = errClose
+		}
+	}()
 
 	for it.Next() {
 		path := it.Datum()

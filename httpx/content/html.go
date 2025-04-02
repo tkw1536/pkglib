@@ -19,14 +19,14 @@ import (
 // The response is automatically minified.
 //
 // If err is not nil, an error response is rendered instead, see [httpx.HTMLInterceptor].
-func WriteHTML[C any](context C, err error, template *template.Template, w http.ResponseWriter, r *http.Request) error {
-	return WriteHTMLI(context, err, template, httpx.HTMLInterceptor, w, r)
+func WriteHTML[C any](context C, e error, template *template.Template, w http.ResponseWriter, r *http.Request) error {
+	return WriteHTMLI(context, e, template, httpx.HTMLInterceptor, w, r)
 }
 
 // WriteHTMLI is like [WriteHTML], but uses a custom error interceptor.
-func WriteHTMLI[C any](context C, err error, template *template.Template, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) error {
+func WriteHTMLI[C any](context C, e error, template *template.Template, interceptor httpx.ErrInterceptor, w http.ResponseWriter, r *http.Request) (err error) {
 	// intercept any errors
-	if interceptor.Intercept(w, r, err) {
+	if interceptor.Intercept(w, r, e) {
 		return nil
 	}
 
@@ -35,7 +35,12 @@ func WriteHTMLI[C any](context C, err error, template *template.Template, interc
 
 	// minify html!
 	minifier := minify.Minify(httpx.ContentTypeHTML, w)
-	defer minifier.Close()
+	defer func() {
+		errClose := minifier.Close()
+		if err == nil {
+			err = errClose
+		}
+	}()
 
 	// return it to the client
 	// and if there is an error, write it to the client

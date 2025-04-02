@@ -18,12 +18,19 @@ func Create(path string, mode fs.FileMode) (*os.File, error) {
 }
 
 // WriteFile is like [os.WriteFile].
-func WriteFile(path string, data []byte, mode fs.FileMode) error {
-	handle, err := Create(path, mode)
+func WriteFile(path string, data []byte, mode fs.FileMode) (err error) {
+	var handle *os.File
+	handle, err = Create(path, mode)
 	if err != nil {
 		return err
 	}
-	defer handle.Close()
+
+	defer func() {
+		errClose := handle.Close()
+		if err == nil {
+			err = errClose
+		}
+	}()
 
 	if _, err := handle.Write(data); err != nil {
 		return err
@@ -51,8 +58,7 @@ func Touch(path string, perm fs.FileMode) error {
 		if err != nil {
 			return err
 		}
-		defer f.Close()
-		return nil
+		return f.Close()
 	case err != nil:
 		return err
 	default:

@@ -155,7 +155,9 @@ func (group Group[Item, Result]) Use(status *Status, items []Item) ([]Result, []
 			// if the line hasn't yet been setup, create it!
 			if group.WaitString == nil {
 				writers[index] = status.OpenLine(prefixes[index], "")
-				defer writers[index].Close()
+				defer func() {
+					_ = writers[index].Close() // TODO: Do we want to handle the error in a smarter way here?
+				}()
 			}
 
 			// write into the result array

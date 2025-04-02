@@ -20,7 +20,7 @@ var ErrCopySameFile = errors.New("src and dst must be different")
 //
 // When dst and src are the same file, returns [ErrCopySameFile].
 // When ctx is closed, the file is not copied.
-func CopyFile(ctx context.Context, dst, src string) error {
+func CopyFile(ctx context.Context, dst, src string) (err error) {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
@@ -34,7 +34,12 @@ func CopyFile(ctx context.Context, dst, src string) error {
 	if err != nil {
 		return err
 	}
-	defer srcFile.Close()
+	defer func() {
+		errClose := srcFile.Close()
+		if err == nil {
+			err = errClose
+		}
+	}()
 
 	// stat it to get the mode!
 	srcStat, err := srcFile.Stat()
@@ -47,7 +52,12 @@ func CopyFile(ctx context.Context, dst, src string) error {
 	if err != nil {
 		return err
 	}
-	defer dstFile.Close()
+	defer func() {
+		errClose := dstFile.Close()
+		if err == nil {
+			err = errClose
+		}
+	}()
 
 	// and do the copy!
 	_, err = contextx.Copy(ctx, dstFile, srcFile)
