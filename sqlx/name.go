@@ -27,13 +27,13 @@ func IsSafeDatabaseLiteral(value string) bool {
 	letters := []rune(value)
 
 	// the first letter must be a unicode letter, a @, _ or #.
-	if !(unicode.IsLetter(letters[0]) || letters[0] == '@' || letters[0] == '_' || letters[0] == '#') {
+	if !unicode.IsLetter(letters[0]) && letters[0] != '@' && letters[0] != '_' && letters[0] != '#' {
 		return false
 	}
 
 	// each subsequent letter may be a unicode letter, a unicode number, @, _, # or $.
 	for _, l := range letters[1:] {
-		if !(unicode.IsLetter(l) || unicode.IsNumber(l) || l == '@' || l == '_' || l == '-' || l == '#' || l == '$') {
+		if !unicode.IsLetter(l) && !unicode.IsNumber(l) && l != '@' && l != '_' && l != '-' && l != '#' && l != '$' {
 			return false
 		}
 	}
