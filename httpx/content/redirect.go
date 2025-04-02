@@ -11,9 +11,9 @@ import (
 
 // Redirect creates a new [RedirectHandler] based on the given function.
 // The Interceptor will be [httpx.TextInterceptor].
-func Redirect(Handler RedirectFunc) RedirectHandler {
+func Redirect(handler RedirectFunc) RedirectHandler {
 	return RedirectHandler{
-		Handler:     Handler,
+		Handler:     handler,
 		Interceptor: httpx.TextInterceptor,
 	}
 }

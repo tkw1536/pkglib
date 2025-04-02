@@ -77,23 +77,23 @@ func (t rankTyp) LessMethod() func(l, r reflect.Value) bool {
 }
 
 // getRankMethod returns the rank method of the given type (if any)
-func getRankMethod(T reflect.Type) (string, rankTyp, bool) {
+func getRankMethod(typ reflect.Type) (string, rankTyp, bool) {
 	// get the name of the method
-	name := T.Name()
+	name := typ.Name()
 	if name == "" {
 		return "", rankTypeInvalid, false
 	}
 	name = "Rank" + name
 
 	// check that it exists
-	m, ok := T.MethodByName(name)
+	m, ok := typ.MethodByName(name)
 	if !ok {
 		return "", rankTypeInvalid, false
 	}
 
 	// offset for number of parameters if a receiver is included
 	rOffset := 0
-	if T.Kind() != reflect.Interface {
+	if typ.Kind() != reflect.Interface {
 		rOffset = 1
 	}
 
@@ -102,23 +102,23 @@ func getRankMethod(T reflect.Type) (string, rankTyp, bool) {
 		return "", rankTypeInvalid, false
 	}
 
-	// where T is a comparable type
-	var typ rankTyp
+	// where rTyp is a comparable type
+	var rTyp rankTyp
 	switch m.Type.Out(0).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		typ = rankTypeInt
+		rTyp = rankTypeInt
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		typ = rankTypeUint
+		rTyp = rankTypeUint
 	case reflect.Float32, reflect.Float64:
-		typ = rankTypeFloat
+		rTyp = rankTypeFloat
 	case reflect.String:
-		typ = rankTypeString
+		rTyp = rankTypeString
 	default:
 		return "", rankTypeInvalid, false
 	}
 
 	// and return that we did
-	return name, typ, true
+	return name, rTyp, true
 }
 
 var _ sort.Interface = (*sortIf)(nil)

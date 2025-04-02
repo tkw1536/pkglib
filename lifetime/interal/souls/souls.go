@@ -147,38 +147,38 @@ func (eug errUnregisteredComponent) Error() string {
 	return fmt.Sprintf("attempt to export un-registered component: %s", eug.T)
 }
 
-// export exports a component that is assignable to T
-func (r *Souls) export(T reflect.Type) (reflect.Value, error) {
+// export exports a component that is assignable to typ
+func (r *Souls) export(typ reflect.Type) (reflect.Value, error) {
 	// if we already have the component type cached, then return it
-	if c, ok := r.components[T]; ok {
+	if c, ok := r.components[typ]; ok {
 		return c, nil
 	}
 
 	// get the first assignable element
-	c, err := lreflect.FirstAssignableInterfaceElement(r.all, T)
+	c, err := lreflect.FirstAssignableInterfaceElement(r.all, typ)
 	if err != nil {
 		return reflect.Value{}, err
 	}
 
 	// if it is nil, don't do anything with it
 	if c.IsNil() {
-		return reflect.Value{}, errUnregisteredComponent{T: T}
+		return reflect.Value{}, errUnregisteredComponent{T: typ}
 	}
 
 	// store it in the cache and return it
-	r.components[T] = c
+	r.components[typ] = c
 	return c, nil
 }
 
 // exportClass exports all components assignable to interface T
-func (r *Souls) exportClass(T reflect.Type) (reflect.Value, error) {
+func (r *Souls) exportClass(typ reflect.Type) (reflect.Value, error) {
 	// if we already have the class cached, then return a copy
-	if clz, ok := r.classes[T]; ok {
+	if clz, ok := r.classes[typ]; ok {
 		return lreflect.CopySlice(clz), nil
 	}
 
 	// get the class
-	clz, err := lreflect.FilterSliceInterface(r.all, T)
+	clz, err := lreflect.FilterSliceInterface(r.all, typ)
 	if err != nil {
 		return reflect.Value{}, err
 	}
@@ -189,7 +189,7 @@ func (r *Souls) exportClass(T reflect.Type) (reflect.Value, error) {
 	}
 
 	// store it in the cache and return it
-	r.classes[T] = lreflect.CopySlice(clz)
+	r.classes[typ] = lreflect.CopySlice(clz)
 	return clz, nil
 }
 
@@ -210,35 +210,35 @@ func (r *Souls) All(copy bool) (reflect.Value, error) {
 }
 
 // Export exports a specific component.
-func (r *Souls) Export(T reflect.Type) (reflect.Value, error) {
+func (r *Souls) Export(typ reflect.Type) (reflect.Value, error) {
 	// initialize the registry
 	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
 	}
 
 	// ensure that we have a pointer to a struct
-	if ok, err := lreflect.ImplementsAsStructPointer(r.componentT, T); err != nil || !ok {
+	if ok, err := lreflect.ImplementsAsStructPointer(r.componentT, typ); err != nil || !ok {
 		return reflect.Value{}, errNotPointerToStruct
 	}
 
 	// and do the export
-	return r.export(T)
+	return r.export(typ)
 }
 
 // ExportClass exports a specific component class.
-func (r *Souls) ExportClass(T reflect.Type) (reflect.Value, error) {
+func (r *Souls) ExportClass(typ reflect.Type) (reflect.Value, error) {
 	// initialize the registry
 	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
 	}
 
 	// ensure that T is a valid type that can implement a class
-	if T == nil || T.Kind() != reflect.Interface || !T.Implements(r.componentT) {
+	if typ == nil || typ.Kind() != reflect.Interface || !typ.Implements(r.componentT) {
 		return reflect.Value{}, errComponentNotImplemented
 	}
 
 	// and export the class
-	return r.exportClass(T)
+	return r.exportClass(typ)
 }
 
 var errWrongAll = errors.New("wrong type for souls.all")

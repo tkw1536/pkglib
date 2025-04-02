@@ -13,3 +13,4 @@ linters:
     - copyloopvar
     - durationcheck
     - err113
+    - gocritic

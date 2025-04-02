@@ -99,8 +99,8 @@ func (lt *Lifetime[Component, InitParams]) getSouls(params InitParams) *souls.So
 // See [Lifetime] regarding order of the exported slice.
 //
 // Export may be safely called concurrently with other calls retrieving components.
-func (lt *Lifetime[Component, InitParams]) All(Params InitParams) []Component {
-	all, err := lt.getSouls(Params).All(true)
+func (lt *Lifetime[Component, InitParams]) All(params InitParams) []Component {
+	all, err := lt.getSouls(params).All(true)
 	if err != nil {
 		panic(err)
 	}
@@ -117,9 +117,9 @@ func (lt *Lifetime[Component, InitParams]) All(Params InitParams) []Component {
 // ExportSlice may be safely called concurrently with other calls retrieving components.
 func ExportSlice[ConcreteComponentType any, Component any, InitParams any](
 	lt *Lifetime[Component, InitParams],
-	Params InitParams,
+	params InitParams,
 ) []ConcreteComponentType {
-	export, err := lt.getSouls(Params).ExportClass(reflect.TypeFor[ConcreteComponentType]())
+	export, err := lt.getSouls(params).ExportClass(reflect.TypeFor[ConcreteComponentType]())
 	if err != nil {
 		panic(err)
 	}
@@ -134,9 +134,9 @@ func ExportSlice[ConcreteComponentType any, Component any, InitParams any](
 // Export may be safely called concurrently with other calls retrieving components.
 func Export[ConcreteComponentType any, Component any, InitParams any](
 	lt *Lifetime[Component, InitParams],
-	Params InitParams,
+	params InitParams,
 ) ConcreteComponentType {
-	export, err := lt.getSouls(Params).Export(reflect.TypeFor[ConcreteComponentType]())
+	export, err := lt.getSouls(params).Export(reflect.TypeFor[ConcreteComponentType]())
 	if err != nil {
 		panic(err)
 	}

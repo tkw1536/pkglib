@@ -64,43 +64,43 @@ func (str IOStream) EPrintln(args ...interface{}) (n int, err error) {
 
 // NewIOStream creates a new IOStream with the provided readers and writers.
 // If any of them are set to nil, they are set to Null.
-func NewIOStream(Stdout, Stderr io.Writer, Stdin io.Reader) IOStream {
-	if Stdout == nil {
-		Stdout = Null
+func NewIOStream(stdout, stderr io.Writer, stdin io.Reader) IOStream {
+	if stdout == nil {
+		stdout = Null
 	}
-	if Stderr == nil {
-		Stderr = Null
+	if stderr == nil {
+		stderr = Null
 	}
-	if Stdin == nil {
-		Stdin = Null
+	if stdin == nil {
+		stdin = Null
 	}
 	return IOStream{
-		Stdin:  Stdin,
-		Stdout: Stdout,
-		Stderr: Stderr,
+		Stdin:  stdin,
+		Stdout: stdout,
+		Stderr: stderr,
 	}
 }
 
 // NonInteractive creates a new non-interactive writer from a single output stream.
 //
-// It is roughly equivalent to NewIOStream(Writer, Writer, nil, 0)
-func NonInteractive(Writer io.Writer) IOStream {
-	return NewIOStream(Writer, Writer, nil).NonInteractive()
+// It is roughly equivalent to NewIOStream(w, w, nil)
+func NonInteractive(w io.Writer) IOStream {
+	return NewIOStream(w, w, nil).NonInteractive()
 }
 
 // Streams creates a new IOStream with the provided streams.
 // If any parameter is the zero value, copies the values from str.
-func (str IOStream) Streams(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
-	if Stdout == nil {
-		Stdout = str.Stdout
+func (str IOStream) Streams(stdout, stderr io.Writer, stdin io.Reader, wrap int) IOStream {
+	if stdout == nil {
+		stdout = str.Stdout
 	}
-	if Stderr == nil {
-		Stderr = str.Stderr
+	if stderr == nil {
+		stderr = str.Stderr
 	}
-	if Stdin == nil {
-		Stdin = str.Stdin
+	if stdin == nil {
+		stdin = str.Stdin
 	}
-	return NewIOStream(Stdout, Stderr, Stdin)
+	return NewIOStream(stdout, stderr, stdin)
 }
 
 // NonInteractive creates a new IOStream with [Null] as standard input.

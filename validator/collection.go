@@ -89,9 +89,9 @@ func (iv IncompatibleValidator) Error() string {
 	return fmt.Sprintf("validator %q: got type %s, expected type %s", iv.Validator, iv.GotType, iv.ExpectedType)
 }
 
-// Call calls the validator with the given name, on the given value, and with the provided default.
+// Call calls the validator with the given name, on the given value, and with the provided _default.
 // See documentation of [Validate] for details.
-func (coll Collection) Call(name string, field reflect.Value, Default string) error {
+func (coll Collection) Call(name string, field reflect.Value, _default string) error {
 	validator, ok := coll[name]
 	if !ok {
 		return UnknownValidator(name)
@@ -120,7 +120,7 @@ func (coll Collection) Call(name string, field reflect.Value, Default string) er
 	}
 
 	// call the validator function, and return an error
-	results := vFunc.Call([]reflect.Value{field.Addr(), reflect.ValueOf(Default)})
+	results := vFunc.Call([]reflect.Value{field.Addr(), reflect.ValueOf(_default)})
 
 	// turn the result into an error
 	// NOTE: We can't just .(error) here because that panic()s on err == nil

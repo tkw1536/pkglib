@@ -40,7 +40,7 @@ func parentSegment(value string) string {
 	}
 	parent := path.Dir(value[:len(value)-1])
 	if parent != "/" {
-		parent = parent + "/"
+		parent += "/"
 	}
 	return parent
 }

@@ -6,13 +6,13 @@ import "gopkg.in/yaml.v3"
 
 // Transplant transplants all nodes found inside donor onto node.
 //
-// Unless SkipMissing is true, donor and node should be of the same shape.
+// Unless skipMissing is true, donor and node should be of the same shape.
 // Being of the same shape means every path where
 //
 //	Find(donor, path...)
 //
 // does not return an error should also not return an error in node.
-func Transplant(node, donor *yaml.Node, SkipMissing bool) (err error) {
+func Transplant(node, donor *yaml.Node, skipMissing bool) (err error) {
 	it := Iterate(donor)
 	defer func() {
 		errClose := it.Close()
@@ -29,7 +29,7 @@ func Transplant(node, donor *yaml.Node, SkipMissing bool) (err error) {
 		}
 
 		err := Replace(node, *path.Node, path.Path...)
-		if err != nil && !SkipMissing {
+		if err != nil && !skipMissing {
 			return err
 		}
 	}

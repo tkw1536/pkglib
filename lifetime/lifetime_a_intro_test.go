@@ -62,5 +62,5 @@ func ExampleLifetime_aIntro() {
 	company.SayHello()
 
 	// Output: Hello from the CEO
-	//Hello from the company
+	// Hello from the company
 }

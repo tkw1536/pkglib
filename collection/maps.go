@@ -10,22 +10,21 @@ import (
 )
 
 // IterSorted returns an iterator that iterates over the map in ascending order of keys.
-func IterSorted[K cmp.Ordered, V any](M map[K]V) iter.Seq2[K, V] {
+func IterSorted[K cmp.Ordered, V any](m map[K]V) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		// get the keys of the map and sort them
-		keys := make([]K, 0, len(M))
-		for k := range M {
+		keys := make([]K, 0, len(m))
+		for k := range m {
 			keys = append(keys, k)
 		}
 		slices.Sort(keys)
 
 		// and do the iteration
 		for _, key := range keys {
-			if !yield(key, M[key]) {
+			if !yield(key, m[key]) {
 				return
 			}
 		}
-		return
 	}
 }
 
@@ -34,8 +33,8 @@ func IterSorted[K cmp.Ordered, V any](M map[K]V) iter.Seq2[K, V] {
 // IterateSorted returns false if the iteration was stopped early, and true otherwise.
 //
 // Deprecated: Use [IterSorted] instead.
-func IterateSorted[K cmp.Ordered, V any](M map[K]V, f func(k K, v V) bool) bool {
-	for key, value := range IterSorted(M) {
+func IterateSorted[K cmp.Ordered, V any](m map[K]V, f func(k K, v V) bool) bool {
+	for key, value := range IterSorted(m) {
 		if !f(key, value) {
 			return false
 		}
@@ -43,15 +42,15 @@ func IterateSorted[K cmp.Ordered, V any](M map[K]V, f func(k K, v V) bool) bool 
 	return true
 }
 
-// MapValues creates a new map which has the same keys as M.
+// MapValues creates a new map which has the same keys as m.
 // The values of the map are determined by passing the old key and values into f.
-func MapValues[K comparable, V1, V2 any](M map[K]V1, f func(K, V1) V2) map[K]V2 {
-	if M == nil {
+func MapValues[K comparable, V1, V2 any](m map[K]V1, f func(K, V1) V2) map[K]V2 {
+	if m == nil {
 		return nil
 	}
 
-	M2 := make(map[K]V2, len(M))
-	for k, v := range M {
+	M2 := make(map[K]V2, len(m))
+	for k, v := range m {
 		M2[k] = f(k, v)
 	}
 	return M2

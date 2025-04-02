@@ -81,10 +81,10 @@ func IterateAllFields(typ reflect.Type, f func(field reflect.StructField, index 
 	return false
 }
 
-func iterFields(embeds bool, index []int, T reflect.Type) iter.Seq2[reflect.StructField, []int] {
+func iterFields(embeds bool, index []int, typ reflect.Type) iter.Seq2[reflect.StructField, []int] {
 	return func(yield func(reflect.StructField, []int) bool) {
-		for i := range T.NumField() {
-			field := T.Field(i)
+		for i := range typ.NumField() {
+			field := typ.Field(i)
 			fieldIndex := append(slices.Clone(index), i)
 			if embeds && field.Anonymous && field.Type.Kind() == reflect.Struct {
 				for field, indexes := range iterFields(embeds, fieldIndex, field.Type) {

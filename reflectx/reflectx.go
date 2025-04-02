@@ -45,19 +45,19 @@ func CopyInterface[I any](value I) (ptr I, mutable bool) {
 	return value, false
 }
 
-// NameOf returns the fully qualified name for T.
+// NameOf returns the fully qualified name for typ.
 //
 // A fully qualified name consists of the package path, followed by a ".", followed by the type name.
 // Builtin types have the empty package path.
-// Types that are not named, return the empty string
-func NameOf(T reflect.Type) string {
-	if T == nil {
+// Types that are not named return the empty string.
+func NameOf(typ reflect.Type) string {
+	if typ == nil {
 		return ""
 	}
 
-	name := T.Name()
+	name := typ.Name()
 	if name == "" {
 		return ""
 	}
-	return T.PkgPath() + "." + name
+	return typ.PkgPath() + "." + name
 }

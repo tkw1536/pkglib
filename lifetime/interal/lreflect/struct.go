@@ -8,22 +8,24 @@ import (
 	"reflect"
 )
 
+// spellchecker:words iface
+
 // This file contains any methods directly interacting with methods via reflect.
 
-// ImplementsStructAsPointer checks if T implements I and T is a pointer to a struct.
-// I must be an interface type, T may be any type.
-func ImplementsAsStructPointer(I reflect.Type, T reflect.Type) (bool, error) {
+// ImplementsStructAsPointer checks if sPtr implements iface and sPtr is a pointer to a struct.
+// iface must be an interface type, sPtr may be any type.
+func ImplementsAsStructPointer(iface reflect.Type, sPtr reflect.Type) (bool, error) {
 	{
-		if I == nil {
-			return false, errNilType("I")
+		if iface == nil {
+			return false, errNilType("iface")
 		}
-		if I.Kind() != reflect.Interface {
-			return false, errNoInterface("I")
+		if iface.Kind() != reflect.Interface {
+			return false, errNoInterface("iface")
 		}
-		if T == nil {
-			return false, errNilType("T")
+		if sPtr == nil {
+			return false, errNilType("sPtr")
 		}
 	}
 
-	return T.Implements(I) && T.Kind() == reflect.Pointer && T.Elem().Kind() == reflect.Struct, nil
+	return sPtr.Implements(iface) && sPtr.Kind() == reflect.Pointer && sPtr.Elem().Kind() == reflect.Struct, nil
 }

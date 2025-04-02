@@ -8,13 +8,13 @@ import (
 )
 
 // stat performs stat on path, following links if requested.
-func stat(path string, follow bool) (info fs.FileInfo, IsNotNotExists bool, err error) {
+func stat(path string, follow bool) (info fs.FileInfo, isNotNotExists bool, err error) {
 	if follow {
 		info, err = os.Stat(path)
 	} else {
 		info, err = os.Lstat(path)
 	}
-	IsNotNotExists = err != nil && !errors.Is(err, fs.ErrNotExist)
+	isNotNotExists = err != nil && !errors.Is(err, fs.ErrNotExist)
 	return
 }
 

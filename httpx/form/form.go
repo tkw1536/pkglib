@@ -63,13 +63,13 @@ type Form[Data any] struct {
 }
 
 // HTML renders the values for the given html fields into a html template.
-// IsError indicates if fields with the EmptyOnError flag should be omitted.
-func (form *Form[D]) HTML(values map[string]string, IsError bool) template.HTML {
+// isError indicates if fields with the EmptyOnError flag should be omitted.
+func (form *Form[D]) HTML(values map[string]string, isError bool) template.HTML {
 	var builder strings.Builder
 
 	for _, field := range form.Fields {
 		value := values[field.Name]
-		if IsError && field.EmptyOnError {
+		if isError && field.EmptyOnError {
 			value = ""
 		}
 

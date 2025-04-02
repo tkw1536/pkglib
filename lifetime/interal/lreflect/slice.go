@@ -7,72 +7,74 @@ import (
 	"reflect"
 )
 
-// ImplementsAsSliceInterface checks if T is a slice type with an interface element that implements I.
+//spellchecker:words iface
+
+// ImplementsAsSliceInterface checks if slice is a slice type with an interface element that implements iface.
 // I must be an interface, T may be any type.
-func ImplementsAsSliceInterface(I reflect.Type, T reflect.Type) (bool, error) {
+func ImplementsAsSliceInterface(iface reflect.Type, slice reflect.Type) (bool, error) {
 
 	// check for valid arguments
 	{
-		if T == nil {
+		if slice == nil {
 			return false, errNilType("T")
 		}
-		if I == nil {
-			return false, errNilType("I")
+		if iface == nil {
+			return false, errNilType("iface")
 		}
-		if I.Kind() != reflect.Interface {
-			return false, errNoInterface("I")
+		if iface.Kind() != reflect.Interface {
+			return false, errNoInterface("iface")
 		}
 	}
 
-	return T.Kind() == reflect.Slice && T.Elem().Kind() == reflect.Interface && T.Elem().Implements(I), nil
+	return slice.Kind() == reflect.Slice && slice.Elem().Kind() == reflect.Interface && slice.Elem().Implements(iface), nil
 }
 
-// FilterSliceInterface filters the slice S by all elements which implement the interface I and returns a new slice of I.
+// FilterSliceInterface filters the slice S by all elements which implement the interface iface and returns a new slice of I.
 // slice must be a slice of some type (preferably some interface), I must be an interface.
-func FilterSliceInterface(slice reflect.Value, I reflect.Type) (reflect.Value, error) {
+func FilterSliceInterface(slice reflect.Value, iface reflect.Type) (reflect.Value, error) {
 	// check that we have valid arguments
 	{
 		S := slice.Type()
 		if S.Kind() != reflect.Slice {
 			return reflect.Value{}, errNoSlice("slice.Type()")
 		}
-		if I == nil {
+		if iface == nil {
 			return reflect.Value{}, errNilType("I")
 		}
-		if I.Kind() != reflect.Interface {
+		if iface.Kind() != reflect.Interface {
 			return reflect.Value{}, errNoInterface("I")
 		}
 	}
 
 	// create a new slice
 	len := slice.Len()
-	result := reflect.MakeSlice(reflect.SliceOf(I), 0, len)
+	result := reflect.MakeSlice(reflect.SliceOf(iface), 0, len)
 
 	// iterate over the elements and check if they implement the slice
 	for i := range len {
 		element := slice.Index(i)
-		if element.Elem().Type().Implements(I) {
-			result = reflect.Append(result, element.Elem().Convert(I))
+		if element.Elem().Type().Implements(iface) {
+			result = reflect.Append(result, element.Elem().Convert(iface))
 		}
 	}
 
 	return result, nil
 }
 
-// FirstAssignableElement finds the first element in slice that is assignable V.
-// If no such element exists, returns the zero value of V.
+// FirstAssignableElement finds the first element in slice that is assignable to v.
+// If no such element exists, returns the zero value of v.
 //
 // slice must be a slice of some interface type.
-func FirstAssignableInterfaceElement(slice reflect.Value, V reflect.Type) (reflect.Value, error) {
+func FirstAssignableInterfaceElement(slice reflect.Value, v reflect.Type) (reflect.Value, error) {
 	// check that we have valid arguments
 	{
-		S := slice.Type()
+		s := slice.Type()
 
-		if S.Kind() != reflect.Slice || S.Elem().Kind() != reflect.Interface {
+		if s.Kind() != reflect.Slice || s.Elem().Kind() != reflect.Interface {
 			return reflect.Value{}, errNoInterfaceSlice("slice.Type()")
 		}
 
-		if V == nil {
+		if v == nil {
 			return reflect.Value{}, errNilType("V")
 		}
 	}
@@ -81,13 +83,13 @@ func FirstAssignableInterfaceElement(slice reflect.Value, V reflect.Type) (refle
 	len := slice.Len()
 	for i := range len {
 		element := slice.Index(i).Elem()
-		if element.Type().AssignableTo(V) {
+		if element.Type().AssignableTo(v) {
 			return element, nil
 		}
 	}
 
 	// no element found => return the nil value of V
-	return reflect.New(V).Elem(), nil
+	return reflect.New(v).Elem(), nil
 }
 
 // CopySlice makes a copy of the provided slice.

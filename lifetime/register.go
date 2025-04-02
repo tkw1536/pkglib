@@ -33,7 +33,7 @@ type Registry[Component any, InitParams any] struct {
 //
 // Register may only be called from within a call to [lifetime.Lifetime.Register].
 // Register may be safely called concurrently.
-func Register[Concrete any, Component any, InitParams any](context *Registry[Component, InitParams], Init func(Concrete, InitParams)) {
+func Register[Concrete any, Component any, InitParams any](context *Registry[Component, InitParams], init func(Concrete, InitParams)) {
 	if context == nil {
 		panic("Register: nil context passed (are you inside Lifetime.Register?)")
 	}
@@ -77,8 +77,8 @@ func Register[Concrete any, Component any, InitParams any](context *Registry[Com
 		comp := reflect.New(S).Interface().(Concrete)
 
 		// call the init function (if any)
-		if Init != nil {
-			Init(comp, ip)
+		if init != nil {
+			init(comp, ip)
 		}
 
 		// and return the component
