@@ -92,7 +92,7 @@ func TestServer_subprotocols(t *testing.T) {
 			}, nil)
 
 			// close the connection and wait for the record to be done
-			c.Close()
+			_ = c.Close()
 			<-done
 
 			if gotProto != tt.WantProto {
@@ -176,7 +176,9 @@ func TestServer_RequireProtocols(t *testing.T) {
 				if err != nil {
 					return
 				}
-				defer conn.Close()
+				defer func() {
+					_ = conn.Close()
+				}()
 
 				return
 			}
@@ -185,7 +187,9 @@ func TestServer_RequireProtocols(t *testing.T) {
 			client, _ := wss.Dial(func(d *websocket.Dialer) {
 				d.Subprotocols = tt.ClientProtocols
 			}, nil)
-			defer client.Close()
+			defer func() {
+				_ = client.Close()
+			}()
 
 			// read the next text message
 			tp, p, err := client.ReadMessage()
@@ -260,7 +264,9 @@ func testServer(t *testing.T, initHandler func(server *websocketx.Server) websoc
 
 	// make a connection, but don't send anything
 	client, _ := wss.Dial(nil, nil)
-	defer client.Close()
+	defer func() {
+		_ = client.Close()
+	}()
 
 	// call the client code
 	doClient(client, &server)

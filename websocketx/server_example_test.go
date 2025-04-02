@@ -33,7 +33,9 @@ func ExampleServer_send() {
 
 	// create a new test client
 	client, _ := wss.Dial(nil, nil)
-	defer client.Close()
+	defer func() {
+		_ = client.Close()
+	}()
 
 	// print text messages
 	for {
@@ -73,7 +75,9 @@ func ExampleServer_prepared() {
 	defer wss.Close()
 
 	client, _ := wss.Dial(nil, nil)
-	defer client.Close()
+	defer func() {
+		_ = client.Close()
+	}()
 
 	// print text messages
 	for {
@@ -113,7 +117,9 @@ func ExampleServer_panic() {
 	if err != nil {
 		panic(err)
 	}
-	defer client.Close()
+	defer func() {
+		_ = client.Close()
+	}()
 
 	// print text messages
 	for {
@@ -167,7 +173,9 @@ func ExampleServer_echo() {
 
 	// create a new test client
 	client, _ := wss.Dial(nil, nil)
-	defer client.Close()
+	defer func() {
+		_ = client.Close()
+	}()
 
 	// send a bunch of example messages
 	messageCount := 1000
@@ -201,7 +209,7 @@ func ExampleServer_echo() {
 		}
 	}
 
-	client.Close()
+	_ = client.Close()
 	<-done
 	// Output: Handler() returned
 }

@@ -257,7 +257,7 @@ func TestServer_HandlerShutdown(t *testing.T) {
 						return
 					}
 					if tt.SendFrame.Code == shutdownForceClose {
-						c.Close()
+						_ = c.Close()
 						return
 					}
 
@@ -325,7 +325,7 @@ func TestServer_ClientClose(t *testing.T) {
 				}
 			}, func(client *websocket.Conn, _ *websocketx.Server) {
 				if tt.SendFrame.Code == shutdownForceClose {
-					client.Close()
+					_ = client.Close()
 					return
 				}
 

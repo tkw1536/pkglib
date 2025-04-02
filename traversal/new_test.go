@@ -20,7 +20,9 @@ func ExampleNew() {
 			return
 		}
 	})
-	defer iterator.Close()
+	defer func() {
+		_ = iterator.Close()
+	}()
 
 	for iterator.Next() {
 		fmt.Println(iterator.Datum())
@@ -44,12 +46,14 @@ func ExampleNew_close() {
 
 		panic("never reached")
 	})
-	defer iterator.Close()
+	defer func() {
+		_ = iterator.Close()
+	}()
 
 	// request a single item, then close the iterator!
 	for iterator.Next() {
 		fmt.Println(iterator.Datum())
-		iterator.Close()
+		_ = iterator.Close()
 	}
 
 	fmt.Println(iterator.Err())
@@ -66,7 +70,9 @@ func ExampleNew_error() {
 
 		generator.YieldError(errors.New("something went wrong"))
 	})
-	defer iterator.Close()
+	defer func() {
+		_ = iterator.Close()
+	}()
 
 	for iterator.Next() {
 		fmt.Println(iterator.Datum())

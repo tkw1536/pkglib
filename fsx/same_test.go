@@ -16,7 +16,11 @@ func TestSameFile(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				t.Error(err)
+			}
+		}()
 	}
 
 	symlink := func(old, new string) {

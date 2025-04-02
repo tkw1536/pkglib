@@ -71,7 +71,7 @@ func TestNewServer(t *testing.T) {
 					t.Fatal(err)
 				}
 				_, _ = writer.Write([]byte(msg.Body))
-				writer.Close()
+				_ = writer.Close()
 
 				// receive the message and check it is of the same type
 				typ, reader, err := client.NextReader()

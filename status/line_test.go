@@ -23,7 +23,7 @@ func ExampleLineBuffer() {
 	_, _ = buffer.WriteString(" line 2\n\n line not terminated")
 
 	// close the buffer, calling CloseLine()
-	buffer.Close()
+	_ = buffer.Close()
 
 	// futures writes are no longer calling Line
 	_, _ = buffer.WriteString("another\nline\n")
@@ -52,7 +52,7 @@ func ExampleLineBuffer_FlushLineOnClose() {
 	_, _ = buffer.WriteString(" line 2\n\n line not terminated")
 
 	// close the buffer, calling CloseLine()
-	buffer.Close()
+	_ = buffer.Close()
 
 	// futures writes are no longer calling Line
 	_, _ = buffer.WriteString("another\nline\n")
