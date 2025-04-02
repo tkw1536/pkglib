@@ -4,8 +4,8 @@ package websocketx_test
 //spellchecker:words context errors testing time github gorilla websocket pkglib websocketx uber goleak
 import (
 	"context"
-	"errors"
 	"fmt"
+	"io"
 	"testing"
 	"time"
 
@@ -169,7 +169,7 @@ var shutdownTests = []struct {
 				Code: websocketx.StatusAbnormalClosure,
 			},
 			WasClean: false,
-			Err:      errors.New("unexpected EOF"),
+			Err:      io.ErrUnexpectedEOF,
 		},
 	},
 }
