@@ -70,9 +70,23 @@ type Server struct {
 	Options Options
 }
 
-// RequireProtocols returns a function which enforces that at least one of the
-// given protocols is used by the given request.
-// It is intended to be used with [Server.Check].
+// ErrNoProtocol is returned by [RequireProtocols].
+// It indicates to a client that none of the required subprotocols are supported.
+type ErrNoProtocol struct {
+	Protocols []string
+}
+
+func (err ErrNoProtocol) Error() string {
+	if len(err.Protocols) == 1 {
+		return fmt.Sprintf("client does not support required %s subprotocol", err.Protocols[0])
+	} else {
+		return fmt.Sprintf("client does not support any of the required subprotocols %v", err.Protocols)
+	}
+}
+
+// RequireProtocols returns a function which enforces that at least one of the given protocols is used by the given request.
+// Empty protocols are ignored; if no non-empty protocols are provided, allows every protocol.
+// It is intended to be used with [Server.Check], and returns an error wrapping.
 func RequireProtocols(protocols ...string) func(*http.Request) error {
 	// create a protocol set
 	protocol_set := make(map[string]struct{}, len(protocols))
@@ -98,12 +112,7 @@ func RequireProtocols(protocols ...string) func(*http.Request) error {
 
 	// generate an error message to return
 	// in case a subprotocol is not supported
-	var errMissingProto error
-	if len(protocol_set) == 1 {
-		errMissingProto = fmt.Errorf("client does not support required %s subprotocol", the_protocols[0])
-	} else {
-		errMissingProto = fmt.Errorf("client does not support any of the required subprotocols %v", the_protocols)
-	}
+	errNoSupportedProtocol := ErrNoProtocol{Protocols: the_protocols}
 
 	// check the actual request
 	return func(r *http.Request) error {
@@ -112,7 +121,7 @@ func RequireProtocols(protocols ...string) func(*http.Request) error {
 				return nil
 			}
 		}
-		return errMissingProto
+		return errNoSupportedProtocol
 	}
 }
 
