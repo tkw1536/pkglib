@@ -12,7 +12,7 @@ import (
 
 func TestSameFile(t *testing.T) {
 	touch := func(path string) {
-		f, err := os.Create(path)
+		f, err := os.Create(path) // #nosec: G304 explicitly included in test
 		if err != nil {
 			panic(err)
 		}
@@ -79,3 +79,5 @@ func TestSameFile(t *testing.T) {
 		})
 	}
 }
+
+// spellchecker:words nosec
