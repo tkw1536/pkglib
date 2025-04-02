@@ -5,3 +5,6 @@ linters:
     - govet
     - staticcheck
     - gosec
+    - bidichk
+    - bodyclose
+    - canonicalheader
