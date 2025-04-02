@@ -5,6 +5,7 @@ package status
 
 //spellchecker:words maps sync atomic time github gosuri uilive pkglib nobufio noop stream
 import (
+	"errors"
 	"fmt"
 	"io"
 	"maps"
@@ -177,34 +178,40 @@ const minFlushDelay = 50 * time.Millisecond
 // flush flushes the output of this Status to the underlying writer.
 // see [flushCompat] and [flushNormal]
 func (st *Status) flush(force bool, changed uint64) error {
-	st.flushLogs(changed)
+	lErr := st.flushLogs(changed)
+
+	var rErr error
 	if st.compat {
-		st.flushCompat(changed)
-		return nil
+		rErr = st.flushCompat(changed)
+	} else {
+		rErr = st.flushNormal(force)
 	}
-	return st.flushNormal(force)
+
+	return errors.Join(lErr, rErr)
 }
 
 // flushCompat flushes the provided updated message, if it is valid.
-func (st *Status) flushCompat(changed uint64) {
+func (st *Status) flushCompat(changed uint64) error {
 	line, ok := st.messages[changed]
 	if !ok {
-		return
+		return nil
 	}
-	fmt.Fprintln(st.w.Out, line)
+	_, err := fmt.Fprintln(st.w.Out, line)
+	return err
 }
 
 // flushLogs flushes to the given log file
-func (st *Status) flushLogs(changed uint64) {
+func (st *Status) flushLogs(changed uint64) error {
 	line, ok := st.messages[changed]
 	if !ok {
-		return
+		return nil
 	}
 	logger, ok := st.logWriters[changed]
 	if !ok {
-		return
+		return nil
 	}
-	fmt.Fprintln(logger, line)
+	_, err := fmt.Fprintln(logger, line)
+	return err
 }
 
 // flushNormal implements flushing in normal mode.
@@ -226,7 +233,7 @@ func (st *Status) flushNormal(force bool) error {
 			line = st.w.Newline()
 		}
 
-		fmt.Fprintln(line, st.messages[key])
+		_, _ = fmt.Fprintln(line, st.messages[key]) // ignore because error is always nil
 	}
 
 	// flush the output
@@ -520,7 +527,7 @@ func (st *Status) listen() {
 			delete(st.idsI, msg.id)
 
 			// flush out the current message!
-			fmt.Fprintln(st.w.Bypass(), st.messages[msg.id])
+			_, _ = fmt.Fprintln(st.w.Bypass(), st.messages[msg.id]) // ignore errors
 			delete(st.messages, msg.id)
 
 			// and flush all the other lines
