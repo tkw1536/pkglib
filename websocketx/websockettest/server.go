@@ -48,7 +48,12 @@ func NewHandler(handler func(conn *websocket.Conn)) http.Handler {
 		if err != nil {
 			return
 		}
-		defer conn.Close()
+		defer func() {
+			errClose := conn.Close()
+			if errClose != nil {
+				panic(fmt.Errorf("error closing websocket connection: %w", errClose))
+			}
+		}()
 
 		// handle it!
 		handler(conn)
