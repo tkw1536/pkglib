@@ -5,8 +5,8 @@ package traversal
 
 //spellchecker:words context runtime
 import (
-	"context"
 	"runtime"
+	"sync"
 )
 
 // Iterator represents an object that can be iterated over.
@@ -72,8 +72,8 @@ type Generator[T any] interface {
 // impl implements both [Iterator] and [Generator]
 // Values should be created using newImpl
 type impl[T any] struct {
-	context context.Context
-	cancel  context.CancelFunc
+	done   <-chan struct{}
+	cancel func()
 
 	messages chan message[T]
 	returned bool
@@ -83,13 +83,15 @@ type impl[T any] struct {
 }
 
 func newImpl[T any]() *impl[T] {
-	context, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	cancel := sync.OnceFunc(func() { close(done) })
+
 	obj := &impl[T]{
-		context:  context,
+		done:     done,
 		cancel:   cancel,
 		messages: make(chan message[T]),
 	}
-	runtime.SetFinalizer(obj, (*impl[T]).Close)
+	runtime.AddCleanup(obj, func(f func()) { f() }, cancel)
 	return obj
 }
 
@@ -100,7 +102,7 @@ type message[T any] struct {
 
 func (it *impl[T]) Next() (ok bool) {
 	select {
-	case <-it.context.Done():
+	case <-it.done:
 		return false
 	case message, mok := <-it.messages:
 		if !mok {
@@ -124,7 +126,6 @@ func (it *impl[T]) Datum() T {
 
 // Close closes the iterator
 func (it *impl[T]) Close() error {
-	runtime.SetFinalizer(it, nil) // no more need to finalize!
 	it.cancel()
 	return nil
 }
@@ -158,7 +159,7 @@ func (it *impl[T]) send(message message[T]) (ok bool) {
 	select {
 	case it.messages <- message:
 		return true
-	case <-it.context.Done():
+	case <-it.done:
 		return false
 	}
 }
