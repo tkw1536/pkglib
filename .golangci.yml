@@ -10,4 +10,4 @@ linters:
     - canonicalheader
     - containedctx
     - contextcheck
-    
+    - copyloopvar

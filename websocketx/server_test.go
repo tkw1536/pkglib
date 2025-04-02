@@ -360,7 +360,6 @@ func TestServer_concurrent(t *testing.T) {
 			// write all the ints
 			wg.Add(concurrency)
 			for i := range concurrency {
-				i := i
 				go func() {
 					defer wg.Done()
 					if err := c.WriteText(strconv.Itoa(i)); err != nil {

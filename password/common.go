@@ -44,7 +44,6 @@ func NewSources(fsys fs.FS, pattern string) ([]PasswordSource, error) {
 
 	sources := make([]PasswordSource, len(matches))
 	for i, match := range matches {
-		match := match // this is needed because variable scoping
 		sources[i] = NewPasswordSource(func() (io.Reader, error) { return fsys.Open(match) }, match)
 	}
 
