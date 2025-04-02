@@ -4,12 +4,13 @@ package traversal_test
 //spellchecker:words github pkglib traversal
 import (
 	"fmt"
+	"iter"
 
 	"github.com/tkw1536/pkglib/traversal"
 )
 
 func ExampleSequence() {
-	seq := traversal.RangeFunc[int](func(yield func(int) bool) {
+	seq := iter.Seq[int](func(yield func(int) bool) {
 		if !yield(42) {
 			return
 		}
