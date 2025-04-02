@@ -49,8 +49,8 @@ type Connection struct {
 	handlerDone chan struct{}  // once the handler has returned
 
 	// context that is open as long as user read/writes are permitted
-	context context.Context
-	cancel  context.CancelCauseFunc
+	context context.Context         //nolint:containedctx
+	cancel  context.CancelCauseFunc //nolint:containedctx
 
 	// incoming and outgoing messages
 	incoming chan Message

@@ -21,6 +21,7 @@ type Server struct {
 	m        sync.Mutex // protects modifying context below
 	initDone bool       // true once we have initialized the server
 
+	//nolint:containedctx
 	context context.Context         // closed upon closing / shutting down server
 	cancel  context.CancelCauseFunc // used to cancel the server
 	conns   sync.WaitGroup          // holds 2 for every active connection

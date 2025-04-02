@@ -8,3 +8,4 @@ linters:
     - bidichk
     - bodyclose
     - canonicalheader
+    - containedctx

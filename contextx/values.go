@@ -28,6 +28,7 @@ func WithValuesOf(parent, values context.Context) context.Context {
 	}
 }
 
+//nolint:containedctx
 type valuesOf struct {
 	context.Context
 	values context.Context
