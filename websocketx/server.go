@@ -239,13 +239,13 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 			// server shutting down =>
 			// just wait for it to finish
-			if cause == errServerShutdown {
+			if errors.Is(cause, errServerShutdown) {
 				return
 			}
 
 			// server is closing =>
 			// close the connection
-			if cause == errServerClose {
+			if errors.Is(cause, errServerClose) {
 				_ = conn.Close() // try our best to close the connection, and ignore errors
 				return
 			}

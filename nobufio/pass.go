@@ -14,7 +14,7 @@ import (
 // When reader is not a terminal, behaves like [ReadLine]
 func ReadPassword(reader io.Reader) (value string, err error) {
 	value, err = ReadPasswordStrict(reader)
-	if err == ErrNoTerminal {
+	if errors.Is(err, ErrNoTerminal) {
 		return ReadLine(reader)
 	}
 	return

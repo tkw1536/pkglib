@@ -3,6 +3,7 @@ package websocketx_test
 
 //spellchecker:words strconv sync testing time github gorilla websocket pkglib websocketx websockettest
 import (
+	"errors"
 	"strconv"
 	"sync"
 	"testing"
@@ -169,7 +170,7 @@ func TestServer_RequireProtocols(t *testing.T) {
 			// if we shouldn't connect test that we didn't
 			if tt.WantClientProtocol == "" {
 				conn, _, err := websocket.DefaultDialer.Dial(wss.URL, nil)
-				if err == websocket.ErrBadHandshake {
+				if errors.Is(err, websocket.ErrBadHandshake) {
 					return
 				}
 				t.Error("connection attempt did not get a bad handshake")
