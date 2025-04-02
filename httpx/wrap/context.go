@@ -23,7 +23,7 @@ func Context(handler http.Handler, f ContextFunc) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// compute the context
+		// replace the context provided by user
 		ctx, cancel := f(r)
 
 		// call cancel once the request ends
@@ -33,7 +33,7 @@ func Context(handler http.Handler, f ContextFunc) http.Handler {
 
 		// use the new context
 		if ctx != nil {
-			r = r.WithContext(ctx)
+			r = r.WithContext(ctx) // nolint:contextcheck
 		}
 
 		// do the handling

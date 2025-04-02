@@ -9,3 +9,5 @@ linters:
     - bodyclose
     - canonicalheader
     - containedctx
+    - contextcheck
+    
