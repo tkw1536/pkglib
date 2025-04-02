@@ -11,3 +11,4 @@ linters:
     - containedctx
     - contextcheck
     - copyloopvar
+    - durationcheck
