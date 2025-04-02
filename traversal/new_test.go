@@ -84,6 +84,24 @@ func ExampleNew_error() {
 	// something went wrong
 }
 
+func ExampleNew_error_twice() {
+	iterator := traversal.New(func(generator traversal.Generator[string]) {
+		generator.YieldError(errors.New("first error"))
+		generator.YieldError(errors.New("second error"))
+	})
+	defer func() {
+		_ = iterator.Close()
+	}()
+
+	for iterator.Next() {
+		panic("never reached")
+	}
+
+	fmt.Println(iterator.Err())
+
+	// Output: first error
+}
+
 func ExampleSlice() {
 	iterator := traversal.Slice([]int{1, 2, 3, 4, 5})
 	for iterator.Next() {

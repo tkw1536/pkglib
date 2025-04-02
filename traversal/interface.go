@@ -53,6 +53,7 @@ type Generator[T any] interface {
 
 	// YieldError yields an error to the receiving end.
 	// Calling YieldError(nil) has no effect.
+	// Calling YieldError multiple times with a non-nil error causes subsequent errors to be ignored.
 	//
 	// If the receiving end of this iterator requested cancellation, the return value is false.
 	// Otherwise, if the return value indicates if a non-nil error has been passed.

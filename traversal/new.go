@@ -46,17 +46,20 @@ func Map[Element1, Element2 any](source Iterator[Element1], f func(Element1) Ele
 // If the pipe function returns false, iteration over the original elements stops.
 func Connect[Element1, Element2 any](source Iterator[Element1], f func(element Element1, sender Generator[Element2]) (ok bool)) Iterator[Element2] {
 	return New(func(sender Generator[Element2]) {
-		// close the source
-		defer source.Close()
+		// close the source (and forward any error)
+		defer func() {
+			if sender.Returned() {
+				return
+			}
+			sender.YieldError(source.Close())
+		}()
 
 		// close the sender unless we already have
 		defer func() {
 			if sender.Returned() {
 				return
 			}
-			if err := source.Err(); err != nil {
-				sender.YieldError(err)
-			}
+			sender.YieldError(source.Err())
 		}()
 
 		for source.Next() {
@@ -86,12 +89,16 @@ func Pipe[Element any](dst Generator[Element], src Iterator[Element]) (ok bool) 
 
 // Drain iterates all values in it until no more values are returned.
 // All returned values are stored in a slice which is returned to the caller.
-func Drain[Element any](it Iterator[Element]) ([]Element, error) {
-	defer it.Close()
+func Drain[Element any](it Iterator[Element]) (elements []Element, err error) {
+	defer func() {
+		errClose := it.Close()
+		if err != nil {
+			err = errClose
+		}
+	}()
 
-	var drain []Element
 	for it.Next() {
-		drain = append(drain, it.Datum())
+		elements = append(elements, it.Datum())
 	}
-	return drain, it.Err()
+	return elements, it.Err()
 }
