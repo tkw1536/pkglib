@@ -33,9 +33,6 @@ func FilterSliceInterface(slice reflect.Value, I reflect.Type) (reflect.Value, e
 	// check that we have valid arguments
 	{
 		S := slice.Type()
-		if S == nil {
-			return reflect.Value{}, errNilType("slice.Type()")
-		}
 		if S.Kind() != reflect.Slice {
 			return reflect.Value{}, errNoSlice("slice.Type()")
 		}
@@ -70,9 +67,6 @@ func FirstAssignableInterfaceElement(slice reflect.Value, V reflect.Type) (refle
 	// check that we have valid arguments
 	{
 		S := slice.Type()
-		if S == nil {
-			return reflect.Value{}, errNilType("slice.Type()")
-		}
 
 		if S.Kind() != reflect.Slice || S.Elem().Kind() != reflect.Interface {
 			return reflect.Value{}, errNoInterfaceSlice("slice.Type()")

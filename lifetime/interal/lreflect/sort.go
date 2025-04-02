@@ -23,7 +23,7 @@ func SortSliceByRank(slice reflect.Value) error {
 
 	// check that we have a slice type
 	S := slice.Type()
-	if S == nil || S.Kind() != reflect.Slice {
+	if S.Kind() != reflect.Slice {
 		return errNoSlice("slice")
 	}
 
