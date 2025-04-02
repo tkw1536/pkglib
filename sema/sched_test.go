@@ -38,11 +38,13 @@ func ExampleSchedule_order() {
 	// Output: 0;1;2;3;
 }
 
+var errFirstFunction = errors.New("first function error")
+
 func ExampleSchedule_error() {
 	err := Schedule(func(i uint64) error {
 		// the first invocation produces an error and returns immediately!
 		if i == 0 {
-			return errors.New("first function error")
+			return errFirstFunction
 		}
 
 		// concurrently with the first invocation, we have at most one other
@@ -75,7 +77,7 @@ func ExampleSchedule_force() {
 		// the first function returns an error
 		// but because of force = True, the execution is not aborted
 		if i == 0 {
-			return errors.New("first function error")
+			return errFirstFunction
 		}
 
 		// ... work ...

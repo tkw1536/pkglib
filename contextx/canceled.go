@@ -7,8 +7,10 @@ import (
 	"errors"
 )
 
+var errCanceled = errors.New("contextx.Canceled")
+
 // ErrCanceled is the cancel cause returned by Canceled.
-var ErrCanceled = errors.Join(context.Canceled, errors.New("contextx.Canceled"))
+var ErrCanceled = errors.Join(context.Canceled, errCanceled)
 
 // Canceled returns a non-nil, empty Context.
 // It has no deadline, has no values, and is already canceled.

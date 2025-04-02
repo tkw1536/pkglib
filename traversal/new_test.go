@@ -62,13 +62,15 @@ func ExampleNew_close() {
 	// <nil>
 }
 
+var errSomethingWentWrong = errors.New("something went wrong")
+
 func ExampleNew_error() {
 	iterator := traversal.New(func(generator traversal.Generator[string]) {
 		if !generator.Yield("hello") {
 			return
 		}
 
-		generator.YieldError(errors.New("something went wrong"))
+		generator.YieldError(errSomethingWentWrong)
 	})
 	defer func() {
 		_ = iterator.Close()
@@ -84,10 +86,15 @@ func ExampleNew_error() {
 	// something went wrong
 }
 
+var (
+	errFirst  = errors.New("first error")
+	errSecond = errors.New("second error")
+)
+
 func ExampleNew_error_twice() {
 	iterator := traversal.New(func(generator traversal.Generator[string]) {
-		generator.YieldError(errors.New("first error"))
-		generator.YieldError(errors.New("second error"))
+		generator.YieldError(errFirst)
+		generator.YieldError(errSecond)
 	})
 	defer func() {
 		_ = iterator.Close()

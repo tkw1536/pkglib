@@ -18,11 +18,13 @@ func ExampleEmpty() {
 	// <nil>
 }
 
+var errSomething = errors.New("something")
+
 func ExampleEmpty_error() {
-	thing := traversal.Empty[any](errors.New("some error"))
+	thing := traversal.Empty[any](errSomething)
 	fmt.Println(thing.Next())
 	fmt.Println(thing.Err())
 
 	// Output: false
-	// some error
+	// something
 }

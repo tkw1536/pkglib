@@ -18,6 +18,12 @@ import (
 	"github.com/tkw1536/pkglib/httpx/form/field"
 )
 
+var (
+	errEmptyGivenName  = errors.New("given name must not be empty")
+	errEmptyFamilyName = errors.New("family name must not be empty")
+	errEmptyPassword   = errors.New("password must not be empty")
+)
+
 func ExampleForm() {
 	formTemplate := template.Must(template.New("form").Parse("<!doctype html><title>Form</title>{{ if .Error }}<p>Error: {{ .Error }}</p>{{ end }}{{ .Form }}"))
 	successTemplate := template.Must(template.New("success").Parse("<!doctype html><title>Success</title>Welcome {{ . }}"))
@@ -35,13 +41,13 @@ func ExampleForm() {
 		Validate: func(r *http.Request, values map[string]string) (string, error) {
 			given, family, password := values["givenName"], values["familyName"], values["password"]
 			if given == "" {
-				return "", errors.New("given name must not be empty")
+				return "", errEmptyGivenName
 			}
 			if family == "" {
-				return "", errors.New("family name must not be empty")
+				return "", errEmptyFamilyName
 			}
 			if password == "" {
-				return "", errors.New("no password provided")
+				return "", errEmptyPassword
 			}
 			return family + ", " + given, nil
 		},

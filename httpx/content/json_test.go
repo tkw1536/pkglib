@@ -14,8 +14,10 @@ import (
 
 type BrokenMarshalJSON struct{}
 
+var errBrokenMarshalJSON = errors.New("BrokenMarshalJSON.MarshalJSON error")
+
 func (BrokenMarshalJSON) MarshalJSON() ([]byte, error) {
-	return nil, errors.New("BrokenMarshalJSON.MarshalJSON error")
+	return nil, errBrokenMarshalJSON
 }
 
 func ExampleJSON() {

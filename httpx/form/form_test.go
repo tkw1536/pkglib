@@ -83,6 +83,11 @@ func TestForm_formContext_afterSuccess(t *testing.T) {
 	}
 }
 
+var (
+	errSuccess  = errors.New("<success>")
+	errValidate = errors.New("<validate>")
+)
+
 // testForm makes a form that can pass or fail the validate and success stages
 func makeTestForm(t *testing.T) form.Form[bool] {
 	if t != nil {
@@ -96,7 +101,7 @@ func makeTestForm(t *testing.T) form.Form[bool] {
 
 		Validate: func(r *http.Request, values map[string]string) (bool, error) {
 			if validate := values["validate"]; validate == "" || validate == "false" {
-				return false, errors.New("<validate>")
+				return false, errValidate
 			}
 
 			success := values["success"]
@@ -105,7 +110,7 @@ func makeTestForm(t *testing.T) form.Form[bool] {
 
 		Success: func(data bool, values map[string]string, w http.ResponseWriter, r *http.Request) error {
 			if !data {
-				return errors.New("<success>")
+				return errSuccess
 			}
 			return nil
 		},

@@ -27,12 +27,14 @@ func ExampleWriter() {
 	// 22 <nil>
 }
 
+var errNoWritesLeft = errors.New("no writes left")
+
 // finWrites is a writer that writes to stdout a finite number of times.
 type finWrites int
 
 func (f *finWrites) Write(d []byte) (int, error) {
 	if f == nil || *f <= 0 {
-		return 0, errors.New("no writes left")
+		return 0, errNoWritesLeft
 	}
 	*f--
 	return os.Stdout.Write(d)

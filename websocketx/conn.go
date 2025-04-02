@@ -153,7 +153,7 @@ func (conn *Connection) handle(handler Handler) {
 					Code: StatusInternalErr,
 				},
 				WasClean: true,
-				Err:      fmt.Errorf("%v", value),
+				Err:      fmt.Errorf("%v", value), // nolint:err113
 			}, nil, false)
 		}()
 
@@ -314,7 +314,7 @@ func (conn *Connection) recvMessages() {
 			// intercept any unexpected CloseErrors
 			// this only has an effect if the context has not yet been closed.
 			if ce, ok := err.(*websocket.CloseError); ok {
-				err = fmt.Errorf("%s", ce.Text)
+				err = fmt.Errorf("%s", ce.Text) // nolint:err113
 			}
 			if err != nil {
 				conn.close(CloseCause{

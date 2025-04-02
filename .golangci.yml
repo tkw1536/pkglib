@@ -12,3 +12,4 @@ linters:
     - contextcheck
     - copyloopvar
     - durationcheck
+    - err113

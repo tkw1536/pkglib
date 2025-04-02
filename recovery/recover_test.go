@@ -9,6 +9,8 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
+var errSomething = errors.New("something")
+
 func ExampleSafe() {
 	// a function that doesn't return an error is invoked normally
 	fmt.Println(
@@ -19,7 +21,7 @@ func ExampleSafe() {
 
 	fmt.Println(
 		recovery.Safe(func() (int, error) {
-			return 0, errors.New("some error")
+			return 0, errSomething
 		}),
 	)
 
@@ -31,6 +33,6 @@ func ExampleSafe() {
 		fmt.Printf("%d %#v\n", res, err)
 	}
 	// Output: 42 <nil>
-	// 0 some error
+	// 0 something
 	// 0 recovery.recovered{/* recover() = "test panic" */}
 }

@@ -8,6 +8,11 @@ import (
 	"strconv"
 )
 
+var (
+	errNotPositive = errors.New("not positive")
+	errEmptyString = errors.New("empty string")
+)
+
 // Demonstrates a passing validation.
 func ExampleValidate() {
 	var value struct {
@@ -36,7 +41,7 @@ func ExampleValidate() {
 
 		// check that we are actually positive!
 		if *Value < 0 {
-			return errors.New("not positive")
+			return errNotPositive
 		}
 		return nil
 	})
@@ -50,7 +55,7 @@ func ExampleValidate() {
 
 		// check that it is not empty
 		if *Value == "" {
-			return errors.New("empty string")
+			return errEmptyString
 		}
 		return nil
 	})
@@ -82,7 +87,7 @@ func ExampleValidate_fail() {
 
 		// check that we are actually positive!
 		if *Value < 0 {
-			return errors.New("not positive")
+			return errNotPositive
 		}
 		return nil
 	})
@@ -96,7 +101,7 @@ func ExampleValidate_fail() {
 
 		// check that it is not empty
 		if *Value == "" {
-			return errors.New("empty string")
+			return errEmptyString
 		}
 		return nil
 	})
