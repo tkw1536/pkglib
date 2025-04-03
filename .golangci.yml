@@ -29,4 +29,5 @@ linters:
     - perfsprint
     - prealloc
     - predeclared
+    - reassign
     - staticcheck
