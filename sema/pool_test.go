@@ -11,6 +11,7 @@ import (
 )
 
 func TestPool_Limit(t *testing.T) {
+	t.Parallel()
 
 	for _, tt := range []struct {
 		Name              string

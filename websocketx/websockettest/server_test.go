@@ -11,6 +11,8 @@ import (
 )
 
 func TestNewServer(t *testing.T) {
+	t.Parallel()
+
 	// Create a simple echo server
 	echo := websockettest.NewServer(websockettest.NewHandler(func(conn *websocket.Conn) {
 		for {

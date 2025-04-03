@@ -10,6 +10,8 @@ import (
 )
 
 func TestPassword(t *testing.T) {
+	t.Parallel()
+
 	N := 1000 // number of runs per test case
 
 	tests := []struct {
@@ -35,6 +37,8 @@ func TestPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			for range N {
 				candidate, err := Generate(rand.Reader, tt.length, tt.charset)
 				if err != nil {

@@ -51,6 +51,7 @@ func ExampleJSON() {
 }
 
 func TestJSON_LogJSONEncodeError(t *testing.T) {
+	t.Parallel()
 
 	// create a redirect based on the url
 	handler := content.JSON(func(r *http.Request) (any, error) {
@@ -71,6 +72,7 @@ func TestJSON_LogJSONEncodeError(t *testing.T) {
 		{Path: "/broken", WantCalled: true},
 	} {
 		t.Run(tt.Path, func(t *testing.T) {
+			t.Parallel()
 
 			// setup a LogTemplateError that records if it was called or not
 			called := false

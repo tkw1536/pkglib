@@ -14,7 +14,7 @@ import (
 	"go.uber.org/goleak"
 )
 
-//spellchecker:words nolint errorlint
+//spellchecker:words nolint errorlint paralleltest
 
 // so it is guaranteed that no valid test uses them.
 const (
@@ -176,6 +176,8 @@ var shutdownTests = []struct {
 
 // Tests that calling Shutdown and friends on the server struct
 // actually shuts down the server.
+//
+//nolint:paralleltest
 func TestServer_ServerShutdown(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
@@ -185,8 +187,6 @@ func TestServer_ServerShutdown(t *testing.T) {
 		}
 
 		t.Run(tt.Name, func(t *testing.T) {
-			t.Parallel()
-
 			testServer(t, nil, func(client *websocket.Conn, server *websocketx.Server) {
 				var gotCode int
 				var gotText string
@@ -241,6 +241,8 @@ func TestServer_ServerShutdown(t *testing.T) {
 
 // Tests that calling shutdown from within the handler
 // does the expected thing.
+//
+//nolint:paralleltest
 func TestServer_HandlerShutdown(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
@@ -249,8 +251,6 @@ func TestServer_HandlerShutdown(t *testing.T) {
 			continue
 		}
 		t.Run(tt.Name, func(t *testing.T) {
-			t.Parallel()
-
 			testServer(t, func(server *websocketx.Server) websocketx.Handler {
 				return func(c *websocketx.Connection) {
 					if tt.SendFrame.Code == shutdownDoNothing {
@@ -303,6 +303,8 @@ func TestServer_HandlerShutdown(t *testing.T) {
 }
 
 // Tests that shutting down from the client side does the right thing.
+//
+//nolint:paralleltest
 func TestServer_ClientClose(t *testing.T) {
 	defer goleak.VerifyNone(t)
 
@@ -313,8 +315,6 @@ func TestServer_ClientClose(t *testing.T) {
 		}
 
 		t.Run(tt.Name, func(t *testing.T) {
-			t.Parallel()
-
 			var gotCancelCause error
 			testServer(t, func(server *websocketx.Server) websocketx.Handler {
 				// record the close cause received

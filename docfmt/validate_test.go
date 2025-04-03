@@ -109,8 +109,12 @@ func init() {
 }
 
 func TestValidate(t *testing.T) {
+	t.Parallel()
+
 	for _, tt := range partTests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			gotErr := Validate(tt.input, exception)
 
 			if !reflect.DeepEqual(gotErr, tt.wantError) {
@@ -121,8 +125,12 @@ func TestValidate(t *testing.T) {
 }
 
 func Test_validateWord(t *testing.T) {
+	t.Parallel()
+
 	for _, tt := range wordTests {
 		t.Run(tt.comment, func(t *testing.T) {
+			t.Parallel()
+
 			if got := validateWord(tt.input, map[string]struct{}{exception: {}}); got != tt.want {
 				t.Errorf("validateWord() = %v, want %v", got, tt.want)
 			}

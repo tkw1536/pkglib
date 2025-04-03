@@ -12,6 +12,8 @@ import (
 //spellchecker:words bref
 
 func TestIteratePaths(t *testing.T) {
+	t.Parallel()
+
 	for _, tt := range []struct {
 		Name      string
 		Source    string

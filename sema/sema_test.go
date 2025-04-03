@@ -153,6 +153,8 @@ func ExampleNew_panic() {
 }
 
 func TestNewSemaphore_simple(t *testing.T) {
+	t.Parallel()
+
 	sema := New(2)
 	sema.Lock()
 	sema.Lock()
@@ -166,18 +168,25 @@ func TestNewSemaphore_simple(t *testing.T) {
 }
 
 func TestNewSemaphore_exhausting(t *testing.T) {
+	t.Parallel()
+
 	// this test tests all cases for 1 <= n < 100
 	for n := 1; n <= 100; n++ {
-		s := New(n)
+		t.Run(fmt.Sprint(n), func(t *testing.T) {
+			t.Parallel()
 
-		// fully lock it
-		for range n {
+			s := New(n)
+
+			// fully lock it
+			for range n {
+				s.Lock()
+			}
+
+			// unlock and lock one of them
+			s.Unlock()
 			s.Lock()
-		}
+		})
 
-		// unlock and lock one of them
-		s.Unlock()
-		s.Lock()
 	}
 }
 
@@ -223,11 +232,15 @@ func BenchmarkNewSemaphore_contested(b *testing.B) {
 }
 
 func TestNewSemaphore_TryLock(t *testing.T) {
+	t.Parallel()
+
 	N := 1000
 
 	for limit := range N {
 		limit += 1
 		t.Run(fmt.Sprintf("limit = %d", limit), func(t *testing.T) {
+			t.Parallel()
+
 			sema := New(limit)
 
 			// lock the semaphore limit times!

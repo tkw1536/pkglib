@@ -73,6 +73,8 @@ func ExampleCopyInterface_lift() {
 type TypeForTesting struct{}
 
 func TestNameOf(t *testing.T) {
+	t.Parallel()
+
 	funcForTesting := func() {}
 
 	tests := []struct {
@@ -119,6 +121,8 @@ func TestNameOf(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := NameOf(tt.T); got != tt.want {
 				t.Errorf("NameOf() = %v, want %v", got, tt.want)
 			}

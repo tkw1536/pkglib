@@ -7,6 +7,8 @@ import (
 )
 
 func TestIsSafeDatabaseLiteral(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		want bool
@@ -24,6 +26,8 @@ func TestIsSafeDatabaseLiteral(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := IsSafeDatabaseLiteral(tt.name); got != tt.want {
 				t.Errorf("IsSafeDatabaseLiteral() = %v, want %v", got, tt.want)
 			}
@@ -32,6 +36,8 @@ func TestIsSafeDatabaseLiteral(t *testing.T) {
 }
 
 func TestIsSafeDatabaseSingleQuote(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		want bool
@@ -41,6 +47,8 @@ func TestIsSafeDatabaseSingleQuote(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := IsSafeDatabaseSingleQuote(tt.name); got != tt.want {
 				t.Errorf("IsSafeDatabaseSingleQuote() = %v, want %v", got, tt.want)
 			}

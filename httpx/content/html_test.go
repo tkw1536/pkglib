@@ -68,6 +68,8 @@ func makeRequest(handler http.Handler, path string) string {
 }
 
 func TestHTML_LogJSONEncodeError(t *testing.T) {
+	t.Parallel()
+
 	var handler content.HTMLHandler[any]
 	handler.Interceptor = httpx.HTMLInterceptor
 	handler.Template = template.Must(template.New("example").Parse(`<!DOCTYPE html>Result: {{ .Value }}`))
@@ -90,6 +92,7 @@ func TestHTML_LogJSONEncodeError(t *testing.T) {
 		{Path: "/broken", WantCalled: true},
 	} {
 		t.Run(tt.Path, func(t *testing.T) {
+			t.Parallel()
 
 			// setup a LogTemplateError that records if it was called or not
 			called := false

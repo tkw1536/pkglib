@@ -13,6 +13,8 @@ import (
 //spellchecker:words bref
 
 func TestFind(t *testing.T) {
+	t.Parallel()
+
 	node := mustUnmarshal(t, "a: 0\nb: &bref\n    c: 2\n    d: 3\n    e:\n        f: 5\ng: 6\nh:\n    - 7\n    - 8\ni: *bref\n")
 
 	type args struct {
@@ -93,6 +95,8 @@ func TestFind(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := yamlx.Find(tt.args.node, tt.args.path...)
 			var errStr string
 			if err != nil {
@@ -110,6 +114,8 @@ func TestFind(t *testing.T) {
 }
 
 func TestFind_extends(t *testing.T) {
+	t.Parallel()
+
 	node := mustUnmarshal(t, `
 # some anchor nodes used for testing
 red: &red

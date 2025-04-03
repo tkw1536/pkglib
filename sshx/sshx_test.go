@@ -50,6 +50,7 @@ func init() {
 }
 
 func TestParseKeys(t *testing.T) {
+	t.Parallel()
 
 	type args struct {
 		in    []byte
@@ -89,6 +90,8 @@ func TestParseKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			gotKeys, gotComments, gotOptions, gotRest, err := ParseKeys(tt.args.in, tt.args.limit)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseKeys() error = %v, wantErr %v", err, tt.wantErr)
@@ -111,6 +114,8 @@ func TestParseKeys(t *testing.T) {
 }
 
 func TestParseAllKeys(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		in []byte
 	}
@@ -131,6 +136,8 @@ func TestParseAllKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if gotKeys := ParseAllKeys(tt.args.in); !reflect.DeepEqual(gotKeys, tt.wantKeys) {
 				t.Errorf("ParseAllKeys() = %v, want %v", gotKeys, tt.wantKeys)
 			}

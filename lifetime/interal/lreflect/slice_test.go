@@ -8,6 +8,8 @@ import (
 )
 
 func Test_ImplementsAsSliceInterface(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		I reflect.Type
 		T reflect.Type
@@ -76,6 +78,8 @@ func Test_ImplementsAsSliceInterface(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got, _ := ImplementsAsSliceInterface(tt.args.I, tt.args.T); got != tt.want {
 				t.Errorf("ImplementsAsSliceInterface() = %v, want %v", got, tt.want)
 			}
@@ -84,6 +88,7 @@ func Test_ImplementsAsSliceInterface(t *testing.T) {
 }
 
 func Test_FilterSliceInterface(t *testing.T) {
+	t.Parallel()
 
 	someStruct := func(i int) *SomeStruct {
 		v := SomeStruct{Value: i}
@@ -155,6 +160,8 @@ func Test_FilterSliceInterface(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := FilterSliceInterface(tt.args.S, tt.args.I)
 			var gotActual any
 			if err == nil {

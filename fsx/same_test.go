@@ -11,6 +11,8 @@ import (
 )
 
 func TestSameFile(t *testing.T) {
+	t.Parallel()
+
 	touch := func(path string) {
 		f, err := os.Create(path) // #nosec: G304 explicitly included in test
 		if err != nil {
@@ -77,6 +79,8 @@ func TestSameFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := Same(tt.path1, tt.path2); got != tt.want {
 				t.Errorf("SameFile() = %v, want %v", got, tt.want)
 			}

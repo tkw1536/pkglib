@@ -50,6 +50,7 @@ func ExampleRingBuffer_Push() {
 }
 
 func TestRingBuffer(t *testing.T) {
+	t.Parallel()
 
 	// this function tests everything for the RingBuffer
 	// with the exception of the Push function.
@@ -68,6 +69,8 @@ func TestRingBuffer(t *testing.T) {
 				optimized:  optimized,
 			}
 			t.Run(fmt.Sprintf("iterations: %d bufferSize: %d optimized %t", tt.iterations, tt.bufferSize, tt.optimized), func(t *testing.T) {
+				t.Parallel()
+
 				primary := ringbuffer.MakeRingBuffer[int](tt.bufferSize)
 				for iterationNo := range tt.iterations {
 
@@ -181,6 +184,8 @@ func checkBufferState[T any](t testing.TB, want BufferState[T], buffer *ringbuff
 }
 
 func TestRingBuffer_Push(t *testing.T) {
+	t.Parallel()
+
 	N := 1000
 	buffer := ringbuffer.MakeRingBuffer[int](0)
 

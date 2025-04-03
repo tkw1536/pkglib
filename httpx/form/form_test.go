@@ -14,8 +14,7 @@ import (
 )
 
 func TestForm_logger(t *testing.T) {
-	frm := makeTestForm(t)
-	frm.Template = template.Must(template.New("form").Parse("{{ .ThisIsAnError }}"))
+	t.Parallel()
 
 	for _, tt := range []struct {
 		ShouldValidate bool
@@ -28,6 +27,10 @@ func TestForm_logger(t *testing.T) {
 		{ShouldValidate: false, ShouldSuccess: false, WantCalled: true},
 	} {
 		t.Run(fmt.Sprintf("Validate %t Success %t", tt.ShouldValidate, tt.ShouldSuccess), func(t *testing.T) {
+			t.Parallel()
+
+			frm := makeTestForm(t)
+			frm.Template = template.Must(template.New("form").Parse("{{ .ThisIsAnError }}"))
 
 			// setup a LogTemplateError that records if it was called or not
 			called := false
@@ -45,8 +48,7 @@ func TestForm_logger(t *testing.T) {
 }
 
 func TestForm_formContext_afterSuccess(t *testing.T) {
-	frm := makeTestForm(t)
-	frm.Template = template.Must(template.New("form").Parse("{{ .Form }}"))
+	t.Parallel()
 
 	for _, tt := range []struct {
 		ShouldValidate bool
@@ -61,6 +63,11 @@ func TestForm_formContext_afterSuccess(t *testing.T) {
 		{ShouldValidate: false, ShouldSuccess: false, WantCalled: true, WantAfterSuccess: false},
 	} {
 		t.Run(fmt.Sprintf("Validate %t Success %t", tt.ShouldValidate, tt.ShouldSuccess), func(t *testing.T) {
+			t.Parallel()
+
+			frm := makeTestForm(t)
+			frm.Template = template.Must(template.New("form").Parse("{{ .Form }}"))
+
 			// record if the TemplateContext function is called
 			// and record what AfterSuccess was like
 			called := false

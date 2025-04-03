@@ -48,6 +48,8 @@ func makePaths(t *testing.T) (paths struct {
 }
 
 func TestExists(t *testing.T) {
+	t.Parallel()
+
 	paths := makePaths(t)
 
 	type args struct {
@@ -68,6 +70,8 @@ func TestExists(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := Exists(tt.args.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Exists() error = %v, wantErr %v", err, tt.wantErr)
@@ -81,6 +85,8 @@ func TestExists(t *testing.T) {
 }
 
 func TestIsDirectory(t *testing.T) {
+	t.Parallel()
+
 	paths := makePaths(t)
 
 	type args struct {
@@ -108,6 +114,8 @@ func TestIsDirectory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := IsDirectory(tt.args.path, tt.args.followLinks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsDirectory() error = %v, wantErr %v", err, tt.wantErr)
@@ -121,6 +129,8 @@ func TestIsDirectory(t *testing.T) {
 }
 
 func TestIsRegular(t *testing.T) {
+	t.Parallel()
+
 	paths := makePaths(t)
 	type args struct {
 		path        string
@@ -147,6 +157,8 @@ func TestIsRegular(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := IsRegular(tt.args.path, tt.args.followLinks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsRegular() error = %v, wantErr %v", err, tt.wantErr)
@@ -160,6 +172,8 @@ func TestIsRegular(t *testing.T) {
 }
 
 func TestIsLink(t *testing.T) {
+	t.Parallel()
+
 	paths := makePaths(t)
 
 	type args struct {
@@ -180,6 +194,8 @@ func TestIsLink(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := IsLink(tt.args.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsLink() error = %v, wantErr %v", err, tt.wantErr)

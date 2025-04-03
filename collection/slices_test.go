@@ -61,6 +61,8 @@ func ExampleNonSequential() {
 }
 
 func TestDeduplicate(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		s []string
 	}
@@ -75,6 +77,8 @@ func TestDeduplicate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := Deduplicate(tt.args.s); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("RemoveDuplicates() = %v, want %v", got, tt.want)
 			}
@@ -83,6 +87,8 @@ func TestDeduplicate(t *testing.T) {
 }
 
 func TestKeepFunc(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		s []string
 		f func(string) bool
@@ -98,6 +104,8 @@ func TestKeepFunc(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got := KeepFunc(slices.Clone(tt.args.s), tt.args.f); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("KeepFunc() = %v, want %v", got, tt.want)
 			}

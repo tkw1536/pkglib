@@ -8,6 +8,8 @@ import (
 )
 
 func TestSplitter(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		haystack string
 		chars    string
@@ -31,6 +33,7 @@ func TestSplitter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.haystack, func(t *testing.T) {
+			t.Parallel()
 			if got := Splitter(tt.chars)(tt.haystack); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Splitter() = %v, want %v", got, tt.want)
 			}

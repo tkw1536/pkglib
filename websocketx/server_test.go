@@ -15,6 +15,8 @@ import (
 )
 
 func TestServer_subprotocols(t *testing.T) {
+	t.Parallel()
+
 	for _, tt := range []struct {
 		Name string
 
@@ -105,6 +107,8 @@ func TestServer_subprotocols(t *testing.T) {
 }
 
 func TestServer_RequireProtocols(t *testing.T) {
+	t.Parallel()
+
 	for _, tt := range []struct {
 		Name               string
 		ServerProtocols    []string
@@ -210,6 +214,8 @@ func TestServer_RequireProtocols(t *testing.T) {
 	}
 }
 func TestServer_timeout(t *testing.T) {
+	t.Parallel()
+
 	// expect to read a message before the timeout expires
 	// NOTE: This must be smaller than the server timeout
 	timeout := 500 * time.Millisecond
@@ -285,6 +291,8 @@ func testServer(t *testing.T, initHandler func(server *websocketx.Server) websoc
 // This test may take longer on some older systems and
 // should be skipped in short mode.
 func TestServer_concurrent(t *testing.T) {
+	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("skipping long concurrent test")
 	}
@@ -406,6 +414,8 @@ func TestServer_concurrent(t *testing.T) {
 }
 
 func TestServer_ReadLimit(t *testing.T) {
+	t.Parallel()
+
 	const (
 		readLimit       = 10 * 1024
 		biggerThanLimit = readLimit + 10

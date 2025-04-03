@@ -8,6 +8,8 @@ import (
 )
 
 func TestSplitParts(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input     string
 		wantParts []string
@@ -21,6 +23,8 @@ func TestSplitParts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			if gotParts := SplitParts(tt.input); !reflect.DeepEqual(gotParts, tt.wantParts) {
 				t.Errorf("SplitParts() = %#v, want %#v", gotParts, tt.wantParts)
 			}
@@ -29,6 +33,8 @@ func TestSplitParts(t *testing.T) {
 }
 
 func TestSplitWords(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input     string
 		wantWords []string
@@ -43,6 +49,8 @@ func TestSplitWords(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			gotWords, gotSep := SplitWords(tt.input)
 			if !reflect.DeepEqual(gotWords, tt.wantWords) {
 				t.Errorf("SplitWords() gotWords = %#v, want %#v", gotWords, tt.wantWords)

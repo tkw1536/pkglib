@@ -42,6 +42,8 @@ type OtherStruct struct {
 func (OtherStruct) MethodA() {}
 
 func Test_ImplementsAsStructPointer(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		I reflect.Type
 		T reflect.Type
@@ -110,6 +112,8 @@ func Test_ImplementsAsStructPointer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if got, _ := ImplementsAsStructPointer(tt.args.I, tt.args.T); got != tt.want {
 				t.Errorf("ImplementsAsStructPointer() = %v, want %v", got, tt.want)
 			}

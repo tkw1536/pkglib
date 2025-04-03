@@ -10,8 +10,12 @@ import (
 )
 
 func TestAssertValid(t *testing.T) {
+	t.Parallel()
+
 	for _, tt := range partTests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			var wantPanic bool
 			var wantError interface{}
 

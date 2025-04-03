@@ -3,11 +3,14 @@ package text
 
 //spellchecker:words strings testing
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
 
 func TestJoin(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		prefix string
 		elems  []string
@@ -51,30 +54,36 @@ func TestJoin(t *testing.T) {
 		{"xxx", []string{"red", "yellow", "pink", "green", "purple", "orange", "blue"}, ","},
 	}
 	for _, tt := range tests {
-		builder := &strings.Builder{}
+		t.Run(fmt.Sprint(tt), func(t *testing.T) {
+			t.Parallel()
 
-		builder.WriteString(tt.prefix)
-		gotN, gotErr := Join(builder, tt.elems, tt.sep)
-		got := builder.String()
+			var builder strings.Builder
 
-		want := tt.prefix + strings.Join(tt.elems, tt.sep)
-		wantN := len(want) - len(tt.prefix)
+			builder.WriteString(tt.prefix)
+			gotN, gotErr := Join(&builder, tt.elems, tt.sep)
+			got := builder.String()
 
-		if got != want {
-			t.Errorf("Join() = %v, want %v", got, want)
-		}
+			want := tt.prefix + strings.Join(tt.elems, tt.sep)
+			wantN := len(want) - len(tt.prefix)
 
-		if gotN != wantN {
-			t.Errorf("Join() n = %v, want %v", gotN, wantN)
-		}
+			if got != want {
+				t.Errorf("Join() = %v, want %v", got, want)
+			}
 
-		if gotErr != nil {
-			t.Errorf("Join() err = %s, want = nil", gotErr)
-		}
+			if gotN != wantN {
+				t.Errorf("Join() n = %v, want %v", gotN, wantN)
+			}
+
+			if gotErr != nil {
+				t.Errorf("Join() err = %s, want = nil", gotErr)
+			}
+		})
 	}
 }
 
 func TestRepeatJoin(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		prefix string
 		s, sep string
@@ -96,35 +105,41 @@ func TestRepeatJoin(t *testing.T) {
 		{"xx", "abc", ", ", 3},
 	}
 	for _, tt := range tests {
-		builder := &strings.Builder{}
+		t.Run(fmt.Sprint(tt), func(t *testing.T) {
+			t.Parallel()
 
-		builder.WriteString(tt.prefix)
-		gotN, gotErr := RepeatJoin(builder, tt.s, tt.sep, tt.count)
-		got := builder.String()
+			var builder strings.Builder
 
-		var want string
-		if tt.count > 0 {
-			want = tt.prefix + tt.s + strings.Repeat(tt.sep+tt.s, tt.count-1)
-		} else {
-			want = tt.prefix
-		}
-		wantN := len(want) - len(tt.prefix)
+			builder.WriteString(tt.prefix)
+			gotN, gotErr := RepeatJoin(&builder, tt.s, tt.sep, tt.count)
+			got := builder.String()
 
-		if got != want {
-			t.Errorf("RepeatJoin() = %v, want %v", got, want)
-		}
+			var want string
+			if tt.count > 0 {
+				want = tt.prefix + tt.s + strings.Repeat(tt.sep+tt.s, tt.count-1)
+			} else {
+				want = tt.prefix
+			}
+			wantN := len(want) - len(tt.prefix)
 
-		if gotN != wantN {
-			t.Errorf("RepeatJoin() n = %v, want %v", gotN, wantN)
-		}
+			if got != want {
+				t.Errorf("RepeatJoin() = %v, want %v", got, want)
+			}
 
-		if gotErr != nil {
-			t.Errorf("RepeatJoin() err = %s, want = nil", gotErr)
-		}
+			if gotN != wantN {
+				t.Errorf("RepeatJoin() n = %v, want %v", gotN, wantN)
+			}
+
+			if gotErr != nil {
+				t.Errorf("RepeatJoin() err = %s, want = nil", gotErr)
+			}
+		})
 	}
 }
 
 func TestRepeat(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		prefix string
 		s      string
@@ -155,25 +170,29 @@ func TestRepeat(t *testing.T) {
 		{"xxx", "abc ", 3},
 	}
 	for _, tt := range tests {
-		builder := &strings.Builder{}
+		t.Run(fmt.Sprint(tt), func(t *testing.T) {
+			t.Parallel()
 
-		builder.WriteString(tt.prefix)
-		gotN, gotErr := Repeat(builder, tt.s, tt.count)
-		got := builder.String()
+			var builder strings.Builder
 
-		want := tt.prefix + strings.Repeat(tt.s, tt.count)
-		wantN := len(want) - len(tt.prefix)
+			builder.WriteString(tt.prefix)
+			gotN, gotErr := Repeat(&builder, tt.s, tt.count)
+			got := builder.String()
 
-		if got != want {
-			t.Errorf("Repeat() = %v, want %v", got, want)
-		}
+			want := tt.prefix + strings.Repeat(tt.s, tt.count)
+			wantN := len(want) - len(tt.prefix)
 
-		if gotN != wantN {
-			t.Errorf("Repeat() n = %v, want %v", gotN, wantN)
-		}
+			if got != want {
+				t.Errorf("Repeat() = %v, want %v", got, want)
+			}
 
-		if gotErr != nil {
-			t.Errorf("Repeat() err = %s, want = nil", gotErr)
-		}
+			if gotN != wantN {
+				t.Errorf("Repeat() n = %v, want %v", gotN, wantN)
+			}
+
+			if gotErr != nil {
+				t.Errorf("Repeat() err = %s, want = nil", gotErr)
+			}
+		})
 	}
 }

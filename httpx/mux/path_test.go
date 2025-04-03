@@ -8,6 +8,8 @@ import (
 )
 
 func TestNormalizePath(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct{ input, want string }{
 		// Already clean
 		{"", "/"},
@@ -60,6 +62,8 @@ func TestNormalizePath(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			if got := mux.NormalizePath(tt.input); got != tt.want {
 				t.Errorf("NormalizePath() = %v, want %v", got, tt.want)
 			}

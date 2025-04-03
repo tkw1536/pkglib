@@ -12,6 +12,8 @@ import (
 )
 
 func TestSnapshot_BytesString(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Time    time.Time
 		Bytes   int64
@@ -38,6 +40,8 @@ func TestSnapshot_BytesString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			snapshot := perf.Snapshot{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
@@ -51,6 +55,8 @@ func TestSnapshot_BytesString(t *testing.T) {
 }
 
 func TestSnapshot_ObjectsString(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Time    time.Time
 		Bytes   int64
@@ -69,6 +75,8 @@ func TestSnapshot_ObjectsString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			snapshot := perf.Snapshot{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
@@ -82,6 +90,8 @@ func TestSnapshot_ObjectsString(t *testing.T) {
 }
 
 func TestSnapshot_String(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Time    time.Time
 		Bytes   int64
@@ -96,6 +106,8 @@ func TestSnapshot_String(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			snapshot := perf.Snapshot{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
@@ -121,6 +133,8 @@ func ExampleDiff() {
 }
 
 func TestSnapshot_Sub(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Time    time.Time
 		Bytes   int64
@@ -141,6 +155,8 @@ func TestSnapshot_Sub(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			s := perf.Snapshot{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
@@ -154,6 +170,8 @@ func TestSnapshot_Sub(t *testing.T) {
 }
 
 func TestDiff_BytesString(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Time    time.Duration
 		Bytes   int64
@@ -180,6 +198,8 @@ func TestDiff_BytesString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			diff := perf.Diff{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
@@ -193,6 +213,8 @@ func TestDiff_BytesString(t *testing.T) {
 }
 
 func TestDiff_ObjectsString(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Time    time.Duration
 		Bytes   int64
@@ -211,6 +233,8 @@ func TestDiff_ObjectsString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			diff := perf.Diff{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,
@@ -224,6 +248,8 @@ func TestDiff_ObjectsString(t *testing.T) {
 }
 
 func TestDiff_String(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Time    time.Duration
 		Bytes   int64
@@ -238,6 +264,8 @@ func TestDiff_String(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			diff := perf.Diff{
 				Time:    tt.fields.Time,
 				Bytes:   tt.fields.Bytes,

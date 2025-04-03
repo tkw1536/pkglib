@@ -10,6 +10,8 @@ import (
 //spellchecker:words errorlint nolint
 
 func TestNullStream_Read(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		bytes []byte
 	}
@@ -24,6 +26,8 @@ func TestNullStream_Read(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := Null.Read(tt.args.bytes)
 			if (err == io.EOF) != tt.wantEOF { //nolint:errorlint
 				t.Errorf("NullStream.Read() error = %v, wantEOF %v", err, tt.wantEOF)
@@ -37,6 +41,8 @@ func TestNullStream_Read(t *testing.T) {
 }
 
 func TestNullStream_Write(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		bytes []byte
 	}
@@ -51,6 +57,8 @@ func TestNullStream_Write(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := Null.Write(tt.args.bytes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NullStream.Write() error = %v, wantErr %v", err, tt.wantErr)
@@ -64,6 +72,8 @@ func TestNullStream_Write(t *testing.T) {
 }
 
 func TestNullStream_Close(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -72,6 +82,8 @@ func TestNullStream_Close(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			if err := Null.Close(); (err != nil) != tt.wantErr {
 				t.Errorf("NullStream.Close() error = %v, wantErr %v", err, tt.wantErr)
 			}

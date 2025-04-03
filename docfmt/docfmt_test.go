@@ -13,6 +13,8 @@ import "testing"
 //spellchecker:words doccheck
 
 func TestFormat(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input string
 		want  string
@@ -24,6 +26,8 @@ func TestFormat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
+			t.Parallel()
+
 			if got := Format(tt.input); got != tt.want {
 				t.Errorf("Format() = %v, want %v", got, tt.want)
 			}
