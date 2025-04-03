@@ -36,10 +36,10 @@ type Wheel struct {
 	}
 }
 
-func (Wheel) isComponent() {}
+func (*Wheel) isComponent() {}
 
 // Wheel itself is also a special color component.
-func (Wheel) Color() string {
+func (*Wheel) Color() string {
 	return "rainbow"
 }
 

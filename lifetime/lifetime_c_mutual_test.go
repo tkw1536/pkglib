@@ -22,8 +22,8 @@ type Even struct {
 	}
 }
 
-func (Odd) isComponent()  {}
-func (Even) isComponent() {}
+func (*Odd) isComponent()  {}
+func (*Even) isComponent() {}
 
 // Now declare two functions IsOdd and IsEven on their respective components.
 // These make use of each other.

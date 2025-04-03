@@ -82,7 +82,7 @@ type Options struct {
 // attempt to negotiate enabling it.
 //
 // This is enabled when the CompressionLevel is not set to [flate.NoCompression].
-func (opt Options) CompressionEnabled() bool {
+func (opt *Options) CompressionEnabled() bool {
 	return opt.CompressionLevel != flate.NoCompression
 }
 

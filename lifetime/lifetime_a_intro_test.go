@@ -38,8 +38,10 @@ type CEO struct{}
 func (*CEO) isComponent() {}
 
 // SayHello says hello from the CEO.
-// Notice the non-pointer receiver, meaning it will panic when the CEO is nil.
-func (CEO) SayHello() {
+func (ceo *CEO) SayHello() {
+	if ceo == nil {
+		panic("nil CEO can't say hello")
+	}
 	fmt.Println("Hello from the CEO")
 }
 

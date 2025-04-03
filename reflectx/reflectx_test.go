@@ -10,9 +10,11 @@ import (
 	"testing"
 )
 
-//spellchecker:words pkglib
+//spellchecker:words pkglib nolint recvcheck
 
 // counter is used for testing.
+//
+//nolint:recvcheck
 type counter struct {
 	Value int
 }
