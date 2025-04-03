@@ -55,6 +55,7 @@ type rankTyp string
 
 const (
 	rankTypeInvalid rankTyp = ""
+	rankTypeBool    rankTyp = "bool"
 	rankTypeInt     rankTyp = "int"
 	rankTypeUint    rankTyp = "uint"
 	rankTypeFloat   rankTyp = "float"
@@ -64,6 +65,8 @@ const (
 // LessMethod returns a method that compare two reflect values of the given rank method
 func (t rankTyp) LessMethod() func(l, r reflect.Value) bool {
 	switch t {
+	case rankTypeBool:
+		return func(l, r reflect.Value) bool { return !l.Bool() && r.Bool() }
 	case rankTypeInt:
 		return func(l, r reflect.Value) bool { return l.Int() < r.Int() }
 	case rankTypeUint:
@@ -72,6 +75,7 @@ func (t rankTyp) LessMethod() func(l, r reflect.Value) bool {
 		return func(l, r reflect.Value) bool { return l.Float() < r.Float() }
 	case rankTypeString:
 		return func(l, r reflect.Value) bool { return l.Interface().(string) < r.Interface().(string) }
+	case rankTypeInvalid:
 	}
 	return nil
 }
@@ -105,6 +109,8 @@ func getRankMethod(typ reflect.Type) (string, rankTyp, bool) {
 	// where rTyp is a comparable type
 	var rTyp rankTyp
 	switch m.Type.Out(0).Kind() {
+	case reflect.Bool:
+		rTyp = rankTypeBool
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		rTyp = rankTypeInt
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -113,8 +119,10 @@ func getRankMethod(typ reflect.Type) (string, rankTyp, bool) {
 		rTyp = rankTypeFloat
 	case reflect.String:
 		rTyp = rankTypeString
-	default:
+	case reflect.Invalid, reflect.Complex64, reflect.Complex128, reflect.Array, reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice, reflect.Struct, reflect.UnsafePointer:
 		return "", rankTypeInvalid, false
+	default:
+		panic("never reached")
 	}
 
 	// and return that we did

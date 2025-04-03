@@ -16,4 +16,5 @@ linters:
     - errchkjson
     - errname
     - errorlint
+    - exhaustive
     - gocritic
