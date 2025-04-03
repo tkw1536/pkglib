@@ -31,6 +31,7 @@ linters:
     - predeclared
     - reassign
     - recvcheck
+    - staticcheck
     - tagalign
     - testableexamples
     - testpackage
@@ -43,4 +44,3 @@ linters:
     - wastedassign
     - whitespace
     - wrapcheck
-    - staticcheck
