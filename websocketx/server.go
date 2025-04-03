@@ -70,13 +70,13 @@ type Server struct {
 	Options Options
 }
 
-// ErrNoProtocol is returned by [RequireProtocols].
+// NoSupportedProtocolError is returned by [RequireProtocols].
 // It indicates to a client that none of the required subprotocols are supported.
-type ErrNoProtocol struct {
+type NoSupportedProtocolError struct {
 	Protocols []string
 }
 
-func (err ErrNoProtocol) Error() string {
+func (err NoSupportedProtocolError) Error() string {
 	if len(err.Protocols) == 1 {
 		return fmt.Sprintf("client does not support required %s subprotocol", err.Protocols[0])
 	} else {
@@ -112,7 +112,7 @@ func RequireProtocols(protocols ...string) func(*http.Request) error {
 
 	// generate an error message to return
 	// in case a subprotocol is not supported
-	errNoSupportedProtocol := ErrNoProtocol{Protocols: the_protocols}
+	errNoSupportedProtocol := NoSupportedProtocolError{Protocols: the_protocols}
 
 	// check the actual request
 	return func(r *http.Request) error {

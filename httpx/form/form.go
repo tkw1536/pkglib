@@ -190,7 +190,9 @@ func (form *Form[Data]) renderForm(err error, afterSuccess bool, values map[stri
 
 }
 
-// FormContext is passed to [Form.TemplateContext] when used
+// FormContext is passed to [Form.TemplateContext] when used.
+//
+//nolint:errname
 type FormContext struct {
 	// Error is the underlying error (if any)
 	Err error

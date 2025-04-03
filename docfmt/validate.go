@@ -11,6 +11,9 @@ import (
 	"slices"
 )
 
+// ValidationResult represents the result of a validation.
+//
+//nolint:errname
 type ValidationResult struct {
 	PartIndex, WordIndex int
 	Part, Word           string

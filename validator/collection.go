@@ -64,28 +64,28 @@ var (
 	strTyp = reflect.TypeFor[string]()
 )
 
-// UnknownValidator is an error returned from Validate if a validator does not exist
-type UnknownValidator string
+// UnknownValidatorError is an error returned from Validate if a validator does not exist
+type UnknownValidatorError string
 
-func (uv UnknownValidator) Error() string {
+func (uv UnknownValidatorError) Error() string {
 	return fmt.Sprintf("unknown validator %q", string(uv))
 }
 
-// NotAValidator is an error returned from Validate if an entry in the validators map is not a validator
-type NotAValidator string
+// NotAValidatorError is an error returned from Validate if an entry in the validators map is not a validator
+type NotAValidatorError string
 
-func (nv NotAValidator) Error() string {
+func (nv NotAValidatorError) Error() string {
 	return fmt.Sprintf("entry %q in validators is not a validator", string(nv))
 }
 
-// IncompatibleValidator is returned when a validator in the validators map is incompatible
-type IncompatibleValidator struct {
+// IncompatibleValidatorError is returned when a validator in the validators map is incompatible
+type IncompatibleValidatorError struct {
 	Validator    string
 	GotType      reflect.Type
 	ExpectedType reflect.Type
 }
 
-func (iv IncompatibleValidator) Error() string {
+func (iv IncompatibleValidatorError) Error() string {
 	return fmt.Sprintf("validator %q: got type %s, expected type %s", iv.Validator, iv.GotType, iv.ExpectedType)
 }
 
@@ -94,7 +94,7 @@ func (iv IncompatibleValidator) Error() string {
 func (coll Collection) Call(name string, field reflect.Value, _default string) error {
 	validator, ok := coll[name]
 	if !ok {
-		return UnknownValidator(name)
+		return UnknownValidatorError(name)
 	}
 
 	// get the type of the validator
@@ -109,10 +109,10 @@ func (coll Collection) Call(name string, field reflect.Value, _default string) e
 	if validator == nil || vTyp.Kind() != reflect.Func || // func
 		vTyp.NumIn() != 2 || vTyp.In(0).Kind() != reflect.Pointer || vTyp.In(1) != strTyp || // (*F,string)
 		vTyp.NumOut() != 1 || vTyp.Out(0) != errTyp { // error
-		return NotAValidator(name)
+		return NotAValidatorError(name)
 	}
 	if vTyp.In(0).Elem() != field.Type() { // the correct *F
-		return IncompatibleValidator{
+		return IncompatibleValidatorError{
 			Validator:    name,
 			GotType:      vTyp.In(0).Elem(),
 			ExpectedType: field.Type(),

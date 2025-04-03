@@ -28,7 +28,7 @@ const injectFieldName = "inject"
 // newSoul creates a soul for the given concrete component
 func newSoul(component reflect.Type, concrete reflect.Type) (s soul, err error) {
 	if component == nil || concrete == nil || concrete.Kind() != reflect.Pointer || concrete.Elem().Kind() != reflect.Struct {
-		return s, errNewGeneric{Concrete: concrete, Err: errNotPointerToStruct}
+		return s, newGenericError{Concrete: concrete, Err: errNotPointerToStruct}
 	}
 
 	s.Elem = concrete.Elem()
@@ -47,7 +47,7 @@ func newSoul(component reflect.Type, concrete reflect.Type) (s soul, err error) 
 
 	// check that we have a struct field
 	if dependenciesField.Type.Kind() != reflect.Struct {
-		return s, errDatumField{Concrete: concrete, InDependencies: false, Field: dependenciesFieldName, Err: errNotAStruct}
+		return s, datumFieldError{Concrete: concrete, InDependencies: false, Field: dependenciesFieldName, Err: errNotAStruct}
 	}
 
 	// and initialize the type map of the given map
@@ -74,7 +74,7 @@ func (s soul) scanFields(component reflect.Type, structType reflect.Type, inDepe
 			continue
 		}
 		if inDependenciesStruct && field.Tag != "" {
-			return errDatumField{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: errFieldHasTag}
+			return datumFieldError{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: errFieldHasTag}
 		}
 
 		tp := field.Type
@@ -83,7 +83,7 @@ func (s soul) scanFields(component reflect.Type, structType reflect.Type, inDepe
 		{
 			isSingleComponent, err := lreflect.ImplementsAsStructPointer(component, tp)
 			if err != nil {
-				return errDatumField{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: err}
+				return datumFieldError{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: err}
 			}
 			if isSingleComponent {
 				cFields[name] = tp
@@ -94,7 +94,7 @@ func (s soul) scanFields(component reflect.Type, structType reflect.Type, inDepe
 		{
 			isSubtype, err := lreflect.ImplementsAsSliceInterface(component, tp)
 			if err != nil {
-				return errDatumField{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: err}
+				return datumFieldError{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: err}
 			}
 			if isSubtype {
 				iFields[name] = tp.Elem()
@@ -103,33 +103,33 @@ func (s soul) scanFields(component reflect.Type, structType reflect.Type, inDepe
 		}
 
 		if inDependenciesStruct {
-			return errDatumField{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: errNotInjectField}
+			return datumFieldError{Concrete: s.Elem, InDependencies: inDependenciesStruct, Field: field.Name, Err: errNotInjectField}
 		}
 	}
 	return nil
 }
 
-type errNewGeneric struct {
+type newGenericError struct {
 	Concrete reflect.Type
 	Err      error
 }
 
-func (err errNewGeneric) Error() string {
+func (err newGenericError) Error() string {
 	return fmt.Sprintf("New: Type %s: %s", err.Concrete, err.Err)
 }
 
-func (err errNewGeneric) Unwrap() error {
+func (err newGenericError) Unwrap() error {
 	return err.Err
 }
 
-type errDatumField struct {
+type datumFieldError struct {
 	Concrete       reflect.Type
 	InDependencies bool
 	Field          string
 	Err            error
 }
 
-func (err errDatumField) Error() string {
+func (err datumFieldError) Error() string {
 	var fieldPrefix string
 	if err.InDependencies {
 		fieldPrefix = "dependencies "
@@ -137,7 +137,7 @@ func (err errDatumField) Error() string {
 	return fmt.Sprintf("New: Type %s, %sField %s: %s", err.Concrete, fieldPrefix, err.Field, err.Err)
 }
 
-func (err errDatumField) Unwrap() error {
+func (err datumFieldError) Unwrap() error {
 	return err.Err
 }
 

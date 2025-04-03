@@ -17,10 +17,10 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 	// ensure both arguments are valid
 	{
 		if !v.IsValid() {
-			return errInvalidValue("v")
+			return invalidValueError("v")
 		}
 		if !x.IsValid() {
-			return errInvalidValue("x")
+			return invalidValueError("x")
 		}
 	}
 
@@ -28,14 +28,14 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 	xT := x.Type()
 	vT := v.Type()
 	if !xT.AssignableTo(vT) {
-		return errTypeUnassignable{X: xT, V: vT}
+		return typeUnassignableError{X: xT, V: vT}
 	}
 
 	// check if the value was obtained from an unexported field
 	// and "forget" where the value was obtained
 	if !v.CanSet() {
 		if !v.CanAddr() {
-			return errTypeUnaddressable{X: vT}
+			return typeUnaddressableError{X: vT}
 		}
 
 		v = reflect.NewAt(vT, v.Addr().UnsafePointer()).Elem()
@@ -46,25 +46,25 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 	return nil
 }
 
-type errTypeUnassignable struct {
+type typeUnassignableError struct {
 	X, V reflect.Type
 }
 
-func (err errTypeUnassignable) Error() string {
+func (err typeUnassignableError) Error() string {
 	return fmt.Sprintf("value of type %s not assignable to type %s", err.X, err.V)
 }
 
-type errTypeUnaddressable struct {
+type typeUnaddressableError struct {
 	X reflect.Type
 }
 
-func (err errTypeUnaddressable) Error() string {
+func (err typeUnaddressableError) Error() string {
 	return fmt.Sprintf("value of type %s is not addressable", err.X)
 }
 
-// errInvalidValue indicates that an invalid value was passed for the variable with the given name
-type errInvalidValue string
+// invalidValueError indicates that an invalid value was passed for the variable with the given name
+type invalidValueError string
 
-func (err errInvalidValue) Error() string {
+func (err invalidValueError) Error() string {
 	return fmt.Sprintf("%s is not a valid value", string(err))
 }

@@ -215,7 +215,7 @@ func DefaultErrorString[Item any](err error, item Item, index int) string {
 // UseErrorGroup calls group.Use(status, items).
 //
 // It then instructs the group to keep log files and manually deletes the log files of items that returned a nil error.
-// Finally it accumulates all non-nil errors inside of an ErrGroupErrors struct, and returns it.
+// Error will be nil, or of type GroupError.
 //
 // When group.ResultString is nil, uses [DefaultErrorString] instead.
 func UseErrorGroup[Item any](status *Status, group Group[Item, error], items []Item) error {
@@ -226,14 +226,14 @@ func UseErrorGroup[Item any](status *Status, group Group[Item, error], items []I
 	errors, ids := group.Use(status, items)
 	filenames := status.Keep()
 
-	var final ErrGroupErrors
+	var final GroupError
 	for i, err := range errors {
 		file, fileExists := filenames[ids[i]]
 		if err != nil { // non-nil error, keep the file!
-			final = append(final, ErrorGroupError{Err: err, Logfile: file})
+			final = append(final, GroupMemberError{Err: err, Logfile: file})
 		} else if fileExists { // nil error, delete the file!
 			if err := os.Remove(file); err != nil {
-				final = append(final, ErrorGroupError{Err: err, Logfile: file})
+				final = append(final, GroupMemberError{Err: err, Logfile: file})
 			}
 		}
 	}
@@ -256,10 +256,10 @@ func RunErrorGroup[Item any](writer io.Writer, group Group[Item, error], items [
 	return UseErrorGroup(status, group, items)
 }
 
-// ErrGroupErrors represents a set of errors
-type ErrGroupErrors []ErrorGroupError
+// GroupError represents the error of an ErrorGroup
+type GroupError []GroupMemberError
 
-func (errs ErrGroupErrors) Unwrap() []error {
+func (errs GroupError) Unwrap() []error {
 	errors := make([]error, len(errs))
 	for i, err := range errs {
 		errors[i] = err
@@ -267,7 +267,7 @@ func (errs ErrGroupErrors) Unwrap() []error {
 	return errors
 }
 
-func (errs ErrGroupErrors) Error() string {
+func (errs GroupError) Error() string {
 	messages := make([]string, len(errs))
 	for i, err := range errs {
 		messages[i] = err.Error()
@@ -275,16 +275,16 @@ func (errs ErrGroupErrors) Error() string {
 	return strings.Join(messages, "\n")
 }
 
-// ErrorGroupError represents an error of an error group
-type ErrorGroupError struct {
+// GroupMemberError represents the error of a single group member
+type GroupMemberError struct {
 	Err     error  // Err is the error produced
 	Logfile string // Path to the detailed logfile
 }
 
-func (err ErrorGroupError) Unwrap() error {
+func (err GroupMemberError) Unwrap() error {
 	return err.Err
 }
 
-func (err ErrorGroupError) Error() string {
+func (err GroupMemberError) Error() string {
 	return fmt.Sprintf("%s (see logfile at %q details)", err.Err, err.Logfile)
 }

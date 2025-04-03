@@ -13,4 +13,6 @@ linters:
     - copyloopvar
     - durationcheck
     - err113
+    - errchkjson
+    - errname
     - gocritic

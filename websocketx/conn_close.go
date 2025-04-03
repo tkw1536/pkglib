@@ -288,6 +288,8 @@ var statusCodeNames = map[StatusCode]string{
 
 // CloseCause is returned by calling [close.Cause] on the context of a connection.
 // It indicates the reason why the server was closed.
+//
+//nolint:errname
 type CloseCause struct {
 	// CloseFrame is the close frame that cause the closure.
 	// If no close frame was received, contains the [StatusAbnormalClosure] code.

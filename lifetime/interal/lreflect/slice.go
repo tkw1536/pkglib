@@ -16,13 +16,13 @@ func ImplementsAsSliceInterface(iface reflect.Type, slice reflect.Type) (bool, e
 	// check for valid arguments
 	{
 		if slice == nil {
-			return false, errNilType("T")
+			return false, nilTypeError("T")
 		}
 		if iface == nil {
-			return false, errNilType("iface")
+			return false, nilTypeError("iface")
 		}
 		if iface.Kind() != reflect.Interface {
-			return false, errNoInterface("iface")
+			return false, noInterfaceError("iface")
 		}
 	}
 
@@ -36,13 +36,13 @@ func FilterSliceInterface(slice reflect.Value, iface reflect.Type) (reflect.Valu
 	{
 		S := slice.Type()
 		if S.Kind() != reflect.Slice {
-			return reflect.Value{}, errNoSlice("slice.Type()")
+			return reflect.Value{}, noSliceError("slice.Type()")
 		}
 		if iface == nil {
-			return reflect.Value{}, errNilType("I")
+			return reflect.Value{}, nilTypeError("I")
 		}
 		if iface.Kind() != reflect.Interface {
-			return reflect.Value{}, errNoInterface("I")
+			return reflect.Value{}, noInterfaceError("I")
 		}
 	}
 
@@ -71,11 +71,11 @@ func FirstAssignableInterfaceElement(slice reflect.Value, v reflect.Type) (refle
 		s := slice.Type()
 
 		if s.Kind() != reflect.Slice || s.Elem().Kind() != reflect.Interface {
-			return reflect.Value{}, errNoInterfaceSlice("slice.Type()")
+			return reflect.Value{}, noInterfaceSliceError("slice.Type()")
 		}
 
 		if v == nil {
-			return reflect.Value{}, errNilType("V")
+			return reflect.Value{}, nilTypeError("V")
 		}
 	}
 
@@ -110,30 +110,30 @@ func CopySlice(slice reflect.Value) reflect.Value {
 	return copy
 }
 
-// errNoSlice indicates that the type with the provided name is not a slice
-type errNoSlice string
+// noSliceError indicates that the type with the provided name is not a slice
+type noSliceError string
 
-func (err errNoSlice) Error() string {
+func (err noSliceError) Error() string {
 	return fmt.Sprintf("%s must be a slice type", string(err))
 }
 
-// errNilType indicates that the type with the provided name is nil
-type errNilType string
+// nilTypeError indicates that the type with the provided name is nil
+type nilTypeError string
 
-func (err errNilType) Error() string {
+func (err nilTypeError) Error() string {
 	return fmt.Sprintf("%s must not be a nil type", string(err))
 }
 
-// errNoInterface indicates that the type with the provided name is not an interface
-type errNoInterface string
+// noInterfaceError indicates that the type with the provided name is not an interface
+type noInterfaceError string
 
-func (err errNoInterface) Error() string {
+func (err noInterfaceError) Error() string {
 	return fmt.Sprintf("%s must be an interface type", string(err))
 }
 
-// errNoInterfaceSlice indicates that the type with provided name is not a slice of an interface
-type errNoInterfaceSlice string
+// noInterfaceSliceError indicates that the type with provided name is not a slice of an interface
+type noInterfaceSliceError string
 
-func (err errNoInterfaceSlice) Error() string {
+func (err noInterfaceSliceError) Error() string {
 	return fmt.Sprintf("%s must be a slice of some interface type", string(err))
 }

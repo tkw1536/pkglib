@@ -100,7 +100,7 @@ func (r *Souls) initComponent(index int) error {
 	for field, eType := range m.CFields {
 		c, err := r.export(eType)
 		if err != nil {
-			return errInitField{Concrete: concrete.Elem(), InDependencies: false, Field: field, Err: err}
+			return initFieldError{Concrete: concrete.Elem(), InDependencies: false, Field: field, Err: err}
 		}
 
 		field := elem.FieldByName(field)
@@ -109,7 +109,7 @@ func (r *Souls) initComponent(index int) error {
 	for field, eType := range m.DCFields {
 		c, err := r.export(eType)
 		if err != nil {
-			return errInitField{Concrete: concrete.Elem(), InDependencies: true, Field: field, Err: err}
+			return initFieldError{Concrete: concrete.Elem(), InDependencies: true, Field: field, Err: err}
 		}
 
 		field := dElem.FieldByName(field)
@@ -120,7 +120,7 @@ func (r *Souls) initComponent(index int) error {
 	for field, eType := range m.IFields {
 		cs, err := r.exportClass(eType)
 		if err != nil {
-			return errInitField{Concrete: concrete.Elem(), InDependencies: false, Field: field, Err: err}
+			return initFieldError{Concrete: concrete.Elem(), InDependencies: false, Field: field, Err: err}
 		}
 
 		field := elem.FieldByName(field)
@@ -129,7 +129,7 @@ func (r *Souls) initComponent(index int) error {
 	for field, eType := range m.DIFields {
 		cs, err := r.exportClass(eType)
 		if err != nil {
-			return errInitField{Concrete: concrete.Elem(), InDependencies: true, Field: field, Err: err}
+			return initFieldError{Concrete: concrete.Elem(), InDependencies: true, Field: field, Err: err}
 		}
 
 		field := dElem.FieldByName(field)
@@ -139,11 +139,11 @@ func (r *Souls) initComponent(index int) error {
 	return nil
 }
 
-type errUnregisteredComponent struct {
+type unregisteredComponentError struct {
 	T reflect.Type
 }
 
-func (eug errUnregisteredComponent) Error() string {
+func (eug unregisteredComponentError) Error() string {
 	return fmt.Sprintf("attempt to export un-registered component: %s", eug.T)
 }
 
@@ -162,7 +162,7 @@ func (r *Souls) export(typ reflect.Type) (reflect.Value, error) {
 
 	// if it is nil, don't do anything with it
 	if c.IsNil() {
-		return reflect.Value{}, errUnregisteredComponent{T: typ}
+		return reflect.Value{}, unregisteredComponentError{T: typ}
 	}
 
 	// store it in the cache and return it
@@ -243,14 +243,14 @@ func (r *Souls) ExportClass(typ reflect.Type) (reflect.Value, error) {
 
 var errWrongAll = errors.New("wrong type for souls.all")
 
-type errInitField struct {
+type initFieldError struct {
 	Concrete       reflect.Type
 	InDependencies bool
 	Field          string
 	Err            error
 }
 
-func (err errInitField) Error() string {
+func (err initFieldError) Error() string {
 	var fieldPrefix string
 	if err.InDependencies {
 		fieldPrefix = "dependencies "
@@ -258,6 +258,6 @@ func (err errInitField) Error() string {
 	return fmt.Sprintf("Type %s, %sField %s: %s", err.Concrete, fieldPrefix, err.Field, err.Err)
 }
 
-func (err errInitField) Unwrap() error {
+func (err initFieldError) Unwrap() error {
 	return err.Err
 }

@@ -27,7 +27,7 @@ func Find(node *yaml.Node, path ...string) (*yaml.Node, error) {
 		// document node => directly iterate into the children
 	case node.Kind == yaml.DocumentNode:
 		if len(node.Content) == 0 {
-			return nil, ChildNotFound("")
+			return nil, ChildNotFoundError("")
 		}
 
 		errs := make([]error, len(node.Content))
@@ -122,7 +122,7 @@ func Child(node *yaml.Node, name string) (*yaml.Node, error) {
 	}
 
 	// nothing found (not even in the merges)
-	return nil, ChildNotFound(name)
+	return nil, ChildNotFoundError(name)
 }
 
 // resolveAlias resolves an alias recursively.
@@ -151,10 +151,10 @@ var (
 	ErrExpectedMapping    error = findError("expected mapping node")
 )
 
-// ChildNotFound indicates that the given child was not found
-type ChildNotFound string
+// ChildNotFoundError indicates that the given child was not found
+type ChildNotFoundError string
 
-func (cnf ChildNotFound) Error() string {
+func (cnf ChildNotFoundError) Error() string {
 	return fmt.Sprintf("child not found: %q", string(cnf))
 }
 
