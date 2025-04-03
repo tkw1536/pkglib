@@ -10,7 +10,6 @@ import (
 // If both paths exist, they are compared using [os.Same].
 // If both files do not exist, the paths are first compared syntactically and then via recursion on [filepath.Dir].
 func Same(path1, path2 string) bool {
-
 	// if the paths are identical, then we don't need to check anything.
 	// and in particular, we don't need to do any expensive stat calls.
 	if filepath.Clean(path1) == filepath.Clean(path2) {

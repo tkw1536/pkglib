@@ -20,7 +20,6 @@ type ValueContainer struct {
 }
 
 func ExampleHTML() {
-
 	var handler content.HTMLHandler[any]
 	handler.Interceptor = httpx.HTMLInterceptor
 	handler.Template = template.Must(template.New("example").Parse(`<!DOCTYPE html>Result: {{ .Value }}`))
@@ -34,7 +33,6 @@ func ExampleHTML() {
 			return ValueContainer{nil}, httpx.ErrNotFound
 		case "/template_error":
 			return 42, nil
-
 		}
 		panic("other error")
 	}
@@ -79,7 +77,6 @@ func TestHTML_LogJSONEncodeError(t *testing.T) {
 			return ValueContainer{69}, nil
 		case "/broken":
 			return 42, nil
-
 		}
 		panic("other error")
 	}

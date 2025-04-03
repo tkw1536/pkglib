@@ -47,7 +47,6 @@ func (ceo *CEO) SayHello() {
 
 // Introductory example on how to use a lifetime with two components.
 func ExampleLifetime_aIntro() {
-
 	// Create a new lifetime using the Component type
 	lt := &lifetime.Lifetime[Component, struct{}]{
 		// Register must register all components.

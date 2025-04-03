@@ -101,7 +101,6 @@ func TestServer_subprotocols(t *testing.T) {
 			if gotProto != tt.WantProto {
 				t.Errorf("got protocol %q, but wanted %q", gotProto, tt.WantProto)
 			}
-
 		})
 	}
 }
@@ -209,7 +208,6 @@ func TestServer_RequireProtocols(t *testing.T) {
 			if string(p) != "selected protocol: "+tt.WantClientProtocol {
 				t.Errorf("got wrong message from server")
 			}
-
 		})
 	}
 }
@@ -409,7 +407,6 @@ func TestServer_concurrent(t *testing.T) {
 
 		check("client", got_client)
 	})
-
 }
 
 func TestServer_ReadLimit(t *testing.T) {

@@ -48,6 +48,5 @@ func AssertValidArgs(args ...any) {
 		if _, ok := args[0].(error); ok {
 			panic("AssertValidArgs: single error argument provided")
 		}
-
 	}
 }

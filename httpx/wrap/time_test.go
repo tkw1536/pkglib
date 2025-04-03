@@ -14,7 +14,6 @@ import (
 )
 
 func ExampleTime() {
-
 	// delay used during this example
 	var delay = 50 * time.Millisecond
 

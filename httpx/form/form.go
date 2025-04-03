@@ -189,7 +189,6 @@ func (form *Form[Data]) renderForm(err error, afterSuccess bool, values map[stri
 			form.LogTemplateError(r, err)
 		}
 	}
-
 }
 
 // FormContext is passed to [Form.TemplateContext] when used.

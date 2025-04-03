@@ -67,7 +67,6 @@ func ExampleLineBuffer_FlushLineOnClose() {
 }
 
 func BenchmarkLineBuffer(b *testing.B) {
-
 	buffer := status.LineBuffer{
 		Line: func(line string) {
 			/* do nothing */

@@ -13,7 +13,6 @@ import (
 )
 
 func ExampleStopTimer() {
-
 	// create a new timer and stop it
 	t := time.NewTimer(timex.Short)
 	timex.StopTimer(t)
@@ -30,7 +29,6 @@ func ExampleStopTimer() {
 }
 
 func ExampleStopTimer_fired() {
-
 	// create a new timer to fire pretty much immediately
 	t := time.NewTimer(time.Nanosecond)
 

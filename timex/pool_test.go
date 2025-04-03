@@ -10,7 +10,6 @@ import (
 )
 
 func ExampleNewTimer() {
-
 	// take a new timer from the pool
 	// and release it again when done
 	t := timex.NewTimer()

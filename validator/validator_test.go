@@ -71,7 +71,6 @@ func ExampleValidate() {
 
 // Demonstrates a failing validation.
 func ExampleValidate_fail() {
-
 	// Create a validator collection
 	collection := make(validator.Collection, 2)
 
@@ -137,7 +136,6 @@ func ExampleValidate_notAStruct() {
 
 // Demonstrates that non-validators cause an error.
 func ExampleValidate_notAValidator() {
-
 	// create a collection with something that isn't a validator
 	collection := make(validator.Collection, 2)
 	collection["generic"] = "I_AM_NOT_A_VALIDATOR"
@@ -155,7 +153,6 @@ func ExampleValidate_notAValidator() {
 
 // Demonstrates that validator types are checked.
 func ExampleValidate_invalid() {
-
 	// create a collection with a string validator
 	collection := make(validator.Collection, 2)
 	collection["string"] = func(Value *string, Default string) error {

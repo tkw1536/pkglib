@@ -13,7 +13,6 @@ import (
 )
 
 func ExampleMethods() {
-
 	handler := wrap.Methods(
 		// Create a new handler that echoes the appropriate method
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

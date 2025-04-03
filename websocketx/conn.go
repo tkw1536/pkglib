@@ -137,7 +137,6 @@ func (conn *Connection) handle(handler Handler) {
 	go func() {
 		defer close(conn.handlerDone)
 		defer func() {
-
 			// if we didn't panic, just close the connection
 			// with a regular close frame
 			value := recover()
@@ -214,7 +213,6 @@ func (conn *Connection) sendMessages() {
 			}
 		}
 	}()
-
 }
 
 // writeRaw writes an underlying message to the connection.
@@ -277,7 +275,6 @@ func (conn *Connection) write(message queuedMessage) error {
 	go func() {
 		message.done = done
 		select {
-
 		// write an outgoing message
 		case conn.outgoing <- message:
 

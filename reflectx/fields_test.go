@@ -15,7 +15,6 @@ import (
 
 // Iterate over the fields of a struct.
 func ExampleIterFields() {
-
 	type Embed struct {
 		EmbeddedField string // field in an embedded struct
 	}
@@ -40,7 +39,6 @@ func ExampleIterFields() {
 
 // Iterate over the fields of a struct.
 func ExampleIterAllFields() {
-
 	type Embed struct {
 		EmbeddedField string // field in an embedded struct
 	}

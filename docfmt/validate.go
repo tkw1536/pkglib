@@ -124,7 +124,6 @@ partLoop:
 					Kind:      typ,
 				})
 			}
-
 		}
 	}
 	return errors

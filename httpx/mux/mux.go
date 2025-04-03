@@ -75,7 +75,6 @@ func (mux *Mux) Match(r *http.Request) (http.Handler, bool) {
 		// move to the parent segment
 		candidate = parentSegment(candidate)
 	}
-
 }
 
 // ServeHTTP serves requests to this mux.

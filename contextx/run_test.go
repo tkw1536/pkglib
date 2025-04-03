@@ -11,7 +11,6 @@ import (
 )
 
 func ExampleRun() {
-
 	// for this example, we create a "work" function that runs until the cancel function is called.
 	var work func() int
 	var cancel func()

@@ -188,7 +188,6 @@ func TestNewSemaphore_exhausting(t *testing.T) {
 			s.Unlock()
 			s.Lock()
 		})
-
 	}
 }
 

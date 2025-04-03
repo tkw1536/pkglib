@@ -92,9 +92,7 @@ func TestNewServer(t *testing.T) {
 				if got := string(bytes); got != msg.Body {
 					t.Errorf("expected body %q, but got %q", msg.Body, got)
 				}
-
 			}
-
 		})
 	}
 }

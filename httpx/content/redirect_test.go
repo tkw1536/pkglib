@@ -14,7 +14,6 @@ import (
 )
 
 func ExampleRedirect() {
-
 	// create a redirect based on the url
 	handler := content.Redirect(func(r *http.Request) (string, int, error) {
 		switch r.URL.Path {

@@ -15,7 +15,6 @@ import (
 
 // Render an error page in response to a panic.
 func ExampleRenderErrorPage() {
-
 	// response for errors
 	res := httpx.Response{StatusCode: http.StatusNotFound, Body: []byte("not found")}
 
@@ -54,7 +53,6 @@ func ExampleRenderErrorPage() {
 
 // Render an error page in response to a panic.
 func ExampleRenderErrorPage_panic() {
-
 	// response for errors
 	res := httpx.Response{StatusCode: http.StatusInternalServerError, Body: []byte("something went wrong")}
 

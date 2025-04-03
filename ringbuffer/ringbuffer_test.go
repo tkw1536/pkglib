@@ -73,7 +73,6 @@ func TestRingBuffer(t *testing.T) {
 
 				primary := ringbuffer.MakeRingBuffer[int](tt.bufferSize)
 				for iterationNo := range tt.iterations {
-
 					// compute the state we want
 					wantElems := make([]int, 0, tt.bufferSize)
 					if iterationNo >= tt.bufferSize {
@@ -117,7 +116,6 @@ func TestRingBuffer(t *testing.T) {
 
 							checkBufferState(t, BufferState[int]{Elems: wantElems[:i], Cap: tt.bufferSize}, popBuffer)
 						}
-
 					})
 				}
 			})
@@ -180,7 +178,6 @@ func checkBufferState[T any](tb testing.TB, want BufferState[T], buffer *ringbuf
 	if nextIndex != len(gotElems) {
 		tb.Errorf("Iterate called an unexpected number of times, expected %d but got %d", len(gotElems), nextIndex)
 	}
-
 }
 
 func TestRingBuffer_Push(t *testing.T) {
@@ -208,5 +205,4 @@ func TestRingBuffer_Push(t *testing.T) {
 			CapMin: true,
 		}, buffer)
 	}
-
 }

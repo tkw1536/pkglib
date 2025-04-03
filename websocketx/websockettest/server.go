@@ -42,7 +42,6 @@ func NewHandler(handler func(conn *websocket.Conn)) http.Handler {
 	var upgrader websocket.Upgrader
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		// upgrade the connection
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {

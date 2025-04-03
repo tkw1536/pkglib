@@ -41,4 +41,5 @@ linters:
     - usestdlibvars
     - usetesting
     - wastedassign
+    - whitespace
     - staticcheck

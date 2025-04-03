@@ -60,5 +60,4 @@ func iterFields(embeds bool, index []int, typ reflect.Type) iter.Seq2[reflect.St
 			}
 		}
 	}
-
 }

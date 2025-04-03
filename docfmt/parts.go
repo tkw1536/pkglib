@@ -75,7 +75,6 @@ func splitString(runes []rune, isDelimiter func(rune) bool, multiDelim bool) (pa
 			}
 		default:
 			if isDelimiter(runes[index]) { // ending the current part
-
 				// allow multiple sequential delimiters to form a single ending
 				// so gobble delimiters until they no longer match
 				if multiDelim {

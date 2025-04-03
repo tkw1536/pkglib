@@ -9,7 +9,6 @@ import (
 )
 
 func ExampleLazy() {
-
 	var l lazy.Lazy[int]
 
 	// the first invocation to lazy will be called and set the value

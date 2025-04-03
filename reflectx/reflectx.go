@@ -17,7 +17,6 @@ import (
 // If the value is not backed by a non-pointer type C, and *C implements I, then a pointer to the copy of the underlying value, along with the boolean true, is returned.
 // Otherwise, a simple copy, and the boolean false, is returned.
 func CopyInterface[I any](value I) (ptr I, mutable bool) {
-
 	// ensure that we are dealing with an interface
 	iTyp := reflect.TypeFor[I]()
 	if iTyp.Kind() != reflect.Interface {

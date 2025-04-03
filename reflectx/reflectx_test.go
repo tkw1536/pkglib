@@ -52,7 +52,6 @@ func ExampleCopyInterface_pointer() {
 }
 
 func ExampleCopyInterface_lift() {
-
 	// AsInt is an interface that returns an integer value
 	type AsInt interface {
 		AsInt() int

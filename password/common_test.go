@@ -12,7 +12,6 @@ func ExamplePasswords() {
 	// load all the passwords from common sources
 	counts := map[string]int{}
 	for pass := range password.Passwords(password.CommonSources()...) {
-
 		// do something with the password
 		_ = pass.Password // string
 

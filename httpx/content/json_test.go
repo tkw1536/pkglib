@@ -21,7 +21,6 @@ func (BrokenMarshalJSON) MarshalJSON() ([]byte, error) {
 }
 
 func ExampleJSON() {
-
 	// create a redirect based on the url
 	handler := content.JSON(func(r *http.Request) (any, error) {
 		switch r.URL.Path {

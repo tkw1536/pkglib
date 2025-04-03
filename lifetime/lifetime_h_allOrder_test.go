@@ -35,7 +35,6 @@ func (Triangle) RankShape() string {
 // Demonstrates that sorting slices applies to the Component type also.
 // See also Example G.
 func ExampleLifetime_hAllOrder() {
-
 	// Create a lifetime with the square, circle and triangle components
 	lt := &lifetime.Lifetime[Shape, struct{}]{
 		Register: func(context *lifetime.Registry[Shape, struct{}]) {

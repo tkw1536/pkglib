@@ -24,7 +24,6 @@ import (
 //
 // WriterGroup returns the first non-nil error returned by each call to handler; or nil otherwise.
 func WriterGroup[T any](writer io.Writer, count int, handler func(value T, output io.Writer) error, items []T, opts ...StreamGroupOption[T]) error {
-
 	// create a group
 	var group Group[T, error]
 	group.HandlerLimit = count

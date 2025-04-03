@@ -56,7 +56,6 @@ func ExampleServer_send() {
 }
 
 func ExampleServer_prepared() {
-
 	var server websocketx.Server
 
 	// prepare a message to send

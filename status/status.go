@@ -216,7 +216,6 @@ func (st *Status) flushLogs(changed uint64) error {
 // flushNormal implements flushing in normal mode.
 // Respects [minFlushDelay], unless force is set to true.
 func (st *Status) flushNormal(force bool) error {
-
 	now := time.Now()
 	if !force && now.Sub(st.lastFlush) < minFlushDelay {
 		return nil
@@ -287,7 +286,6 @@ func (st *Status) Stop() {
 			_ = os.Remove(name) // deleting the logs is low priority, so ignore the error
 		}
 	}
-
 }
 
 // openLogger opens the logger for the line with the given id.

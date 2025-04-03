@@ -22,5 +22,4 @@ func MinifyBytes(mediaType string, in []byte) []byte {
 
 	// return the bytes!
 	return buffer.Bytes()
-
 }

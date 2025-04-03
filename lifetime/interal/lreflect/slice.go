@@ -11,7 +11,6 @@ import (
 // ImplementsAsSliceInterface checks if slice is a slice type with an interface element that implements iface.
 // I must be an interface, T may be any type.
 func ImplementsAsSliceInterface(iface reflect.Type, slice reflect.Type) (bool, error) {
-
 	// check for valid arguments
 	{
 		if slice == nil {

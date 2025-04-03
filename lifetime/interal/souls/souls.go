@@ -40,7 +40,6 @@ func New(all any) *Souls {
 func (r *Souls) Init() error {
 	// do an initialization
 	return r.initErr.Get(func() error {
-
 		// set allT and componentT correctly
 		{
 			if !r.all.IsValid() {
