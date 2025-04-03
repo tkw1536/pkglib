@@ -329,12 +329,11 @@ func TestServer_concurrent(t *testing.T) {
 			defer l.Unlock()
 		}
 
-		i := int(id)
-		if _, ok := m[i]; ok {
-			t.Errorf("%s received %d more than once", side, i)
+		if _, ok := m[id]; ok {
+			t.Errorf("%s received %d more than once", side, id)
 			return
 		}
-		m[i] = struct{}{}
+		m[id] = struct{}{}
 	}
 
 	check := func(side string, m map[int]struct{}) {

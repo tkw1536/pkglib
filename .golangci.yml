@@ -35,4 +35,6 @@ linters:
     - testableexamples
     - testpackage
     - thelper
+    - tparallel
+    - unconvert
     - staticcheck

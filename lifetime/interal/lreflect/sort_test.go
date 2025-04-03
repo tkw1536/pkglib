@@ -20,7 +20,7 @@ func (r RankableStruct) RankRankableStruct() uint64 {
 
 // That can be used to sort the slice in inverted length fashion.
 func (r RankableStruct) RankRankableInterface() int {
-	return -int(len(r))
+	return -len(r)
 }
 
 type RankableInterface interface {
