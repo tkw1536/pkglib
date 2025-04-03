@@ -17,4 +17,5 @@ linters:
     - errname
     - errorlint
     - exhaustive
+    - exptostd
     - gocritic
