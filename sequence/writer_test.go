@@ -3,7 +3,7 @@
 //spellchecker:words sequence
 package sequence
 
-//spellchecker:words errors
+//spellchecker:words errors sync
 import (
 	"errors"
 	"fmt"

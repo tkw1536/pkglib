@@ -124,4 +124,4 @@ func newSError(err error) sError {
 	return e
 }
 
-// spellchecker:words nosec
+//spellchecker:words nosec

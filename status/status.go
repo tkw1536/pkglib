@@ -3,7 +3,7 @@
 //spellchecker:words status
 package status
 
-//spellchecker:words maps sync atomic time github gosuri uilive pkglib nobufio noop stream
+//spellchecker:words errors maps sync atomic time github gosuri uilive pkglib nobufio noop stream
 import (
 	"errors"
 	"fmt"
@@ -547,4 +547,4 @@ func (st *Status) Bypass() io.Writer {
 	return st.w.Bypass()
 }
 
-// spellchecker:words nosec
+//spellchecker:words nosec

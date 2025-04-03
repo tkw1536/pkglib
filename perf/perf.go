@@ -151,4 +151,4 @@ func perf() (bytes int64, objects int64) {
 	return int64(stats.HeapInuse + stats.StackInuse), int64(stats.HeapObjects) // #nosec G115 all stats are guaranteed to be positive
 }
 
-// spellchecker:words nosec
+//spellchecker:words nosec

@@ -1,7 +1,7 @@
 //spellchecker:words collection
 package collection
 
-//spellchecker:words maps slices
+//spellchecker:words iter maps slices
 import (
 	"cmp"
 	"iter"

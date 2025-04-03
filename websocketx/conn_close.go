@@ -12,6 +12,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+//spellchecker:words nolint errname
+
 const MsgFailedCloseFrame = "error writing close frame"
 
 var failedCloseFrameMessage = websocket.FormatCloseMessage(websocket.CloseInternalServerErr, MsgFailedCloseFrame)

@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//spellchecker:words upgrader websockets
+//spellchecker:words upgrader websockets nolint containedctx
 
 // Server implements a websocket server.
 type Server struct {

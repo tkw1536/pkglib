@@ -6,6 +6,8 @@ import (
 	"context"
 )
 
+//spellchecker:words nolint containedctx
+
 // WithValues creates a new context that inherits from parent, but has associated values from values.
 //
 // This function is equivalent to repeated invocations of [context.WithValue].

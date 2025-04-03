@@ -3,7 +3,7 @@
 //spellchecker:words reflectx
 package reflectx
 
-//spellchecker:words reflect slices
+//spellchecker:words reflect
 import (
 	"reflect"
 )

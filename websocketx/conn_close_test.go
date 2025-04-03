@@ -1,7 +1,7 @@
 //spellchecker:words websocketx
 package websocketx_test
 
-//spellchecker:words context errors testing time github gorilla websocket pkglib websocketx uber goleak
+//spellchecker:words context testing time github gorilla websocket pkglib websocketx uber goleak
 import (
 	"context"
 	"fmt"

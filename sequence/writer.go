@@ -3,6 +3,7 @@
 //spellchecker:words sequence
 package sequence
 
+//spellchecker:words sync atomic
 import (
 	"fmt"
 	"io"

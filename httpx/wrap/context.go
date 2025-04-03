@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+//spellchecker:words nolint contextcheck
+
 // ContextFunc is a function that replaces contexts for a given request.
 // A nil ContextFunc leaves the original context intact.
 //

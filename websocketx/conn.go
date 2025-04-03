@@ -14,6 +14,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+//spellchecker:words nolint containedctx
+
 // accept accepts a websocket connection with the specified handler.
 // The caller should call [connection.serve] to start serving the connection.
 func (handler Handler) accept(r *http.Request, conn *websocket.Conn, opt Options) *Connection {
@@ -383,4 +385,4 @@ type queuedMessage struct {
 	done chan<- struct{} // done should be closed when finished
 }
 
-// spellchecker:words nosec
+//spellchecker:words nosec

@@ -1,7 +1,7 @@
 //spellchecker:words websocketx
 package websocketx_test
 
-//spellchecker:words strconv sync testing time github gorilla websocket pkglib websocketx websockettest
+//spellchecker:words errors strconv sync testing time github gorilla websocket pkglib websocketx websockettest
 import (
 	"errors"
 	"strconv"

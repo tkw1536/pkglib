@@ -1,6 +1,7 @@
 //spellchecker:words traversal
 package traversal
 
+//spellchecker:words iter
 import "iter"
 
 // Sequence creates a new iterator from the given RangeFunc.

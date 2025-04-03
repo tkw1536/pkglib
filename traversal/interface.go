@@ -3,7 +3,7 @@
 //spellchecker:words traversal
 package traversal
 
-//spellchecker:words context runtime
+//spellchecker:words runtime sync
 import (
 	"runtime"
 	"sync"

@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+//spellchecker:words nolint errname
+
 // StatusCode represents an error based on a http status code.
 // The integer is the http status code.
 //

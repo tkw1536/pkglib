@@ -17,6 +17,8 @@ import (
 	"github.com/tkw1536/pkglib/httpx/form/field"
 )
 
+//spellchecker:words nolint contextcheck errname
+
 // Form provides a form that a user can submit via a http POST method call.
 // It implements [http.Handler], see [Form.ServeHTTP] for details on how form submission works.
 //
@@ -240,4 +242,4 @@ var formBytes []byte
 // FormTemplate is a template to embed a form
 var FormTemplate = template.Must(template.New("form.html").Parse(string(formBytes)))
 
-// spellchecker:words nosec
+//spellchecker:words nosec

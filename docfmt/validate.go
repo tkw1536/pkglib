@@ -11,6 +11,8 @@ import (
 	"slices"
 )
 
+//spellchecker:words nolint errname
+
 // ValidationResult represents the result of a validation.
 //
 //nolint:errname

@@ -1,5 +1,7 @@
+//spellchecker:words reflectx
 package reflectx
 
+//spellchecker:words iter reflect slices
 import (
 	"iter"
 	"reflect"

@@ -1,7 +1,7 @@
 //spellchecker:words traversal
 package traversal_test
 
-//spellchecker:words github pkglib traversal
+//spellchecker:words iter github pkglib traversal
 import (
 	"fmt"
 	"iter"

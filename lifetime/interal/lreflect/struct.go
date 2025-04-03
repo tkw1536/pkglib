@@ -8,7 +8,7 @@ import (
 	"reflect"
 )
 
-// spellchecker:words iface
+//spellchecker:words iface
 
 // This file contains any methods directly interacting with methods via reflect.
 
