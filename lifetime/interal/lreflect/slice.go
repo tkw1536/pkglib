@@ -46,11 +46,11 @@ func FilterSliceInterface(slice reflect.Value, iface reflect.Type) (reflect.Valu
 	}
 
 	// create a new slice
-	len := slice.Len()
-	result := reflect.MakeSlice(reflect.SliceOf(iface), 0, len)
+	sliceLen := slice.Len()
+	result := reflect.MakeSlice(reflect.SliceOf(iface), 0, sliceLen)
 
 	// iterate over the elements and check if they implement the slice
-	for i := range len {
+	for i := range sliceLen {
 		element := slice.Index(i)
 		if element.Elem().Type().Implements(iface) {
 			result = reflect.Append(result, element.Elem().Convert(iface))
@@ -79,8 +79,7 @@ func FirstAssignableInterfaceElement(slice reflect.Value, v reflect.Type) (refle
 	}
 
 	// find an element that is assignable to V
-	len := slice.Len()
-	for i := range len {
+	for i := range slice.Len() {
 		element := slice.Index(i).Elem()
 		if element.Type().AssignableTo(v) {
 			return element, nil
@@ -103,10 +102,10 @@ func CopySlice(slice reflect.Value) reflect.Value {
 		return reflect.New(slice.Type()).Elem()
 	}
 
-	// create a new slice and copy over the elements
-	copy := reflect.MakeSlice(slice.Type(), slice.Len(), slice.Len())
-	reflect.Copy(copy, slice)
-	return copy
+	// create a new slice and cp over the elements
+	cp := reflect.MakeSlice(slice.Type(), slice.Len(), slice.Len())
+	reflect.Copy(cp, slice)
+	return cp
 }
 
 // noSliceError indicates that the type with the provided name is not a slice.

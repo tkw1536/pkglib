@@ -27,10 +27,10 @@ type RingBuffer[T any] struct {
 }
 
 // MakeRingBuffer creates a new RingBuffer with the given capacity.
-func MakeRingBuffer[T any](cap int) *RingBuffer[T] {
+func MakeRingBuffer[T any](capacity int) *RingBuffer[T] {
 	return &RingBuffer[T]{
 		index: 0,
-		elems: make([]T, 0, cap),
+		elems: make([]T, 0, capacity),
 	}
 }
 

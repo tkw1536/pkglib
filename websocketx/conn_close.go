@@ -315,32 +315,32 @@ func (cc CloseCause) Error() string {
 
 	_, err := fmt.Fprint(&builder, cc.Frame.Code)
 	if err != nil {
-		goto error
+		goto bailout
 	}
 
 	if cc.Frame.Reason != "" {
 		_, err := fmt.Fprintf(&builder, " (reason: %q)", cc.Frame.Reason)
 		if err != nil {
-			goto error
+			goto bailout
 		}
 	}
 
 	if !cc.WasClean {
 		_, err := fmt.Fprint(&builder, " (unclean)")
 		if err != nil {
-			goto error
+			goto bailout
 		}
 	}
 
 	if cc.Err != nil {
 		_, err := fmt.Fprintf(&builder, ": %s", cc.Err)
 		if err != nil {
-			goto error
+			goto bailout
 		}
 	}
 
 	return builder.String()
-error:
+bailout:
 	return "(error formatting CloseCause)"
 }
 

@@ -34,14 +34,14 @@ func ExampleCopyInterface_pointer() {
 	// make a pointer to a counter
 	original := Inc(&counter{Value: 0})
 
-	// make a copy and increment the copy
-	copy, _ := CopyInterface(original)
-	copy.Inc()
+	// make a cp and increment the cp
+	cp, _ := CopyInterface(original)
+	cp.Inc()
 
 	// print the value of the original counter and the copy
 	// the copy is also a pointer
 	fmt.Println("original counter", original)
-	fmt.Println("copy of counter", copy)
+	fmt.Println("copy of counter", cp)
 
 	// Output: original counter &{0}
 	// copy of counter &{1}
@@ -57,14 +57,14 @@ func ExampleCopyInterface_lift() {
 	// make a *non-pointer* counter
 	original := AsInt(counter{Value: 0})
 
-	// make a copy and increment the copy
-	copy, _ := CopyInterface(original)
-	copy.(interface{ Inc() }).Inc()
+	// make a cp and increment the cp
+	cp, _ := CopyInterface(original)
+	cp.(interface{ Inc() }).Inc()
 
 	// print the original value and the new value
 	// the original is a plain value, the copy is a pointer!
 	fmt.Println("original counter", original)
-	fmt.Println("copy of counter", copy)
+	fmt.Println("copy of counter", cp)
 
 	// Output: original counter {0}
 	// copy of counter &{1}

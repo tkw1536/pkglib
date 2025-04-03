@@ -28,4 +28,5 @@ linters:
     - paralleltest
     - perfsprint
     - prealloc
+    - predeclared
     - staticcheck

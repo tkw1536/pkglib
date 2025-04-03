@@ -29,16 +29,16 @@ func CopyInterface[I any](value I) (ptr I, mutable bool) {
 
 	// case 1: we have a pointer => copy the underlying value
 	if cTyp.Kind() == reflect.Pointer {
-		copy := reflect.New(cTyp.Elem())
-		copy.Elem().Set(reflect.ValueOf(value).Elem())
-		return copy.Interface().(I), true
+		cp := reflect.New(cTyp.Elem())
+		cp.Elem().Set(reflect.ValueOf(value).Elem())
+		return cp.Interface().(I), true
 	}
 
 	// case 2: *C implements I => return a pointer to the copy
 	if reflect.PointerTo(cTyp).Implements(iTyp) {
-		copy := reflect.New(cTyp)
-		copy.Elem().Set(reflect.ValueOf(value))
-		return copy.Interface().(I), true
+		cp := reflect.New(cTyp)
+		cp.Elem().Set(reflect.ValueOf(value))
+		return cp.Interface().(I), true
 	}
 
 	// case 3: *C does not implement I => fallback

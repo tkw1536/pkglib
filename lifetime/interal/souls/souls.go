@@ -194,14 +194,15 @@ func (r *Souls) exportClass(typ reflect.Type) (reflect.Value, error) {
 }
 
 // All returns the list of all components.
-func (r *Souls) All(copy bool) (reflect.Value, error) {
+// cp indicates if a copy should be made.
+func (r *Souls) All(cp bool) (reflect.Value, error) {
 	// do the initialization
 	if err := r.Init(); err != nil {
 		return reflect.Value{}, err
 	}
 
 	// if we didn't request a copy, return as is
-	if !copy {
+	if !cp {
 		return r.all, nil
 	}
 

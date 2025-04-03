@@ -10,6 +10,8 @@ import (
 	"github.com/tkw1536/pkglib/testlib"
 )
 
+//spellchecker:words oldname newname
+
 func TestSameFile(t *testing.T) {
 	t.Parallel()
 
@@ -25,11 +27,11 @@ func TestSameFile(t *testing.T) {
 		}()
 	}
 
-	symlink := func(old, new string) {
-		if err := os.MkdirAll(filepath.Dir(new), fs.ModeDir&fs.ModePerm); err != nil {
+	symlink := func(oldname, newname string) {
+		if err := os.MkdirAll(filepath.Dir(newname), fs.ModeDir&fs.ModePerm); err != nil {
 			panic(err)
 		}
-		if err := os.Symlink(old, new); err != nil {
+		if err := os.Symlink(oldname, newname); err != nil {
 			panic(err)
 		}
 	}
