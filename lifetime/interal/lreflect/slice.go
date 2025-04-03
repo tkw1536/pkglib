@@ -3,7 +3,6 @@ package lreflect
 
 //spellchecker:words reflect
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -114,26 +113,26 @@ func CopySlice(slice reflect.Value) reflect.Value {
 type noSliceError string
 
 func (err noSliceError) Error() string {
-	return fmt.Sprintf("%s must be a slice type", string(err))
+	return string(err) + " must be a slice type"
 }
 
 // nilTypeError indicates that the type with the provided name is nil.
 type nilTypeError string
 
 func (err nilTypeError) Error() string {
-	return fmt.Sprintf("%s must not be a nil type", string(err))
+	return string(err) + " must not be a nil type"
 }
 
 // noInterfaceError indicates that the type with the provided name is not an interface.
 type noInterfaceError string
 
 func (err noInterfaceError) Error() string {
-	return fmt.Sprintf("%s must be an interface type", string(err))
+	return string(err) + " must be an interface type"
 }
 
 // noInterfaceSliceError indicates that the type with provided name is not a slice of an interface.
 type noInterfaceSliceError string
 
 func (err noInterfaceSliceError) Error() string {
-	return fmt.Sprintf("%s must be a slice of some interface type", string(err))
+	return string(err) + " must be a slice of some interface type"
 }

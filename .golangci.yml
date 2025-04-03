@@ -26,4 +26,6 @@ linters:
     - nolintlint
     - nosprintfhostport
     - paralleltest
+    - perfsprint
+    - prealloc
     - staticcheck

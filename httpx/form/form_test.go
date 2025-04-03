@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/tkw1536/pkglib/httpx/form"
@@ -38,7 +39,7 @@ func TestForm_logger(t *testing.T) {
 				called = true
 			}
 
-			makeFormRequest(t, &frm, map[string]string{"validate": fmt.Sprint(tt.ShouldValidate), "success": fmt.Sprint(tt.ShouldSuccess)})
+			makeFormRequest(t, &frm, map[string]string{"validate": strconv.FormatBool(tt.ShouldValidate), "success": strconv.FormatBool(tt.ShouldSuccess)})
 
 			if called != tt.WantCalled {
 				t.Errorf("want called = %t, got called = %t", tt.WantCalled, called)
@@ -78,7 +79,7 @@ func TestForm_formContext_afterSuccess(t *testing.T) {
 				return fc
 			}
 
-			makeFormRequest(t, &frm, map[string]string{"validate": fmt.Sprint(tt.ShouldValidate), "success": fmt.Sprint(tt.ShouldSuccess)})
+			makeFormRequest(t, &frm, map[string]string{"validate": strconv.FormatBool(tt.ShouldValidate), "success": strconv.FormatBool(tt.ShouldSuccess)})
 
 			if called != tt.WantCalled {
 				t.Errorf("want called = %t, got called = %t", tt.WantCalled, called)

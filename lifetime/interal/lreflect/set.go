@@ -66,5 +66,5 @@ func (err typeUnaddressableError) Error() string {
 type invalidValueError string
 
 func (err invalidValueError) Error() string {
-	return fmt.Sprintf("%s is not a valid value", string(err))
+	return string(err) + " is not a valid value"
 }

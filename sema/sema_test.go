@@ -4,6 +4,7 @@ package sema
 //spellchecker:words sync atomic testing time github pkglib testlib
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -172,7 +173,7 @@ func TestNewSemaphore_exhausting(t *testing.T) {
 
 	// this test tests all cases for 1 <= n < 100
 	for n := 1; n <= 100; n++ {
-		t.Run(fmt.Sprint(n), func(t *testing.T) {
+		t.Run(strconv.Itoa(n), func(t *testing.T) {
 			t.Parallel()
 
 			s := New(n)
