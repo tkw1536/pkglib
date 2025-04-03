@@ -6,6 +6,8 @@ package yamlx
 
 //spellchecker:words gopkg yaml
 import (
+	"fmt"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -13,5 +15,8 @@ import (
 func Marshal(value any) (*yaml.Node, error) {
 	node := new(yaml.Node)
 	err := node.Encode(value)
-	return node, err
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode node: %w", err)
+	}
+	return node, nil
 }

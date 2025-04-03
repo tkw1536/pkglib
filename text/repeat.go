@@ -7,10 +7,14 @@ import (
 	"io"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // Join writes the elements of elem into writer, separated by sep.
 // Returns the number of runes written and a nil error.
 //
 // It is like strings.Join, but writes into a writer instead of allocating a strings.Builder.
+//
+//nolint:wrapcheck
 func Join(writer io.Writer, elems []string, sep string) (n int, err error) {
 	// this function has been adapted from strings.Join
 

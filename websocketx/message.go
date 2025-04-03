@@ -3,6 +3,8 @@ package websocketx
 
 //spellchecker:words github gorilla websocket
 import (
+	"fmt"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -42,7 +44,7 @@ func NewBinaryMessage(data []byte) Message {
 func (msg Message) Prepare() (PreparedMessage, error) {
 	m, err := websocket.NewPreparedMessage(msg.Type, msg.Body)
 	if err != nil {
-		return PreparedMessage{}, err
+		return PreparedMessage{}, fmt.Errorf("failed to prepare message: %w", err)
 	}
 	return PreparedMessage{m: m}, nil
 }

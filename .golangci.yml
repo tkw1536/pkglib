@@ -42,4 +42,5 @@ linters:
     - usetesting
     - wastedassign
     - whitespace
+    - wrapcheck
     - staticcheck

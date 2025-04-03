@@ -80,7 +80,7 @@ func ExampleValidate_fail() {
 		if *Value == 0 {
 			i, err := strconv.ParseInt(Default, 10, 64)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to parse int: %w", err)
 			}
 			*Value = int(i)
 			return nil
