@@ -26,7 +26,8 @@ func (nullStream) Read(bytes []byte) (int, error) {
 	return 0, io.EOF
 }
 func (nullStream) ReadFrom(r io.Reader) (n int64, err error) {
-	return io.Discard.(io.ReaderFrom).ReadFrom(r)
+	// TODO: check if this is safe
+	return io.Copy(io.Discard, r)
 }
 
 func (nullStream) Write(bytes []byte) (int, error) {

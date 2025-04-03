@@ -1,6 +1,8 @@
 //spellchecker:words traversal
 package traversal
 
+//spellchecker:words wrapcheck
+
 // New creates a new iterator generator pair and returns the iterator.
 //
 // The generator is passed to the function source.
@@ -100,5 +102,5 @@ func Drain[Element any](it Iterator[Element]) (elements []Element, err error) {
 	for it.Next() {
 		elements = append(elements, it.Datum())
 	}
-	return elements, it.Err()
+	return elements, it.Err() //nolint:wrapcheck
 }

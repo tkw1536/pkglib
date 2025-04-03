@@ -55,5 +55,5 @@ func TickUntilFunc(f func(t time.Time) bool, c context.Context, d time.Duration)
 			break
 		}
 	}
-	return c.Err()
+	return c.Err() //nolint:wrapcheck
 }
