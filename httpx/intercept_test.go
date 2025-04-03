@@ -3,6 +3,7 @@ package httpx_test
 
 //spellchecker:words http httptest github pkglib httpx
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -56,7 +57,7 @@ func ExampleErrInterceptor() {
 
 	// a function to make a request to a specific method
 	makeRequest := func(path string) {
-		req, err := http.NewRequest(http.MethodGet, path, nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -100,7 +101,7 @@ func ExampleTextInterceptor() {
 
 	// a function to make a request to a specific method
 	makeRequest := func(path string) {
-		req, err := http.NewRequest(http.MethodGet, path, nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -144,7 +145,7 @@ func ExampleJSONInterceptor() {
 
 	// a function to make a request to a specific method
 	makeRequest := func(path string) {
-		req, err := http.NewRequest(http.MethodGet, path, nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -188,7 +189,7 @@ func ExampleHTMLInterceptor() {
 
 	// a function to make a request to a specific method
 	makeRequest := func(path string) {
-		req, err := http.NewRequest(http.MethodGet, path, nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		if err != nil {
 			panic(err)
 		}

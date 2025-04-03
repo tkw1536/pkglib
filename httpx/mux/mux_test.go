@@ -2,6 +2,7 @@ package mux_test
 
 //spellchecker:words http httptest github pkglib httpx
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -26,7 +27,7 @@ func ExampleMux() {
 
 	// a function to make a request to a specific method
 	makeRequest := func(method, path string) {
-		req, err := http.NewRequest(method, path, nil)
+		req, err := http.NewRequestWithContext(context.Background(), method, path, nil)
 		if err != nil {
 			panic(err)
 		}

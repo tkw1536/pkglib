@@ -3,6 +3,7 @@ package content_test
 
 //spellchecker:words http httptest github pkglib httpx content
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,7 +29,7 @@ func ExampleRedirect() {
 	})
 
 	makeRequest := func(path string) {
-		req, err := http.NewRequest(http.MethodGet, path, nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 		if err != nil {
 			panic(err)
 		}

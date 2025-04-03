@@ -3,6 +3,7 @@ package httpx_test
 
 //spellchecker:words http httptest github pkglib httpx
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -22,7 +23,7 @@ func ExampleStatusCode() {
 
 	// it also implements a static http.Handler
 	{
-		req, err := http.NewRequest(http.MethodGet, "/", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		if err != nil {
 			panic(err)
 		}

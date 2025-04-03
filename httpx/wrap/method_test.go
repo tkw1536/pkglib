@@ -3,6 +3,7 @@ package wrap_test
 
 //spellchecker:words http httptest github pkglib httpx wrap
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -25,7 +26,7 @@ func ExampleMethods() {
 
 	// A simple function to make a request with a specific method
 	makeRequest := func(method string) {
-		req, err := http.NewRequest(method, "/", nil)
+		req, err := http.NewRequestWithContext(context.Background(), method, "/", nil)
 		if err != nil {
 			panic(err)
 		}

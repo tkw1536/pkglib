@@ -5,6 +5,7 @@ package httpx_test
 
 //spellchecker:words http httptest time github pkglib httpx
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -24,7 +25,7 @@ func ExampleResponse() {
 		Body:        []byte("<!DOCTYPE html>Hello world"),
 	}
 
-	req, err := http.NewRequest(http.MethodGet, "/", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +50,7 @@ func ExampleResponse_defaults() {
 		Body: []byte("Hello world"),
 	}
 
-	req, err := http.NewRequest(http.MethodGet, "/", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -74,7 +75,7 @@ func ExampleResponse_Now() {
 		Body: []byte("Hello world"),
 	}.Now()
 
-	req, err := http.NewRequest(http.MethodGet, "/", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	if err != nil {
 		panic(err)
 	}

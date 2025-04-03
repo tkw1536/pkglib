@@ -3,6 +3,7 @@ package wrap_test
 
 //spellchecker:words encoding json http httptest time github pkglib httpx wrap
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -26,7 +27,7 @@ func ExampleTime() {
 	}))
 
 	// create a new request
-	req, err := http.NewRequest(http.MethodGet, "/", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	if err != nil {
 		panic(err)
 	}

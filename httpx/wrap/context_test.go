@@ -36,7 +36,7 @@ func ExampleContext() {
 	)
 
 	// create a new request
-	req, err := http.NewRequest(http.MethodGet, "/", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -69,7 +69,8 @@ func ExampleContext_cancel() {
 	)
 
 	// create a new request
-	req, err := http.NewRequest(http.MethodGet, "/", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+
 	if err != nil {
 		panic(err)
 	}

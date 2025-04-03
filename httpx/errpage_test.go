@@ -3,6 +3,7 @@ package httpx_test
 
 //spellchecker:words embed http httptest github pkglib httpx recovery
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"net/http"
@@ -34,7 +35,7 @@ func ExampleRenderErrorPage() {
 
 	// run the request
 	{
-		req, err := http.NewRequest(http.MethodGet, "/", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		if err != nil {
 			panic(err)
 		}
@@ -74,7 +75,7 @@ func ExampleRenderErrorPage_panic() {
 
 	// run the request
 	{
-		req, err := http.NewRequest(http.MethodGet, "/", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		if err != nil {
 			panic(err)
 		}

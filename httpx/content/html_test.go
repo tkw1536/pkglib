@@ -3,6 +3,7 @@ package content_test
 
 //spellchecker:words html template http httptest testing github pkglib httpx content
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"io"
@@ -53,7 +54,7 @@ func ExampleHTML() {
 }
 
 func makeRequest(handler http.Handler, path string) string {
-	req, err := http.NewRequest(http.MethodGet, path, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, path, nil)
 	if err != nil {
 		panic(err)
 	}
