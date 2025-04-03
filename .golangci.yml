@@ -31,4 +31,5 @@ linters:
     - predeclared
     - reassign
     - recvcheck
+    - tagalign
     - staticcheck

@@ -16,11 +16,11 @@ var (
 // Demonstrates a passing validation.
 func ExampleValidate() {
 	var value struct {
-		Number    int    `validate:"positive" default:"234"`
-		String    string `validate:"nonempty" default:"stuff"`
+		Number    int    `default:"234"   validate:"positive"`
+		String    string `default:"stuff" validate:"nonempty"`
 		Recursive struct {
-			Number int    `validate:"positive" default:"45"`
-			String string `validate:"nonempty" default:"more"`
+			Number int    `default:"45"   validate:"positive"`
+			String string `default:"more" validate:"nonempty"`
 		} `recurse:"true"`
 	}
 
@@ -108,10 +108,10 @@ func ExampleValidate_fail() {
 
 	// declare a value that uses the validators
 	var value struct {
-		Number    int    `validate:"positive" default:"12"`
-		String    string `validate:"nonempty" default:"stuff"`
+		Number    int    `default:"12"    validate:"positive"`
+		String    string `default:"stuff" validate:"nonempty"`
 		Recursive struct {
-			Number int    `validate:"positive" default:"12"`
+			Number int    `default:"12"        validate:"positive"`
 			String string `validate:"nonempty"`
 		} `recurse:"true"`
 	}
