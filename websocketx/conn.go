@@ -286,7 +286,7 @@ func (conn *Connection) write(message queuedMessage) error {
 
 	_, ok := <-done
 	if !ok {
-		return context.Cause(conn.context)
+		return context.Cause(conn.context) //nolint:wrapcheck
 	}
 
 	return nil

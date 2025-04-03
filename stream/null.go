@@ -7,6 +7,8 @@ import (
 	"io"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // Null is an io.ReadWriteCloser.
 //
 // Reads from it return 0 bytes and io.EOF.
@@ -26,8 +28,7 @@ func (nullStream) Read(bytes []byte) (int, error) {
 	return 0, io.EOF
 }
 func (nullStream) ReadFrom(r io.Reader) (n int64, err error) {
-	// TODO: check if this is safe
-	return io.Copy(io.Discard, r)
+	return io.Copy(io.Discard, r) //nolint:wrapcheck
 }
 
 func (nullStream) Write(bytes []byte) (int, error) {
