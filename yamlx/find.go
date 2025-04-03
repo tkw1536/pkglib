@@ -94,7 +94,7 @@ func Child(node *yaml.Node, name string) (*yaml.Node, error) {
 	for i := 0; i+1 < len(node.Content); i += 2 {
 		key := node.Content[i]
 		if key.Kind != yaml.ScalarNode {
-			return nil, MappingExpectedScalar(i)
+			return nil, ExpectedScalarError{Index: i}
 		}
 
 		// saw a merge tag => record it and keep going
@@ -172,8 +172,11 @@ func (pe ChildError) Unwrap() error {
 	return pe.Err
 }
 
-type MappingExpectedScalar int
+// ExpectedScalarError is returned by [Child] to indicate that a scalar node was expected
+type ExpectedScalarError struct {
+	Index int
+}
 
-func (mes MappingExpectedScalar) Error() string {
-	return fmt.Sprintf("expected scalar node in content with index %d", int(mes))
+func (err ExpectedScalarError) Error() string {
+	return fmt.Sprintf("expected scalar node in content with index %d", err.Index)
 }
