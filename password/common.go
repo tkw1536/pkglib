@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"iter"
 	"strings"
-	"sync"
 )
 
 //spellchecker:words fsys
@@ -19,11 +19,8 @@ type PasswordSource interface {
 	// Name returns the name of this source
 	Name() string
 
-	// Passwords returns a channel that reads all passwords.
-	// If an error occurs, returns an empty channel
-	//
-	// The caller must drain the channel for it to be garbage collected.
-	Passwords() <-chan string
+	// Passwords returns a list of passwords.
+	Passwords() iter.Seq[string]
 }
 
 // NewPasswordSource creates a new password source from a function.
@@ -59,11 +56,8 @@ func (cpr *commonPasswordReader) Name() string {
 	return cpr.name
 }
 
-func (cpr *commonPasswordReader) Passwords() <-chan string {
-	src := make(chan string, 10)
-	go func() {
-		defer close(src)
-
+func (cpr *commonPasswordReader) Passwords() iter.Seq[string] {
+	return func(yield func(string) bool) {
 		file, err := cpr.open()
 		if err != nil {
 			return
@@ -75,10 +69,11 @@ func (cpr *commonPasswordReader) Passwords() <-chan string {
 			if line == "" || strings.HasPrefix(line, "//") {
 				continue
 			}
-			src <- line
+			if !yield(line) {
+				return
+			}
 		}
-	}()
-	return src
+	}
 }
 
 type CommonPassword struct {
@@ -107,38 +102,23 @@ func CommonSources() []PasswordSource {
 	return sources
 }
 
-// Passwords returns a channel that contains all passwords in the provided sources.
-// Passwords may be returned in any order.
-//
-// The caller must drain the channel.
-func Passwords(sources ...PasswordSource) <-chan CommonPassword {
-	// TODO: make this an iter.Seq
-	common := make(chan CommonPassword, 10*len(sources))
-
-	var wg sync.WaitGroup
-	wg.Add(len(sources))
-
-	for _, source := range sources {
-		go func(source PasswordSource) {
-			defer wg.Done()
-
+// Passwords returns an iterator that iterates over all of the passwords in all of the sources.
+// They may be returned in any order.
+func Passwords(sources ...PasswordSource) iter.Seq[CommonPassword] {
+	return func(yield func(CommonPassword) bool) {
+		for _, source := range sources {
 			name := source.Name()
 
 			for password := range source.Passwords() {
-				common <- CommonPassword{
+				if !yield(CommonPassword{
 					Source:   name,
 					Password: password,
+				}) {
+					return
 				}
 			}
-		}(source)
+		}
 	}
-
-	go func() {
-		defer close(common)
-		wg.Wait()
-	}()
-
-	return common
 }
 
 // - or nil (when a password is not a common password.
