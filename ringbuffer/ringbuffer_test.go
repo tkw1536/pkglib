@@ -131,54 +131,54 @@ type BufferState[T any] struct {
 	CapMin bool
 }
 
-func checkBufferState[T any](t testing.TB, want BufferState[T], buffer *ringbuffer.RingBuffer[T]) {
-	t.Helper()
+func checkBufferState[T any](tb testing.TB, want BufferState[T], buffer *ringbuffer.RingBuffer[T]) {
+	tb.Helper()
 
 	wantLen := len(want.Elems)
 	wantCap := want.Cap
 
 	gotLen := buffer.Len()
 	if gotLen != wantLen {
-		t.Errorf("got len = %v, want len = %v", gotLen, wantLen)
+		tb.Errorf("got len = %v, want len = %v", gotLen, wantLen)
 	}
 
 	gotCap := buffer.Cap()
 	if !want.CapMin {
 		if gotCap != wantCap {
-			t.Errorf("got cap = %v, want cap = %v", gotCap, wantCap)
+			tb.Errorf("got cap = %v, want cap = %v", gotCap, wantCap)
 		}
 	} else {
 		if gotCap < wantCap {
-			t.Errorf("got cap = %v, want cap >= %v", gotCap, wantCap)
+			tb.Errorf("got cap = %v, want cap >= %v", gotCap, wantCap)
 		}
 	}
 
 	gotElems := buffer.Elems()
 	if !reflect.DeepEqual(gotElems, want.Elems) {
-		t.Errorf("got elems = %v, want elems = %v", gotElems, want.Elems)
+		tb.Errorf("got elems = %v, want elems = %v", gotElems, want.Elems)
 	}
 
 	var nextIndex int
 	buffer.Iterate(func(elem T, index int) bool {
 		if index != nextIndex {
-			t.Errorf("Iterate called in the wrong order, expected %d but got %d", nextIndex, index)
+			tb.Errorf("Iterate called in the wrong order, expected %d but got %d", nextIndex, index)
 		}
 		nextIndex++
 
 		if index < 0 || index >= len(want.Elems) {
-			t.Errorf("Iterate called with unexpected element %v", elem)
+			tb.Errorf("Iterate called with unexpected element %v", elem)
 			return true
 		}
 
 		wantElem := want.Elems[index]
 		if !reflect.DeepEqual(elem, wantElem) {
-			t.Errorf("Iterate called with wrong element, expected %v but got %v", wantElem, elem)
+			tb.Errorf("Iterate called with wrong element, expected %v but got %v", wantElem, elem)
 		}
 
 		return true
 	})
 	if nextIndex != len(gotElems) {
-		t.Errorf("Iterate called an unexpected number of times, expected %d but got %d", len(gotElems), nextIndex)
+		tb.Errorf("Iterate called an unexpected number of times, expected %d but got %d", len(gotElems), nextIndex)
 	}
 
 }

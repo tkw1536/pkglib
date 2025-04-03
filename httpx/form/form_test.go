@@ -98,9 +98,8 @@ var (
 
 // testForm makes a form that can pass or fail the validate and success stages.
 func makeTestForm(t *testing.T) form.Form[bool] {
-	if t != nil {
-		t.Helper()
-	}
+	t.Helper()
+
 	return form.Form[bool]{
 		Fields: []field.Field{
 			{Name: "validate", Type: field.Text, Label: "Should the validate stage be passed?"},

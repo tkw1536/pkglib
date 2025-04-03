@@ -10,6 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+//spellchecker:words nolint thelper
+
 func ExampleMarshal() {
 	// take a random value to encode
 	value := map[string]any{
@@ -35,27 +37,37 @@ func ExampleMarshal() {
 	//     "69": nice
 }
 
-func mustMarshal(t testing.TB, node *yaml.Node) string {
+//nolint:thelper
+func mustMarshal(tb testing.TB, node *yaml.Node) string {
+	if tb != nil {
+		tb.Helper()
+	}
+
 	result, err := yaml.Marshal(node)
 	if err != nil {
 		msg := fmt.Sprintf("unable to marshal: %v", err)
-		if t != nil {
-			t.Error(msg)
-			t.Fail()
+		if tb != nil {
+			tb.Error(msg)
+			tb.Fail()
 		}
 		panic(msg)
 	}
 	return string(result)
 }
 
-func mustUnmarshal(t testing.TB, source string) *yaml.Node {
+//nolint:thelper
+func mustUnmarshal(tb testing.TB, source string) *yaml.Node {
+	if tb != nil {
+		tb.Helper()
+	}
+
 	var node yaml.Node
 	err := yaml.Unmarshal([]byte(source), &node)
 	if err != nil {
 		msg := fmt.Sprintf("unable to unmarshal: %v", err)
-		if t != nil {
-			t.Error(msg)
-			t.Fail()
+		if tb != nil {
+			tb.Error(msg)
+			tb.Fail()
 		}
 		panic(msg)
 	}

@@ -18,6 +18,8 @@ func makePaths(t *testing.T) (paths struct {
 	LinkToDir  string
 	BrokenLink string
 }) {
+	t.Helper()
+
 	base := t.TempDir()
 
 	paths.Dir = filepath.Join(base, "dir")

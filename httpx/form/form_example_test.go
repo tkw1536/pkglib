@@ -18,6 +18,8 @@ import (
 	"github.com/tkw1536/pkglib/httpx/form/field"
 )
 
+//spellchecker:words nolint thelper
+
 var (
 	errEmptyGivenName  = errors.New("given name must not be empty")
 	errEmptyFamilyName = errors.New("family name must not be empty")
@@ -67,6 +69,8 @@ func ExampleForm() {
 }
 
 // makeFormRequest makes a request to a form.
+//
+//nolint:thelper
 func makeFormRequest(t *testing.T, form http.Handler, body map[string]string) string {
 	if t != nil {
 		t.Helper()
