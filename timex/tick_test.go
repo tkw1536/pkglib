@@ -39,7 +39,7 @@ func ExampleStopTimer_fired() {
 	timex.StopTimer(t)
 
 	// check if the timer fired
-	fired := false
+	var fired bool
 	select {
 	case <-t.C:
 		fired = true

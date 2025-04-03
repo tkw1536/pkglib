@@ -10,7 +10,7 @@ import (
 	"github.com/tkw1536/pkglib/lazy"
 )
 
-//spellchecker:words finalizer
+//spellchecker:words finalizer nolint wastedassign
 
 // Pool holds a finite set of lazily created objects.
 type Pool[V any] struct {
@@ -63,7 +63,7 @@ func (pool *Pool[V]) Use(f func(V) error) error {
 	ok, err := func() (ok bool, err error) {
 		defer func() { _ = recover() }() // silently ignore errors
 
-		ok = false
+		ok = false //nolint:wastedassign
 		err = f(entry)
 		ok = err == nil
 		return
