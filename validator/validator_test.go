@@ -1,11 +1,13 @@
 //spellchecker:words validator
-package validator
+package validator_test
 
-//spellchecker:words errors strconv
+//spellchecker:words errors strconv github pkglib validator
 import (
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/tkw1536/pkglib/validator"
 )
 
 var (
@@ -25,10 +27,10 @@ func ExampleValidate() {
 	}
 
 	// Create a validator collection
-	collection := make(Collection, 2)
+	collection := make(validator.Collection, 2)
 
 	// positive checks if a number is positive
-	Add(collection, "positive", func(Value *int, Default string) error {
+	validator.Add(collection, "positive", func(Value *int, Default string) error {
 		// if value is unset, parse the default as a string
 		if *Value == 0 {
 			i, err := strconv.ParseInt(Default, 10, 64)
@@ -47,7 +49,7 @@ func ExampleValidate() {
 	})
 
 	// nonempty checks that a string is not empty
-	Add(collection, "nonempty", func(Value *string, Default string) error {
+	validator.Add(collection, "nonempty", func(Value *string, Default string) error {
 		// set the default
 		if *Value == "" {
 			*Value = Default
@@ -60,7 +62,7 @@ func ExampleValidate() {
 		return nil
 	})
 
-	err := Validate(&value, collection)
+	err := validator.Validate(&value, collection)
 	fmt.Printf("%v\n", value)
 	fmt.Println(err)
 	// Output: {234 stuff {45 more}}
@@ -71,10 +73,10 @@ func ExampleValidate() {
 func ExampleValidate_fail() {
 
 	// Create a validator collection
-	collection := make(Collection, 2)
+	collection := make(validator.Collection, 2)
 
 	// positive checks if a number is positive
-	Add(collection, "positive", func(Value *int, Default string) error {
+	validator.Add(collection, "positive", func(Value *int, Default string) error {
 		// if value is unset, parse the default as a string
 		if *Value == 0 {
 			i, err := strconv.ParseInt(Default, 10, 64)
@@ -93,7 +95,7 @@ func ExampleValidate_fail() {
 	})
 
 	// nonempty checks that a string is not empty
-	Add(collection, "nonempty", func(Value *string, Default string) error {
+	validator.Add(collection, "nonempty", func(Value *string, Default string) error {
 		// set the default
 		if *Value == "" {
 			*Value = Default
@@ -116,7 +118,7 @@ func ExampleValidate_fail() {
 		} `recurse:"true"`
 	}
 
-	err := Validate(&value, collection)
+	err := validator.Validate(&value, collection)
 
 	fmt.Printf("%v\n", value)
 	fmt.Println(err)
@@ -127,7 +129,7 @@ func ExampleValidate_fail() {
 // Demonstrates that Validate cannot be called on a non-struct type.
 func ExampleValidate_notAStruct() {
 	var value int
-	err := Validate(&value, nil)
+	err := validator.Validate(&value, nil)
 
 	fmt.Println(err)
 	// Output: validate called on non-struct type
@@ -137,14 +139,14 @@ func ExampleValidate_notAStruct() {
 func ExampleValidate_notAValidator() {
 
 	// create a collection with something that isn't a validator
-	collection := make(Collection, 2)
+	collection := make(validator.Collection, 2)
 	collection["generic"] = "I_AM_NOT_A_VALIDATOR"
 
 	// try to validate a field with a non-validator
 	var value struct {
 		Field int `validate:"generic"`
 	}
-	err := Validate(&value, collection)
+	err := validator.Validate(&value, collection)
 
 	fmt.Println(err)
 
@@ -155,7 +157,7 @@ func ExampleValidate_notAValidator() {
 func ExampleValidate_invalid() {
 
 	// create a collection with a string validator
-	collection := make(Collection, 2)
+	collection := make(validator.Collection, 2)
 	collection["string"] = func(Value *string, Default string) error {
 		panic("never reached")
 	}
@@ -164,7 +166,7 @@ func ExampleValidate_invalid() {
 	var value struct {
 		Field int `validate:"string"`
 	}
-	err := Validate(&value, collection)
+	err := validator.Validate(&value, collection)
 
 	fmt.Println(err)
 	// Output: field "Field": validator "string": got type string, expected type int

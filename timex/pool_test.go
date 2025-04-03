@@ -1,34 +1,36 @@
 //spellchecker:words timex
-package timex
+package timex_test
 
-//spellchecker:words time
+//spellchecker:words time github pkglib timex
 import (
 	"fmt"
 	"time"
+
+	"github.com/tkw1536/pkglib/timex"
 )
 
 func ExampleNewTimer() {
 
 	// take a new timer from the pool
 	// and release it again when done
-	t := NewTimer()
-	defer ReleaseTimer(t)
+	t := timex.NewTimer()
+	defer timex.ReleaseTimer(t)
 
 	// the returned timer is stopped
 	// so it will never fire!
 	select {
 	case <-t.C:
 		fmt.Println("timer fired initially")
-	case <-time.After(2 * short):
+	case <-time.After(2 * timex.Short):
 		fmt.Println("timer did not fire initially")
 	}
 
 	// if you reset it, it will fire!
-	t.Reset(short)
+	t.Reset(timex.Short)
 	select {
 	case <-t.C:
 		fmt.Println("timer fired")
-	case <-time.After(2 * short):
+	case <-time.After(2 * timex.Short):
 		fmt.Println("timer did not fire")
 	}
 

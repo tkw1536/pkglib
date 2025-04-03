@@ -1,10 +1,12 @@
 //spellchecker:words lreflect
-package lreflect
+package lreflect_test
 
-//spellchecker:words reflect
+//spellchecker:words reflect github pkglib lifetime interal lreflect
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
 )
 
 //spellchecker:words rankable
@@ -35,7 +37,7 @@ func ExampleSortSliceByRank() {
 			"i",
 		}
 
-		_ = SortSliceByRank(reflect.ValueOf(values))
+		_ = lreflect.SortSliceByRank(reflect.ValueOf(values))
 		fmt.Println(values)
 	}
 
@@ -46,7 +48,7 @@ func ExampleSortSliceByRank() {
 			RankableStruct("yoda"),
 			RankableStruct("am"),
 		}
-		_ = SortSliceByRank(reflect.ValueOf(values))
+		_ = lreflect.SortSliceByRank(reflect.ValueOf(values))
 
 		fmt.Println(values)
 	}
@@ -58,7 +60,7 @@ func ExampleSortSliceByRank() {
 			"yoda",
 			"am",
 		}
-		_ = SortSliceByRank(reflect.ValueOf(values))
+		_ = lreflect.SortSliceByRank(reflect.ValueOf(values))
 
 		fmt.Println(values)
 	}

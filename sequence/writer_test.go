@@ -1,19 +1,21 @@
 // Package sequence provides Writer.
 //
 //spellchecker:words sequence
-package sequence
+package sequence_test
 
-//spellchecker:words errors sync
+//spellchecker:words errors sync github pkglib sequence
 import (
 	"errors"
 	"fmt"
 	"os"
 	"sync"
+
+	"github.com/tkw1536/pkglib/sequence"
 )
 
 func ExampleWriter() {
 	// Writer counts the total number of bytes written
-	w := Writer{
+	w := sequence.Writer{
 		Writer: os.Stdout,
 	}
 
@@ -62,7 +64,7 @@ func ExampleWriter_concurrent() {
 	// create a writer that can only be written to once
 	writeOnce := writeSyncToStdout{NumWrites: 2}
 
-	w := Writer{
+	w := sequence.Writer{
 		Writer: &writeOnce,
 	}
 
@@ -88,7 +90,7 @@ func ExampleWriter_fail() {
 	// create a writer that can only be written to once
 	writeOnce := writeSyncToStdout{NumWrites: 1}
 
-	w := Writer{
+	w := sequence.Writer{
 		Writer: &writeOnce,
 	}
 

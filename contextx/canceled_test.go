@@ -1,10 +1,15 @@
 //spellchecker:words contextx
-package contextx
+package contextx_test
 
-import "fmt"
+//spellchecker:words github pkglib contextx
+import (
+	"fmt"
+
+	"github.com/tkw1536/pkglib/contextx"
+)
 
 func ExampleCanceled() {
-	ctx := Canceled()
+	ctx := contextx.Canceled()
 
 	select {
 	case <-ctx.Done():

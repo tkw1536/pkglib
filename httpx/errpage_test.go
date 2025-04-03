@@ -1,7 +1,7 @@
 //spellchecker:words httpx
 package httpx_test
 
-//spellchecker:words embed http httptest github pkglib httpx recovery
+//spellchecker:words context embed http httptest github pkglib httpx recovery
 import (
 	"context"
 	_ "embed"

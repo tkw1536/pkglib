@@ -1,10 +1,12 @@
 //spellchecker:words docfmt
-package docfmt
+package docfmt_test
 
-//spellchecker:words reflect testing
+//spellchecker:words reflect testing github pkglib docfmt
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tkw1536/pkglib/docfmt"
 )
 
 func TestSplitParts(t *testing.T) {
@@ -25,7 +27,7 @@ func TestSplitParts(t *testing.T) {
 		t.Run(tt.input, func(t *testing.T) {
 			t.Parallel()
 
-			if gotParts := SplitParts(tt.input); !reflect.DeepEqual(gotParts, tt.wantParts) {
+			if gotParts := docfmt.SplitParts(tt.input); !reflect.DeepEqual(gotParts, tt.wantParts) {
 				t.Errorf("SplitParts() = %#v, want %#v", gotParts, tt.wantParts)
 			}
 		})
@@ -51,7 +53,7 @@ func TestSplitWords(t *testing.T) {
 		t.Run(tt.input, func(t *testing.T) {
 			t.Parallel()
 
-			gotWords, gotSep := SplitWords(tt.input)
+			gotWords, gotSep := docfmt.SplitWords(tt.input)
 			if !reflect.DeepEqual(gotWords, tt.wantWords) {
 				t.Errorf("SplitWords() gotWords = %#v, want %#v", gotWords, tt.wantWords)
 			}

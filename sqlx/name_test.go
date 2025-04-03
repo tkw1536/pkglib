@@ -1,9 +1,11 @@
 //spellchecker:words sqlx
-package sqlx
+package sqlx_test
 
-//spellchecker:words testing
+//spellchecker:words testing github pkglib sqlx
 import (
 	"testing"
+
+	"github.com/tkw1536/pkglib/sqlx"
 )
 
 func TestIsSafeDatabaseLiteral(t *testing.T) {
@@ -28,7 +30,7 @@ func TestIsSafeDatabaseLiteral(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got := IsSafeDatabaseLiteral(tt.name); got != tt.want {
+			if got := sqlx.IsSafeDatabaseLiteral(tt.name); got != tt.want {
 				t.Errorf("IsSafeDatabaseLiteral() = %v, want %v", got, tt.want)
 			}
 		})
@@ -49,7 +51,7 @@ func TestIsSafeDatabaseSingleQuote(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got := IsSafeDatabaseSingleQuote(tt.name); got != tt.want {
+			if got := sqlx.IsSafeDatabaseSingleQuote(tt.name); got != tt.want {
 				t.Errorf("IsSafeDatabaseSingleQuote() = %v, want %v", got, tt.want)
 			}
 		})

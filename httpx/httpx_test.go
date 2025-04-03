@@ -3,7 +3,7 @@
 //spellchecker:words httpx
 package httpx_test
 
-//spellchecker:words http httptest time github pkglib httpx
+//spellchecker:words context http httptest time github pkglib httpx
 import (
 	"context"
 	"fmt"

@@ -1,12 +1,14 @@
 // Package password allows generating random passwords
 //
 //spellchecker:words password
-package password
+package password_test
 
-//spellchecker:words crypto rand testing
+//spellchecker:words crypto rand testing github pkglib password
 import (
 	"crypto/rand"
 	"testing"
+
+	"github.com/tkw1536/pkglib/password"
 )
 
 func TestPassword(t *testing.T) {
@@ -17,17 +19,17 @@ func TestPassword(t *testing.T) {
 	tests := []struct {
 		name    string
 		length  int
-		charset Charset
+		charset password.Charset
 	}{
 		{
 			name:    "length 10 default charset",
 			length:  10,
-			charset: DefaultCharSet,
+			charset: password.DefaultCharSet,
 		},
 		{
 			name:    "length 20 default charset",
 			length:  20,
-			charset: DefaultCharSet,
+			charset: password.DefaultCharSet,
 		},
 		{
 			name:    "length 14 custom charset",
@@ -40,7 +42,7 @@ func TestPassword(t *testing.T) {
 			t.Parallel()
 
 			for range N {
-				candidate, err := Generate(rand.Reader, tt.length, tt.charset)
+				candidate, err := password.Generate(rand.Reader, tt.length, tt.charset)
 				if err != nil {
 					t.Error(err)
 				}

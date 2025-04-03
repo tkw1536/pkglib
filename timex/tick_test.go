@@ -1,26 +1,28 @@
 // Package timex manages various timer-related functions.
 //
 //spellchecker:words timex
-package timex
+package timex_test
 
-//spellchecker:words context time
+//spellchecker:words context time github pkglib timex
 import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/tkw1536/pkglib/timex"
 )
 
 func ExampleStopTimer() {
 
 	// create a new timer and stop it
-	t := time.NewTimer(short)
-	StopTimer(t)
+	t := time.NewTimer(timex.Short)
+	timex.StopTimer(t)
 
 	// wait twice the timer amount to make sure it did not fire!
 	select {
 	case <-t.C:
 		fmt.Println("timer fired")
-	case <-time.After(2 * short):
+	case <-time.After(2 * timex.Short):
 		fmt.Println("timer did not fire")
 	}
 
@@ -33,15 +35,15 @@ func ExampleStopTimer_fired() {
 	t := time.NewTimer(time.Nanosecond)
 
 	// wait for a bit, then stop the timer
-	time.Sleep(short)
-	StopTimer(t)
+	time.Sleep(timex.Short)
+	timex.StopTimer(t)
 
 	// check if the timer fired
 	fired := false
 	select {
 	case <-t.C:
 		fired = true
-	case <-time.After(short):
+	case <-time.After(timex.Short):
 		fired = false
 	}
 	fmt.Println(fired)
@@ -53,7 +55,7 @@ func ExampleTickContext() {
 	// create a new context
 	ctx, cancel := context.WithCancel(context.Background())
 
-	ticker := TickContext(ctx, short)
+	ticker := timex.TickContext(ctx, timex.Short)
 
 	// have a couple ticks, each time the channel should be open
 	{
@@ -84,11 +86,11 @@ func ExampleTickUntilFunc() {
 	var counter int
 
 	// keep a counter, and stop when it reaches 3!
-	_ = TickUntilFunc(func(t time.Time) bool {
+	_ = timex.TickUntilFunc(func(t time.Time) bool {
 		counter++
 		fmt.Printf("tick(%d)\n", counter)
 		return counter == 3
-	}, context.Background(), short)
+	}, context.Background(), timex.Short)
 
 	// Output: tick(1)
 	// tick(2)

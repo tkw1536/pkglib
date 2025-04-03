@@ -1,11 +1,13 @@
 //spellchecker:words text
-package text
+package text_test
 
-//spellchecker:words strings testing
+//spellchecker:words strings testing github pkglib text
 import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/tkw1536/pkglib/text"
 )
 
 func TestJoin(t *testing.T) {
@@ -60,7 +62,7 @@ func TestJoin(t *testing.T) {
 			var builder strings.Builder
 
 			builder.WriteString(tt.prefix)
-			gotN, gotErr := Join(&builder, tt.elems, tt.sep)
+			gotN, gotErr := text.Join(&builder, tt.elems, tt.sep)
 			got := builder.String()
 
 			want := tt.prefix + strings.Join(tt.elems, tt.sep)
@@ -111,7 +113,7 @@ func TestRepeatJoin(t *testing.T) {
 			var builder strings.Builder
 
 			builder.WriteString(tt.prefix)
-			gotN, gotErr := RepeatJoin(&builder, tt.s, tt.sep, tt.count)
+			gotN, gotErr := text.RepeatJoin(&builder, tt.s, tt.sep, tt.count)
 			got := builder.String()
 
 			var want string
@@ -176,7 +178,7 @@ func TestRepeat(t *testing.T) {
 			var builder strings.Builder
 
 			builder.WriteString(tt.prefix)
-			gotN, gotErr := Repeat(&builder, tt.s, tt.count)
+			gotN, gotErr := text.Repeat(&builder, tt.s, tt.count)
 			got := builder.String()
 
 			want := tt.prefix + strings.Repeat(tt.s, tt.count)

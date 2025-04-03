@@ -1,11 +1,12 @@
 //spellchecker:words docfmt
-package docfmt
+package docfmt_test
 
-//spellchecker:words reflect testing github pkglib testlib
+//spellchecker:words reflect testing github pkglib docfmt testlib
 import (
 	"reflect"
 	"testing"
 
+	"github.com/tkw1536/pkglib/docfmt"
 	"github.com/tkw1536/pkglib/testlib"
 )
 
@@ -19,10 +20,10 @@ func TestAssertValid(t *testing.T) {
 			var wantPanic bool
 			var wantError interface{}
 
-			if Enabled {
+			if docfmt.Enabled {
 				wantPanic = tt.wantError != nil
 				if wantPanic {
-					wantError = ValidationError{
+					wantError = docfmt.ValidationError{
 						Message: tt.input,
 						Results: tt.wantError,
 					}
@@ -30,7 +31,7 @@ func TestAssertValid(t *testing.T) {
 			}
 
 			gotPanic, gotError := testlib.DoesPanic(func() {
-				AssertValid(tt.input)
+				docfmt.AssertValid(tt.input)
 			})
 
 			if gotPanic != wantPanic {

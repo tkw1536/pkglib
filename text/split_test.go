@@ -1,10 +1,12 @@
 //spellchecker:words text
-package text
+package text_test
 
-//spellchecker:words reflect testing
+//spellchecker:words reflect testing github pkglib text
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tkw1536/pkglib/text"
 )
 
 func TestSplitter(t *testing.T) {
@@ -34,7 +36,7 @@ func TestSplitter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.haystack, func(t *testing.T) {
 			t.Parallel()
-			if got := Splitter(tt.chars)(tt.haystack); !reflect.DeepEqual(got, tt.want) {
+			if got := text.Splitter(tt.chars)(tt.haystack); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Splitter() = %v, want %v", got, tt.want)
 			}
 		})

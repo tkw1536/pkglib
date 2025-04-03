@@ -33,4 +33,5 @@ linters:
     - recvcheck
     - tagalign
     - testableexamples
+    - testpackage
     - staticcheck

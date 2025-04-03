@@ -1,8 +1,11 @@
 //spellchecker:words collection
-package collection
+package collection_test
 
+//spellchecker:words github pkglib collection
 import (
 	"fmt"
+
+	"github.com/tkw1536/pkglib/collection"
 )
 
 func ExampleIterSorted() {
@@ -11,7 +14,7 @@ func ExampleIterSorted() {
 		1: "world",
 	}
 
-	for k, v := range IterSorted(m) {
+	for k, v := range collection.IterSorted(m) {
 		fmt.Printf("%d: %v\n", k, v)
 	}
 
@@ -24,7 +27,7 @@ func ExampleMapValues() {
 		0: "hi",
 		1: "world",
 	}
-	m2 := MapValues(m, func(k int, v string) int {
+	m2 := collection.MapValues(m, func(k int, v string) int {
 		return len(v)
 	})
 	fmt.Println(m2)
@@ -34,24 +37,24 @@ func ExampleMapValues() {
 
 func ExampleAppend() {
 	// append to the first map
-	fmt.Println(Append(map[string]string{
+	fmt.Println(collection.Append(map[string]string{
 		"hello": "world",
 	}, map[string]string{
 		"answer": "42",
 	}))
 
 	// append to the first non-nil map
-	fmt.Println(Append(nil, nil, nil, map[string]string{
+	fmt.Println(collection.Append(nil, nil, nil, map[string]string{
 		"hello": "world",
 	}, map[string]string{
 		"answer": "42",
 	}))
 
 	// appending nothing results in an empty map
-	fmt.Println(Append[string, string]())
+	fmt.Println(collection.Append[string, string]())
 
 	// appending to the nil map results in an empty map
-	fmt.Println(Append[string, string](nil))
+	fmt.Println(collection.Append[string, string](nil))
 
 	// Output: map[answer:42 hello:world]
 	// map[answer:42 hello:world]

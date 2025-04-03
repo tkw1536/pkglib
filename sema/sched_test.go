@@ -1,22 +1,24 @@
 //spellchecker:words sema
-package sema
+package sema_test
 
-//spellchecker:words errors sync atomic time
+//spellchecker:words errors sync atomic time github pkglib sema
 import (
 	"errors"
 	"fmt"
 	"sync/atomic"
 	"time"
+
+	"github.com/tkw1536/pkglib/sema"
 )
 
 func ExampleSchedule() {
 	var counter atomic.Uint64
 
 	// because we have a parallelism of 1, we run exactly in order!
-	_ = Schedule(func(i uint64) error {
+	_ = sema.Schedule(func(i uint64) error {
 		counter.Add(1)
 		return nil
-	}, 1000, Concurrency{
+	}, 1000, sema.Concurrency{
 		Limit: 0,
 		Force: false,
 	})
@@ -27,10 +29,10 @@ func ExampleSchedule() {
 
 func ExampleSchedule_order() {
 	// because we have a parallelism of 1, we run exactly in order!
-	_ = Schedule(func(i uint64) error {
+	_ = sema.Schedule(func(i uint64) error {
 		fmt.Print(i, ";")
 		return nil
-	}, 4, Concurrency{
+	}, 4, sema.Concurrency{
 		Limit: 1,
 		Force: false,
 	})
@@ -41,7 +43,7 @@ func ExampleSchedule_order() {
 var errFirstFunction = errors.New("first function error")
 
 func ExampleSchedule_error() {
-	err := Schedule(func(i uint64) error {
+	err := sema.Schedule(func(i uint64) error {
 		// the first invocation produces an error and returns immediately!
 		if i == 0 {
 			return errFirstFunction
@@ -58,7 +60,7 @@ func ExampleSchedule_error() {
 			panic("never reached")
 		}
 		return nil
-	}, 4, Concurrency{
+	}, 4, sema.Concurrency{
 		Limit: 2,
 		Force: false,
 	})
@@ -70,7 +72,7 @@ func ExampleSchedule_error() {
 func ExampleSchedule_force() {
 	var counter atomic.Uint64
 
-	err := Schedule(func(i uint64) error {
+	err := sema.Schedule(func(i uint64) error {
 		// count the number of invocations
 		counter.Add(1)
 
@@ -83,7 +85,7 @@ func ExampleSchedule_force() {
 		// ... work ...
 		time.Sleep(50 * time.Millisecond)
 		return nil
-	}, 10, Concurrency{
+	}, 10, sema.Concurrency{
 		Limit: 2,
 		Force: true,
 	})

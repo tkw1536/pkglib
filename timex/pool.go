@@ -7,13 +7,12 @@ import (
 	"time"
 )
 
-// short is a short time.Duration to use for various initializations and tests.
-// It has no observable effect, other than duration of some tests.
-const short = 100 * time.Millisecond
+// Short is a short time.Duration to use for various initializations.
+const Short = 100 * time.Millisecond
 
 var tPool = sync.Pool{
 	New: func() any {
-		timer := time.NewTimer(short)
+		timer := time.NewTimer(Short)
 		StopTimer(timer)
 		return timer
 	},

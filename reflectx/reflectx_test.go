@@ -1,13 +1,15 @@
 // Package reflectx provides extensions to the reflect package
 //
 //spellchecker:words reflectx
-package reflectx
+package reflectx_test
 
-//spellchecker:words reflect testing
+//spellchecker:words reflect testing github pkglib reflectx
 import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/tkw1536/pkglib/reflectx"
 )
 
 //spellchecker:words pkglib nolint recvcheck
@@ -37,7 +39,7 @@ func ExampleCopyInterface_pointer() {
 	original := Inc(&counter{Value: 0})
 
 	// make a cp and increment the cp
-	cp, _ := CopyInterface(original)
+	cp, _ := reflectx.CopyInterface(original)
 	cp.Inc()
 
 	// print the value of the original counter and the copy
@@ -60,7 +62,7 @@ func ExampleCopyInterface_lift() {
 	original := AsInt(counter{Value: 0})
 
 	// make a cp and increment the cp
-	cp, _ := CopyInterface(original)
+	cp, _ := reflectx.CopyInterface(original)
 	cp.(interface{ Inc() }).Inc()
 
 	// print the original value and the new value
@@ -97,7 +99,7 @@ func TestNameOf(t *testing.T) {
 		{
 			"type in this library",
 			reflect.TypeFor[TypeForTesting](),
-			"github.com/tkw1536/pkglib/reflectx.TypeForTesting",
+			"github.com/tkw1536/pkglib/reflectx_test.TypeForTesting",
 		},
 
 		{
@@ -125,7 +127,7 @@ func TestNameOf(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got := NameOf(tt.T); got != tt.want {
+			if got := reflectx.NameOf(tt.T); got != tt.want {
 				t.Errorf("NameOf() = %v, want %v", got, tt.want)
 			}
 		})

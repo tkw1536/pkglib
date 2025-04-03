@@ -1,10 +1,12 @@
 //spellchecker:words stream
-package stream
+package stream_test
 
-//spellchecker:words testing
+//spellchecker:words testing github pkglib stream
 import (
 	"io"
 	"testing"
+
+	"github.com/tkw1536/pkglib/stream"
 )
 
 //spellchecker:words errorlint nolint
@@ -28,7 +30,7 @@ func TestNullStream_Read(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := Null.Read(tt.args.bytes)
+			got, err := stream.Null.Read(tt.args.bytes)
 			if (err == io.EOF) != tt.wantEOF { //nolint:errorlint
 				t.Errorf("NullStream.Read() error = %v, wantEOF %v", err, tt.wantEOF)
 				return
@@ -59,7 +61,7 @@ func TestNullStream_Write(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := Null.Write(tt.args.bytes)
+			got, err := stream.Null.Write(tt.args.bytes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NullStream.Write() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -84,7 +86,7 @@ func TestNullStream_Close(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if err := Null.Close(); (err != nil) != tt.wantErr {
+			if err := stream.Null.Close(); (err != nil) != tt.wantErr {
 				t.Errorf("NullStream.Close() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

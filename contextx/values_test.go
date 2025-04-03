@@ -1,10 +1,12 @@
 //spellchecker:words contextx
-package contextx
+package contextx_test
 
-//spellchecker:words context
+//spellchecker:words context github pkglib contextx
 import (
 	"context"
 	"fmt"
+
+	"github.com/tkw1536/pkglib/contextx"
 )
 
 type customInt int
@@ -21,7 +23,7 @@ func ExampleWithValues() {
 	original := context.Background()
 
 	// add two values to it!
-	derived := WithValues(original, map[any]any{
+	derived := contextx.WithValues(original, map[any]any{
 		oneContextKey: "hello earth",
 		twoContextKey: "hello mars",
 	})
@@ -41,20 +43,20 @@ func ExampleWithValues() {
 func ExampleWithValuesOf() {
 	// create a primary context with 'hello' values.
 	// Note that we only fill '1' and '2' here.
-	primary := WithValues(context.Background(), map[any]any{
+	primary := contextx.WithValues(context.Background(), map[any]any{
 		oneContextKey: "hello earth",
 		twoContextKey: "hello mars",
 	})
 
 	// create a secondary context with 'bye' values
 	// note that we only fill '2' and '3' here.
-	secondary := WithValues(context.Background(), map[any]any{
+	secondary := contextx.WithValues(context.Background(), map[any]any{
 		twoContextKey:   "bye mars",
 		threeContextKey: "bye venus",
 	})
 
 	// now creates a derived context that overrides the values of primary with secondary.
-	derived := WithValuesOf(primary, secondary)
+	derived := contextx.WithValuesOf(primary, secondary)
 
 	// found only in primary
 	fmt.Println(derived.Value(oneContextKey))

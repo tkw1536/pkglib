@@ -5,10 +5,14 @@
 // See Check.
 //
 //spellchecker:words docfmt
-package docfmt
+package docfmt_test
 
-//spellchecker:words testing
-import "testing"
+//spellchecker:words testing github pkglib docfmt
+import (
+	"testing"
+
+	"github.com/tkw1536/pkglib/docfmt"
+)
 
 //spellchecker:words doccheck
 
@@ -28,7 +32,7 @@ func TestFormat(t *testing.T) {
 		t.Run(tt.input, func(t *testing.T) {
 			t.Parallel()
 
-			if got := Format(tt.input); got != tt.want {
+			if got := docfmt.Format(tt.input); got != tt.want {
 				t.Errorf("Format() = %v, want %v", got, tt.want)
 			}
 		})

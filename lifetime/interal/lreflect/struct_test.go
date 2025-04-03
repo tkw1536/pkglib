@@ -1,10 +1,12 @@
 //spellchecker:words lreflect
-package lreflect
+package lreflect_test
 
-//spellchecker:words reflect testing
+//spellchecker:words reflect testing github pkglib lifetime interal lreflect
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
 )
 
 // HasAPrivateField has a private field.
@@ -114,7 +116,7 @@ func Test_ImplementsAsStructPointer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got, _ := ImplementsAsStructPointer(tt.args.I, tt.args.T); got != tt.want {
+			if got, _ := lreflect.ImplementsAsStructPointer(tt.args.I, tt.args.T); got != tt.want {
 				t.Errorf("ImplementsAsStructPointer() = %v, want %v", got, tt.want)
 			}
 		})

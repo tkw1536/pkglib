@@ -1,11 +1,13 @@
 //spellchecker:words contextx
-package contextx
+package contextx_test
 
-//spellchecker:words context time
+//spellchecker:words context time github pkglib contextx
 import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/tkw1536/pkglib/contextx"
 )
 
 func ExampleRun() {
@@ -33,7 +35,7 @@ func ExampleRun() {
 	defer ctxCancel()
 
 	// and run the function with the context and explicit cancel!
-	result, err := Run(ctx, func(start func()) int {
+	result, err := contextx.Run(ctx, func(start func()) int {
 		start() // allow calling cancel immediately!
 
 		// start the work!

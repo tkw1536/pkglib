@@ -1,15 +1,18 @@
 // Package testlib contains functions useful for testing
 //
 //spellchecker:words testlib
-package testlib
+package testlib_test
 
+//spellchecker:words github pkglib testlib
 import (
 	"fmt"
+
+	"github.com/tkw1536/pkglib/testlib"
 )
 
 // DoesPanic behavior for a panicking function.
 func ExampleDoesPanic_panic() {
-	didPanic, recovered := DoesPanic(func() {
+	didPanic, recovered := testlib.DoesPanic(func() {
 		panic("some error message")
 	})
 	fmt.Printf("didPanic = %t\n", didPanic)
@@ -20,7 +23,7 @@ func ExampleDoesPanic_panic() {
 
 // DoesPanic behavior for a function that does not panic.
 func ExampleDoesPanic_normal() {
-	didPanic, _ := DoesPanic(func() {
+	didPanic, _ := testlib.DoesPanic(func() {
 		/* do nothing */
 	})
 	fmt.Printf("didPanic = %t\n", didPanic)

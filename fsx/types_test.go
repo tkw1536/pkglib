@@ -1,11 +1,13 @@
-package fsx
+package fsx_test
 
-//spellchecker:words path filepath testing
+//spellchecker:words path filepath testing github pkglib
 import (
 	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/tkw1536/pkglib/fsx"
 )
 
 func makePaths(t *testing.T) (paths struct {
@@ -72,7 +74,7 @@ func TestExists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := Exists(tt.args.path)
+			got, err := fsx.Exists(tt.args.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Exists() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -116,7 +118,7 @@ func TestIsDirectory(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := IsDirectory(tt.args.path, tt.args.followLinks)
+			got, err := fsx.IsDirectory(tt.args.path, tt.args.followLinks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsDirectory() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -159,7 +161,7 @@ func TestIsRegular(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := IsRegular(tt.args.path, tt.args.followLinks)
+			got, err := fsx.IsRegular(tt.args.path, tt.args.followLinks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsRegular() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -196,7 +198,7 @@ func TestIsLink(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := IsLink(tt.args.path)
+			got, err := fsx.IsLink(tt.args.path)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("IsLink() error = %v, wantErr %v", err, tt.wantErr)
 				return

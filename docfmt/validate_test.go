@@ -1,10 +1,12 @@
 //spellchecker:words docfmt
-package docfmt
+package docfmt_test
 
-//spellchecker:words reflect testing
+//spellchecker:words reflect testing github pkglib docfmt
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tkw1536/pkglib/docfmt"
 )
 
 //spellchecker:words noth
@@ -13,14 +15,14 @@ import (
 var partTests = []struct {
 	name      string
 	input     string
-	wantError []ValidationResult
+	wantError []docfmt.ValidationResult
 }{
 	// failed checks
-	{"empty part", "hello::world", []ValidationResult{{PartIndex: 1, WordIndex: 0, Part: ":", Word: "", Kind: WordIsEmpty}}},
-	{"may not have extra spaces", "hello: world  ", []ValidationResult{{PartIndex: 1, WordIndex: 2, Part: " world  ", Word: "", Kind: WordIsEmpty}}},
-	{"may not start with upper case", "Hello World", []ValidationResult{{PartIndex: 0, WordIndex: 0, Part: "Hello World", Word: "Hello", Kind: WordForbiddenRune}, {PartIndex: 0, WordIndex: 1, Part: "Hello World", Word: "World", Kind: WordForbiddenRune}}},
-	{"may not start with upper case (2)", "HeLLo World", []ValidationResult{{PartIndex: 0, WordIndex: 0, Part: "HeLLo World", Word: "HeLLo", Kind: WordForbiddenRune}, {PartIndex: 0, WordIndex: 1, Part: "HeLLo World", Word: "World", Kind: WordForbiddenRune}}},
-	{"may not have an invalid ending spaces", "hello\tworld", []ValidationResult{{PartIndex: 0, WordIndex: 0, Part: "hello\tworld", Word: "hello\t", Kind: WordInvalidEnd}}},
+	{"empty part", "hello::world", []docfmt.ValidationResult{{PartIndex: 1, WordIndex: 0, Part: ":", Word: "", Kind: docfmt.WordIsEmpty}}},
+	{"may not have extra spaces", "hello: world  ", []docfmt.ValidationResult{{PartIndex: 1, WordIndex: 2, Part: " world  ", Word: "", Kind: docfmt.WordIsEmpty}}},
+	{"may not start with upper case", "Hello World", []docfmt.ValidationResult{{PartIndex: 0, WordIndex: 0, Part: "Hello World", Word: "Hello", Kind: docfmt.WordForbiddenRune}, {PartIndex: 0, WordIndex: 1, Part: "Hello World", Word: "World", Kind: docfmt.WordForbiddenRune}}},
+	{"may not start with upper case (2)", "HeLLo World", []docfmt.ValidationResult{{PartIndex: 0, WordIndex: 0, Part: "HeLLo World", Word: "HeLLo", Kind: docfmt.WordForbiddenRune}, {PartIndex: 0, WordIndex: 1, Part: "HeLLo World", Word: "World", Kind: docfmt.WordForbiddenRune}}},
+	{"may not have an invalid ending spaces", "hello\tworld", []docfmt.ValidationResult{{PartIndex: 0, WordIndex: 0, Part: "hello\tworld", Word: "hello\t", Kind: docfmt.WordInvalidEnd}}},
 
 	// passed checks
 	{"empty string passes", "", nil},
@@ -34,43 +36,43 @@ var partTests = []struct {
 // When asPart is false, they cannot be used as a part test.
 var wordTests = []struct {
 	input   string
-	want    ValidationKind
+	want    docfmt.ValidationKind
 	comment string
 	asPart  bool
 }{
 
-	{"nothing", ValidationOK, "only letters", true},
-	{"(nothing)", ValidationOK, "leading and trailing bracket is ok", true},
-	{"(nothing", ValidationOK, "leading only bracket", true},
-	{"nothing)", ValidationOK, "trailing only bracket", true},
-	{"nothing,", ValidationOK, "trailing comma", true},
-	{"hello-world", ValidationOK, "letters and dashes", true},
-	{"1234", ValidationOK, "only numbers", true},
-	{"1", ValidationOK, "only numbers", true},
-	{"URL", ValidationOK, "only capitals", true},
-	{"URLs", ValidationOK, "capitals, followed by 's'", true},
-	{"%s", ValidationOK, "leading % allowed", true},
-	{"`something'", ValidationOK, "`' delimited word is allowed", true},
-	{`"hello W0rld-"`, ValidationOK, " \"-quoted word is ok", true},
-	{"`hello W0rld-`", ValidationOK, " `-quoted word is ok", true},
-	{"`hello W0rld-`,", ValidationOK, " `-quoted word with suffix is ok", true},
+	{"nothing", docfmt.ValidationOK, "only letters", true},
+	{"(nothing)", docfmt.ValidationOK, "leading and trailing bracket is ok", true},
+	{"(nothing", docfmt.ValidationOK, "leading only bracket", true},
+	{"nothing)", docfmt.ValidationOK, "trailing only bracket", true},
+	{"nothing,", docfmt.ValidationOK, "trailing comma", true},
+	{"hello-world", docfmt.ValidationOK, "letters and dashes", true},
+	{"1234", docfmt.ValidationOK, "only numbers", true},
+	{"1", docfmt.ValidationOK, "only numbers", true},
+	{"URL", docfmt.ValidationOK, "only capitals", true},
+	{"URLs", docfmt.ValidationOK, "capitals, followed by 's'", true},
+	{"%s", docfmt.ValidationOK, "leading % allowed", true},
+	{"`something'", docfmt.ValidationOK, "`' delimited word is allowed", true},
+	{`"hello W0rld-"`, docfmt.ValidationOK, " \"-quoted word is ok", true},
+	{"`hello W0rld-`", docfmt.ValidationOK, " `-quoted word is ok", true},
+	{"`hello W0rld-`,", docfmt.ValidationOK, " `-quoted word with suffix is ok", true},
 
-	{"_", WordForbiddenRune, "dash not allowed", true},
-	{"a1", WordForbiddenRune, "mixed letter numbers not allowed", true},
-	{`"hello world"extra stuff`, WordIncorrectQuote, "may not have extra content after quote", false},
-	{`"unclosed`, WordIncorrectQuote, "unclosed quote", true},
-	{"hello world", WordForbiddenRune, "spaces not allowed", false}, // excluded from part test because it won't be seen as a part
-	{"Hello", WordForbiddenRune, "capital letter not allowed", true},
-	{"hello--world", WordNoSequentialDashes, "non sequential dashes not allowed", true},
-	{"-hello", WordNoOutsideDashes, "leading dash not allowed", true},
-	{"hello-", WordNoOutsideDashes, "trailing dash not allowed", true},
-	{"hello(", WordForbiddenRune, "inside bracket not allowed", true},
-	{"noth,ing", WordForbiddenRune, "non-trailing comma not allowed", true},
-	{"som%thing", WordForbiddenRune, "% in the middle of word not allowed", true},
-	{"a%", WordForbiddenRune, "trailing % not allowed", true},
+	{"_", docfmt.WordForbiddenRune, "dash not allowed", true},
+	{"a1", docfmt.WordForbiddenRune, "mixed letter numbers not allowed", true},
+	{`"hello world"extra stuff`, docfmt.WordIncorrectQuote, "may not have extra content after quote", false},
+	{`"unclosed`, docfmt.WordIncorrectQuote, "unclosed quote", true},
+	{"hello world", docfmt.WordForbiddenRune, "spaces not allowed", false}, // excluded from part test because it won't be seen as a part
+	{"Hello", docfmt.WordForbiddenRune, "capital letter not allowed", true},
+	{"hello--world", docfmt.WordNoSequentialDashes, "non sequential dashes not allowed", true},
+	{"-hello", docfmt.WordNoOutsideDashes, "leading dash not allowed", true},
+	{"hello-", docfmt.WordNoOutsideDashes, "trailing dash not allowed", true},
+	{"hello(", docfmt.WordForbiddenRune, "inside bracket not allowed", true},
+	{"noth,ing", docfmt.WordForbiddenRune, "non-trailing comma not allowed", true},
+	{"som%thing", docfmt.WordForbiddenRune, "% in the middle of word not allowed", true},
+	{"a%", docfmt.WordForbiddenRune, "trailing % not allowed", true},
 
-	{exception, ValidationOK, "excluded special word is ok", true},
-	{exception + ",", ValidationOK, "excluded special word is ok", true},
+	{exception, docfmt.ValidationOK, "excluded special word is ok", true},
+	{exception + ",", docfmt.ValidationOK, "excluded special word is ok", true},
 }
 
 var exception = "SpeCiAL"
@@ -82,9 +84,9 @@ func init() {
 			continue
 		}
 
-		var wantError []ValidationResult
-		if wt.want != ValidationOK {
-			wantError = []ValidationResult{
+		var wantError []docfmt.ValidationResult
+		if wt.want != docfmt.ValidationOK {
+			wantError = []docfmt.ValidationResult{
 				{
 					PartIndex: 0,
 					Part:      wt.input,
@@ -99,7 +101,7 @@ func init() {
 		partTests = append(partTests, struct {
 			name      string
 			input     string
-			wantError []ValidationResult
+			wantError []docfmt.ValidationResult
 		}{
 			name:      wt.comment,
 			input:     wt.input,
@@ -115,7 +117,7 @@ func TestValidate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotErr := Validate(tt.input, exception)
+			gotErr := docfmt.Validate(tt.input, exception)
 
 			if !reflect.DeepEqual(gotErr, tt.wantError) {
 				t.Errorf("Validate() error = %#v, want = %#v", gotErr, tt.wantError)
@@ -131,8 +133,8 @@ func Test_validateWord(t *testing.T) {
 		t.Run(tt.comment, func(t *testing.T) {
 			t.Parallel()
 
-			if got := validateWord(tt.input, map[string]struct{}{exception: {}}); got != tt.want {
-				t.Errorf("validateWord() = %v, want %v", got, tt.want)
+			if got := docfmt.ValidateWord(tt.input, map[string]struct{}{exception: {}}); got != tt.want {
+				t.Errorf("ValidateWord() = %v, want %v", got, tt.want)
 			}
 		})
 	}

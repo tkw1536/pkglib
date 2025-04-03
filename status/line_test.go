@@ -1,15 +1,17 @@
 //spellchecker:words status
-package status
+package status_test
 
-//spellchecker:words testing
+//spellchecker:words testing github pkglib status
 import (
 	"fmt"
 	"testing"
+
+	"github.com/tkw1536/pkglib/status"
 )
 
 func ExampleLineBuffer() {
 	// create a new line buffer
-	buffer := LineBuffer{
+	buffer := status.LineBuffer{
 		Line: func(line string) {
 			fmt.Printf("Line(%q)\n", line)
 		},
@@ -36,7 +38,7 @@ func ExampleLineBuffer() {
 
 func ExampleLineBuffer_FlushLineOnClose() {
 	// create a new line buffer
-	buffer := LineBuffer{
+	buffer := status.LineBuffer{
 		Line: func(line string) {
 			fmt.Printf("Line(%q)\n", line)
 		},
@@ -66,7 +68,7 @@ func ExampleLineBuffer_FlushLineOnClose() {
 
 func BenchmarkLineBuffer(b *testing.B) {
 
-	buffer := LineBuffer{
+	buffer := status.LineBuffer{
 		Line: func(line string) {
 			/* do nothing */
 		},

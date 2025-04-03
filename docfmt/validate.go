@@ -115,7 +115,7 @@ partLoop:
 			word = strings.TrimSpace(word)
 
 			// check word for appropriate letters
-			if typ := validateWord(word, exceptionsMap); typ != ValidationOK {
+			if typ := ValidateWord(word, exceptionsMap); typ != ValidationOK {
 				errors = append(errors, ValidationResult{
 					PartIndex: pI,
 					Part:      part,
@@ -130,8 +130,8 @@ partLoop:
 	return errors
 }
 
-// IsValidWord checks that word fulfills the rules for a valid word.
-func validateWord(word string, exceptions map[string]struct{}) ValidationKind {
+// ValidateWord checks that word fulfills the rules for a valid word.
+func ValidateWord(word string, exceptions map[string]struct{}) ValidationKind {
 	// NOTE: Return the exact validation result
 	runes := []rune(word)
 

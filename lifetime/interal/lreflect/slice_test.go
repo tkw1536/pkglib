@@ -1,10 +1,12 @@
 //spellchecker:words lreflect
-package lreflect
+package lreflect_test
 
-//spellchecker:words reflect testing
+//spellchecker:words reflect testing github pkglib lifetime interal lreflect
 import (
 	"reflect"
 	"testing"
+
+	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
 )
 
 func Test_ImplementsAsSliceInterface(t *testing.T) {
@@ -80,7 +82,7 @@ func Test_ImplementsAsSliceInterface(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got, _ := ImplementsAsSliceInterface(tt.args.I, tt.args.T); got != tt.want {
+			if got, _ := lreflect.ImplementsAsSliceInterface(tt.args.I, tt.args.T); got != tt.want {
 				t.Errorf("ImplementsAsSliceInterface() = %v, want %v", got, tt.want)
 			}
 		})
@@ -162,7 +164,7 @@ func Test_FilterSliceInterface(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := FilterSliceInterface(tt.args.S, tt.args.I)
+			got, err := lreflect.FilterSliceInterface(tt.args.S, tt.args.I)
 			var gotActual any
 			if err == nil {
 				gotActual = got.Interface()

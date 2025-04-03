@@ -1,4 +1,4 @@
-package fsx
+package fsx_test
 
 //spellchecker:words path filepath testing github pkglib testlib
 import (
@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/tkw1536/pkglib/fsx"
 	"github.com/tkw1536/pkglib/testlib"
 )
 
@@ -83,7 +84,7 @@ func TestSameFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if got := Same(tt.path1, tt.path2); got != tt.want {
+			if got := fsx.Same(tt.path1, tt.path2); got != tt.want {
 				t.Errorf("SameFile() = %v, want %v", got, tt.want)
 			}
 		})

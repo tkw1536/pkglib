@@ -1,11 +1,13 @@
 //spellchecker:words contextx
-package contextx
+package contextx_test
 
-//spellchecker:words context time
+//spellchecker:words context time github pkglib contextx
 import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/tkw1536/pkglib/contextx"
 )
 
 func ExampleAnyways() {
@@ -13,7 +15,7 @@ func ExampleAnyways() {
 
 	// on a non-cancelled context it just behaves like short
 	{
-		ctx, cancel := Anyways(context.Background(), short)
+		ctx, cancel := contextx.Anyways(context.Background(), short)
 		defer cancel()
 
 		start := time.Now()
@@ -25,7 +27,7 @@ func ExampleAnyways() {
 
 	// on a canceled context it delays the cancellation by the timeout
 	{
-		ctx, cancel := Anyways(Canceled(), short)
+		ctx, cancel := contextx.Anyways(contextx.Canceled(), short)
 		defer cancel()
 
 		start := time.Now()

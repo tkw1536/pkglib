@@ -1,7 +1,7 @@
 //spellchecker:words sshx
-package sshx
+package sshx_test
 
-//spellchecker:words crypto ecdsa elliptic rand reflect testing golang
+//spellchecker:words crypto ecdsa elliptic rand reflect testing github pkglib sshx golang
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/tkw1536/pkglib/sshx"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -92,7 +93,7 @@ func TestParseKeys(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotKeys, gotComments, gotOptions, gotRest, err := ParseKeys(tt.args.in, tt.args.limit)
+			gotKeys, gotComments, gotOptions, gotRest, err := sshx.ParseKeys(tt.args.in, tt.args.limit)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseKeys() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -138,7 +139,7 @@ func TestParseAllKeys(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			if gotKeys := ParseAllKeys(tt.args.in); !reflect.DeepEqual(gotKeys, tt.wantKeys) {
+			if gotKeys := sshx.ParseAllKeys(tt.args.in); !reflect.DeepEqual(gotKeys, tt.wantKeys) {
 				t.Errorf("ParseAllKeys() = %v, want %v", gotKeys, tt.wantKeys)
 			}
 		})

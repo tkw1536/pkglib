@@ -1,7 +1,7 @@
 //spellchecker:words sema
-package sema
+package sema_test
 
-//spellchecker:words sync atomic testing time github pkglib testlib
+//spellchecker:words strconv sync atomic testing time github pkglib sema testlib
 import (
 	"fmt"
 	"strconv"
@@ -10,12 +10,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/tkw1536/pkglib/sema"
 	"github.com/tkw1536/pkglib/testlib"
 )
 
 func ExampleNew() {
 	// create a new semaphore with two elements
-	sema := New(2)
+	sema := sema.New(2)
 
 	// some very finite resource pool
 	var resource atomic.Uint64
@@ -59,7 +60,7 @@ func ExampleNew() {
 }
 
 func ExampleNew_simple() {
-	sema := New(2)
+	sema := sema.New(2)
 
 	// we can lock it two times
 	sema.Lock()
@@ -80,7 +81,7 @@ func ExampleNew_simple() {
 }
 func ExampleNew_zero() {
 	// a zero or negative limit creates a semaphore without any limits
-	sema := New(0)
+	sema := sema.New(0)
 
 	N := 1000
 
@@ -98,7 +99,7 @@ func ExampleNew_zero() {
 
 func ExampleNew_two() {
 	// a semaphore with value >= 2 is a regular semaphore
-	sema := New(2)
+	sema := sema.New(2)
 	nothing := time.Nanosecond
 
 	// do a bunch of locks and unlocks
@@ -121,7 +122,7 @@ func ExampleNew_two() {
 
 func ExampleNew_one() {
 	// a semaphore with value one behaves just like a mutex
-	sema := New(1)
+	sema := sema.New(1)
 	nothing := time.Nanosecond
 
 	// do a bunch of locks and unlocks
@@ -139,7 +140,7 @@ func ExampleNew_one() {
 }
 
 func ExampleNew_panic() {
-	sema := New(2)
+	sema := sema.New(2)
 
 	// an unlock without a corresponding unlock will always panic
 	didPanic, value := testlib.DoesPanic(func() {
@@ -156,7 +157,7 @@ func ExampleNew_panic() {
 func TestNewSemaphore_simple(t *testing.T) {
 	t.Parallel()
 
-	sema := New(2)
+	sema := sema.New(2)
 	sema.Lock()
 	sema.Lock()
 
@@ -176,7 +177,7 @@ func TestNewSemaphore_exhausting(t *testing.T) {
 		t.Run(strconv.Itoa(n), func(t *testing.T) {
 			t.Parallel()
 
-			s := New(n)
+			s := sema.New(n)
 
 			// fully lock it
 			for range n {
@@ -192,7 +193,7 @@ func TestNewSemaphore_exhausting(t *testing.T) {
 }
 
 func BenchmarkNewSemaphore_uncontested(b *testing.B) {
-	sema := New(2)
+	sema := sema.New(2)
 	nothing := time.Nanosecond
 
 	for range b.N {
@@ -207,7 +208,7 @@ func BenchmarkNewSemaphore_uncontested(b *testing.B) {
 }
 
 func BenchmarkNewSemaphore_contested(b *testing.B) {
-	sema := New(2)
+	sema := sema.New(2)
 	nothing := time.Nanosecond
 
 	sema.Lock()
@@ -242,7 +243,7 @@ func TestNewSemaphore_TryLock(t *testing.T) {
 		t.Run(fmt.Sprintf("limit = %d", limit), func(t *testing.T) {
 			t.Parallel()
 
-			sema := New(limit)
+			sema := sema.New(limit)
 
 			// lock the semaphore limit times!
 			for range limit {

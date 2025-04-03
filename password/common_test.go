@@ -1,18 +1,23 @@
 //spellchecker:words password
-package password
+package password_test
 
-import "fmt"
+//spellchecker:words github pkglib password
+import (
+	"fmt"
+
+	"github.com/tkw1536/pkglib/password"
+)
 
 func ExamplePasswords() {
 	// load all the passwords from common sources
 	counts := map[string]int{}
-	for password := range Passwords(CommonSources()...) {
+	for pass := range password.Passwords(password.CommonSources()...) {
 
 		// do something with the password
-		_ = password.Password // string
+		_ = pass.Password // string
 
 		// and in this case count it by source
-		counts[password.Source]++
+		counts[pass.Source]++
 	}
 
 	// output the overall counts!

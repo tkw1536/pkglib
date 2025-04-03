@@ -112,6 +112,7 @@ func CommonSources() []PasswordSource {
 //
 // The caller must drain the channel.
 func Passwords(sources ...PasswordSource) <-chan CommonPassword {
+	// TODO: make this an iter.Seq
 	common := make(chan CommonPassword, 10*len(sources))
 
 	var wg sync.WaitGroup
