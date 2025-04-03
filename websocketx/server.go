@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//spellchecker:words upgrader websockets nolint containedctx
+//spellchecker:words upgrader websockets nolint containedctx errorlint
 
 // Server implements a websocket server.
 type Server struct {
@@ -261,7 +261,7 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 			// server is shutting down with a specific code =>
 			// close the server with that specific code
-			if cc, ok := cause.(CloseCause); ok {
+			if cc, ok := cause.(CloseCause); ok { //nolint:errorlint
 				conn.ShutdownWith(cc.Frame)
 				return
 			}

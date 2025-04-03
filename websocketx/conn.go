@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//spellchecker:words nolint containedctx
+//spellchecker:words nolint containedctx errorlint
 
 // accept accepts a websocket connection with the specified handler.
 // The caller should call [connection.serve] to start serving the connection.
@@ -315,7 +315,7 @@ func (conn *Connection) recvMessages() {
 
 			// intercept any unexpected CloseErrors
 			// this only has an effect if the context has not yet been closed.
-			if ce, ok := err.(*websocket.CloseError); ok {
+			if ce, ok := err.(*websocket.CloseError); ok { // nolint:errorlint
 				err = fmt.Errorf("%s", ce.Text) // nolint:err113
 			}
 			if err != nil {

@@ -12,7 +12,7 @@ import (
 	_ "embed"
 )
 
-//spellchecker:words errpage
+//spellchecker:words errpage nolint errorlint
 
 // RenderErrorPage renders a debug error page instead of the fallback response res.
 // The error page is intended to replace error pages for debugging and should not be used in production.
@@ -104,7 +104,7 @@ func newSError(err error) sError {
 
 	// find the child errors
 	var children []error
-	switch x := err.(type) {
+	switch x := err.(type) { //nolint:errorlint
 	case interface{ Unwrap() error }:
 		children = []error{x.Unwrap()}
 	case interface{ Unwrap() []error }:

@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+//spellchecker:words errorlint nolint
+
 func TestNullStream_Read(t *testing.T) {
 	type args struct {
 		bytes []byte
@@ -23,7 +25,7 @@ func TestNullStream_Read(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Null.Read(tt.args.bytes)
-			if (err == io.EOF) != tt.wantEOF {
+			if (err == io.EOF) != tt.wantEOF { //nolint:errorlint
 				t.Errorf("NullStream.Read() error = %v, wantEOF %v", err, tt.wantEOF)
 				return
 			}

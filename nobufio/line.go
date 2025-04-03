@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+//spellchecker:words errorlint nolint
+
 // ReadLine reads the current line from the provided reader.
 // It does not use a buffer, and does not read beyond the end of line marker.
 //
@@ -22,8 +24,8 @@ func ReadLine(reader io.Reader) (value string, err error) {
 	for {
 		// read the next valid rune
 		r, _, err := ReadRune(reader)
-		if err == io.EOF { // at EOF, we are done!
-			break
+		if err == io.EOF { //nolint:errorlint
+			break // at EOF, we are done!
 		}
 		readSomething = true
 		if err != nil { // unknown reading error => bail out

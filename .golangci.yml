@@ -15,4 +15,5 @@ linters:
     - err113
     - errchkjson
     - errname
+    - errorlint
     - gocritic

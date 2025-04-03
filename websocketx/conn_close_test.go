@@ -14,6 +14,8 @@ import (
 	"go.uber.org/goleak"
 )
 
+//spellchecker:words nolint errorlint
+
 // special status codes for testing
 // these are declared as reserved by the websocket protocol
 // so it is guaranteed that no valid test uses them
@@ -340,7 +342,7 @@ func TestServer_ClientClose(t *testing.T) {
 				}
 			})
 
-			gotCloseCause, ok := gotCancelCause.(websocketx.CloseCause)
+			gotCloseCause, ok := gotCancelCause.(websocketx.CloseCause) //nolint:errorlint
 			if !ok {
 				t.Errorf("server-side didn't return a close cause")
 				return
