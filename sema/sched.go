@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 )
 
-// Concurrency represents the amount of concurrency of an operation
+// Concurrency represents the amount of concurrency of an operation.
 type Concurrency struct {
 	Limit int  // Limit indicates the maximum number of concurrent operations. 0 or negative implies no limit.
 	Force bool // Force indicates if a failed operation should still allow future operations to start

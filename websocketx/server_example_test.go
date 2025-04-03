@@ -96,7 +96,7 @@ func ExampleServer_prepared() {
 	// Output: i am prepared
 }
 
-// Demonstrates how panic()ing handlers are handled handler
+// Demonstrates how panic()ing handlers are handled handler.
 func ExampleServer_panic() {
 	var server websocketx.Server
 
@@ -138,7 +138,7 @@ func ExampleServer_panic() {
 	// Output: normal message
 }
 
-// A simple echo server for messages
+// A simple echo server for messages.
 func ExampleServer_echo() {
 	// create a very simple websocket server that just echoes back messages
 	var server websocketx.Server

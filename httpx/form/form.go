@@ -221,8 +221,7 @@ func (fc FormContext) Unwrap() error {
 	return fc.Err
 }
 
-// renderSuccess renders a successful pass of the form
-// if an error occurs during rendering, renderForm is called instead
+// if an error occurs during rendering, renderForm is called instead.
 func (form *Form[D]) renderSuccess(data D, values map[string]string, w http.ResponseWriter, r *http.Request) {
 	// must have a form Success
 	if form.Success == nil {
@@ -239,7 +238,7 @@ func (form *Form[D]) renderSuccess(data D, values map[string]string, w http.Resp
 //go:embed "form.html"
 var formBytes []byte
 
-// FormTemplate is a template to embed a form
+// FormTemplate is a template to embed a form.
 var FormTemplate = template.Must(template.New("form.html").Parse(string(formBytes)))
 
 //spellchecker:words nosec

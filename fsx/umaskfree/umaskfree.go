@@ -13,7 +13,7 @@ import (
 	"syscall"
 )
 
-// mask is the global mask lock
+// mask is the global mask lock.
 var m mask
 
 // mask allows disabling and re-enabling the global umask.

@@ -18,4 +18,6 @@ linters:
     - errorlint
     - exhaustive
     - exptostd
+    - gocheckcompilerdirectives
     - gocritic
+    - godot

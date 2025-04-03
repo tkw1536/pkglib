@@ -68,7 +68,7 @@ type Status struct {
 	done    chan struct{}
 }
 
-// state* describe the lifecycle of a Status
+// state* describe the lifecycle of a Status.
 const (
 	stateInvalid uint64 = iota
 	stateNewCalled
@@ -76,7 +76,7 @@ const (
 	stateStopCalled
 )
 
-// lineAction describe the types of actions for lines
+// lineAction describe the types of actions for lines.
 type lineAction uint8
 
 const (
@@ -85,7 +85,7 @@ const (
 	closeAction
 )
 
-// action describes actions to perform on a [Status]
+// action describes actions to perform on a [Status].
 type action struct {
 	action  lineAction // what kind of action to perform
 	id      uint64     // id of line to perform action on
@@ -175,8 +175,7 @@ func (st *Status) Start() {
 
 const minFlushDelay = 50 * time.Millisecond
 
-// flush flushes the output of this Status to the underlying writer.
-// see [flushCompat] and [flushNormal]
+// see [flushCompat] and [flushNormal].
 func (st *Status) flush(force bool, changed uint64) error {
 	lErr := st.flushLogs(changed)
 
@@ -200,7 +199,7 @@ func (st *Status) flushCompat(changed uint64) error {
 	return err
 }
 
-// flushLogs flushes to the given log file
+// flushLogs flushes to the given log file.
 func (st *Status) flushLogs(changed uint64) error {
 	line, ok := st.messages[changed]
 	if !ok {
@@ -291,7 +290,7 @@ func (st *Status) Stop() {
 
 }
 
-// openLogger opens the logger for the line with the given id
+// openLogger opens the logger for the line with the given id.
 func (st *Status) openLogger(id uint64) {
 	if st == nil {
 		return
@@ -321,7 +320,7 @@ func (st *Status) openLogger(id uint64) {
 	st.logNames[id] = file.Name()
 }
 
-// closeLogger closes the logger for the line with the given id
+// closeLogger closes the logger for the line with the given id.
 func (st *Status) closeLogger(id uint64) error {
 	defer func() { _ = recover() }() // silently ignore errors
 
@@ -471,7 +470,7 @@ func (st *Status) Close(id uint64) {
 	}
 }
 
-// listen listens for updates
+// listen listens for updates.
 func (st *Status) listen() {
 	// nil check for no-op status
 	if st == nil {

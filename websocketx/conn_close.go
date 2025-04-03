@@ -68,12 +68,7 @@ func (conn *Connection) close(cause CloseCause, frame *CloseFrame, force bool) {
 	conn.state = stateClosing
 }
 
-// forceClose kills the underlying network connection.
-// and then updates the state of the connection.
-//
-// # If error is not nil, it also cancels the context with the given context
-//
-// the caller should hold stateM
+// the caller should hold stateM.
 func (conn *Connection) forceClose(err error) error {
 	if conn.stateM.TryLock() {
 		panic("conn.forceClose: stateM is not held")
@@ -154,7 +149,7 @@ func (cf CloseFrame) Body() []byte {
 	return websocket.FormatCloseMessage(int(cf.Code), cf.Reason)
 }
 
-// IsZero checks if this CloseFrame has the zero value
+// IsZero checks if this CloseFrame has the zero value.
 func (cf CloseFrame) IsZero() bool {
 	var zero CloseFrame
 	return zero == cf

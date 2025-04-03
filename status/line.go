@@ -74,7 +74,7 @@ func (lb *LineBuffer) WriteByte(b byte) error {
 	return lb.buffer.WriteByte(b)
 }
 
-// WriteRune is like [Write], but takes a single rune
+// WriteRune is like [Write], but takes a single rune.
 func (lb *LineBuffer) WriteRune(r rune) (int, error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
@@ -87,7 +87,7 @@ func (lb *LineBuffer) WriteRune(r rune) (int, error) {
 	return lb.buffer.WriteRune(r)
 }
 
-// WriteString is like [Write], but takes a string
+// WriteString is like [Write], but takes a string.
 func (lb *LineBuffer) WriteString(s string) (int, error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
@@ -100,11 +100,11 @@ func (lb *LineBuffer) WriteString(s string) (int, error) {
 	return lb.buffer.WriteString(s)
 }
 
-// runeR and runeN represent the bytes corresponding to '\r' and '\n' respectively
+// runeR and runeN represent the bytes corresponding to '\r' and '\n' respectively.
 const runeR byte = '\r'
 const runeN byte = '\n'
 
-// flush takes any completed lines in the internal buffer and calls the Line function
+// flush takes any completed lines in the internal buffer and calls the Line function.
 func (lb *LineBuffer) flush() {
 	// if we're closed, just delete all the lines!
 	if lb.closed {

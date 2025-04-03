@@ -10,7 +10,7 @@ import (
 
 //spellchecker:words timewrap
 
-// requestTime is a type for storing the request time
+// requestTime is a type for storing the request time.
 type requestTime struct{}
 
 var requestTimeKey = requestTime{}

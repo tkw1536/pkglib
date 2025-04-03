@@ -13,7 +13,7 @@ import (
 
 //spellchecker:words pkglib nolint
 
-// Iterate over the fields of a struct
+// Iterate over the fields of a struct.
 func ExampleIterFields() {
 
 	type Embed struct {
@@ -38,7 +38,7 @@ func ExampleIterFields() {
 	// encountered field Another with index 3
 }
 
-// Iterate over the fields of a struct
+// Iterate over the fields of a struct.
 func ExampleIterAllFields() {
 
 	type Embed struct {

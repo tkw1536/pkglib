@@ -13,7 +13,7 @@ type Component interface {
 	isComponent()
 }
 
-// Company is a Component
+// Company is a Component.
 type Company struct {
 	// Company declares its' dependencies using an embedded "dependencies" struct.
 	// This can simply refer to other components and will be set automatically.
@@ -32,7 +32,7 @@ func (c *Company) SayHello() {
 
 func (*Company) isComponent() {}
 
-// CEO is another component
+// CEO is another component.
 type CEO struct{}
 
 func (*CEO) isComponent() {}

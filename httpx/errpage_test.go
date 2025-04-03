@@ -12,7 +12,7 @@ import (
 	"github.com/tkw1536/pkglib/recovery"
 )
 
-// Render an error page in response to a panic
+// Render an error page in response to a panic.
 func ExampleRenderErrorPage() {
 
 	// response for errors
@@ -51,7 +51,7 @@ func ExampleRenderErrorPage() {
 	// Got content-type: text/html; charset=utf-8
 }
 
-// Render an error page in response to a panic
+// Render an error page in response to a panic.
 func ExampleRenderErrorPage_panic() {
 
 	// response for errors

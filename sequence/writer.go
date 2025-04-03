@@ -33,10 +33,7 @@ type Writer struct {
 	Writer io.Writer
 }
 
-// write performs the write operation w
-//
-// - if an error occurred previously, w is not called and 0, a [PreviousWriteFailed] is returned
-// - if no error occurred, w is called and the state is updated
+// - if no error occurred, w is called and the state is updated.
 func (sw *Writer) write(w func() (int, error)) (int, error) {
 	// fast path: we had an error, just return it!
 	if sw.hadError.Load() {

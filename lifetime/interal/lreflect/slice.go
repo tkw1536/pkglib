@@ -110,28 +110,28 @@ func CopySlice(slice reflect.Value) reflect.Value {
 	return copy
 }
 
-// noSliceError indicates that the type with the provided name is not a slice
+// noSliceError indicates that the type with the provided name is not a slice.
 type noSliceError string
 
 func (err noSliceError) Error() string {
 	return fmt.Sprintf("%s must be a slice type", string(err))
 }
 
-// nilTypeError indicates that the type with the provided name is nil
+// nilTypeError indicates that the type with the provided name is nil.
 type nilTypeError string
 
 func (err nilTypeError) Error() string {
 	return fmt.Sprintf("%s must not be a nil type", string(err))
 }
 
-// noInterfaceError indicates that the type with the provided name is not an interface
+// noInterfaceError indicates that the type with the provided name is not an interface.
 type noInterfaceError string
 
 func (err noInterfaceError) Error() string {
 	return fmt.Sprintf("%s must be an interface type", string(err))
 }
 
-// noInterfaceSliceError indicates that the type with provided name is not a slice of an interface
+// noInterfaceSliceError indicates that the type with provided name is not a slice of an interface.
 type noInterfaceSliceError string
 
 func (err noInterfaceSliceError) Error() string {

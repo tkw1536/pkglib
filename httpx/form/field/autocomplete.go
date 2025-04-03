@@ -1,7 +1,7 @@
 //spellchecker:words field
 package field
 
-// Autocomplete represents different autocomplete options
+// Autocomplete represents different autocomplete options.
 type Autocomplete string
 
 //spellchecker:words Impp bday

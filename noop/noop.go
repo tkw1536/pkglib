@@ -5,7 +5,7 @@ package noop
 
 import "io"
 
-// Writer extends an io.Writer by adding a noop close operation
+// Writer extends an io.Writer by adding a noop close operation.
 type Writer struct {
 	io.Writer
 }
@@ -14,7 +14,7 @@ func (Writer) Close() error {
 	return nil
 }
 
-// Reader extends an io.Reader by adding a noop close operation
+// Reader extends an io.Reader by adding a noop close operation.
 type Reader struct {
 	io.Reader
 }

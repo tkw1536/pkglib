@@ -9,8 +9,7 @@ import (
 
 //spellchecker:words noth
 
-// partTests are tests where an entire part is checked against the Validate() or Check() function.
-// These are outlined because they are reuse between parts
+// These are outlined because they are reuse between parts.
 var partTests = []struct {
 	name      string
 	input     string
@@ -76,7 +75,7 @@ var wordTests = []struct {
 
 var exception = "SpeCiAL"
 
-// add the word tests to the part tests
+// add the word tests to the part tests.
 func init() {
 	for _, wt := range wordTests {
 		if !wt.asPart {

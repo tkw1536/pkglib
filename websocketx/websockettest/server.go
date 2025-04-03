@@ -78,7 +78,7 @@ func (srv *Server) Dial(opts func(*websocket.Dialer), requestHeader http.Header)
 	return conn, response
 }
 
-// Close closes the underlying server
+// Close closes the underlying server.
 func (srv *Server) Close() {
 	srv.http.Close()
 }

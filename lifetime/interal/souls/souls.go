@@ -79,7 +79,7 @@ func (r *Souls) Init() error {
 	})
 }
 
-// initComponent initializes the component with the given id
+// initComponent initializes the component with the given id.
 func (r *Souls) initComponent(index int) error {
 	// the underlying element at the given index
 	elem := r.all.Index(index).Elem()
@@ -147,7 +147,7 @@ func (eug unregisteredComponentError) Error() string {
 	return fmt.Sprintf("attempt to export un-registered component: %s", eug.T)
 }
 
-// export exports a component that is assignable to typ
+// export exports a component that is assignable to typ.
 func (r *Souls) export(typ reflect.Type) (reflect.Value, error) {
 	// if we already have the component type cached, then return it
 	if c, ok := r.components[typ]; ok {
@@ -170,7 +170,7 @@ func (r *Souls) export(typ reflect.Type) (reflect.Value, error) {
 	return c, nil
 }
 
-// exportClass exports all components assignable to interface T
+// exportClass exports all components assignable to interface T.
 func (r *Souls) exportClass(typ reflect.Type) (reflect.Value, error) {
 	// if we already have the class cached, then return a copy
 	if clz, ok := r.classes[typ]; ok {
@@ -193,7 +193,7 @@ func (r *Souls) exportClass(typ reflect.Type) (reflect.Value, error) {
 	return clz, nil
 }
 
-// All returns the list of all components
+// All returns the list of all components.
 func (r *Souls) All(copy bool) (reflect.Value, error) {
 	// do the initialization
 	if err := r.Init(); err != nil {

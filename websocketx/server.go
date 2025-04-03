@@ -138,10 +138,7 @@ func (server *Server) RequireProtocols() {
 // Handler may not retain a reference to its' argument past the function returning.
 type Handler func(*Connection)
 
-// ServeHTTP implements the [http.Handler] interface.
-//
-// This is typically a websocket upgrade request.
-// If a non http-client
+// If a non http-client.
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// if the user did not request a websocket, go to the fallback handler
 	if !websocket.IsWebSocketUpgrade(r) {
@@ -324,7 +321,7 @@ func (server *Server) Close() {
 	server.close(errServerClose)
 }
 
-// close closes the server with the given cause
+// close closes the server with the given cause.
 func (server *Server) close(cause error) {
 	server.m.Lock()
 	defer server.m.Unlock()

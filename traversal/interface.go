@@ -69,8 +69,7 @@ type Generator[T any] interface {
 	Return()
 }
 
-// impl implements both [Iterator] and [Generator]
-// Values should be created using newImpl
+// Values should be created using newImpl.
 type impl[T any] struct {
 	done   <-chan struct{}
 	cancel func()
@@ -124,14 +123,13 @@ func (it *impl[T]) Datum() T {
 	return it.datum
 }
 
-// Close closes the iterator
+// Close closes the iterator.
 func (it *impl[T]) Close() error {
 	it.cancel()
 	return nil
 }
 
-// Err returns any error that occurred.
-// It may not be called
+// It may not be called.
 func (it *impl[T]) Err() error {
 	return it.err
 }

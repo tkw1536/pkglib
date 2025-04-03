@@ -16,7 +16,7 @@ func New[T any](source func(generator Generator[T])) Iterator[T] {
 	return it
 }
 
-// Slice creates a new Iterator that yields elements from the given slice
+// Slice creates a new Iterator that yields elements from the given slice.
 func Slice[T any](elements []T) Iterator[T] {
 	return New(func(sender Generator[T]) {
 		defer sender.Return()

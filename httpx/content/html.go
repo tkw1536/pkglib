@@ -53,9 +53,7 @@ func WriteHTMLI[C any](context C, e error, template *template.Template, intercep
 	}
 }
 
-// HTMLHandler is a [http.Handler] that responds to requests with html.
-//
-// C is the type of the context to be passed to the Template
+// C is the type of the context to be passed to the Template.
 type HTMLHandler[C any] struct {
 	Handler func(r *http.Request) (C, error)
 

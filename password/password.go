@@ -37,10 +37,7 @@ func (c Charset) ContainsOnly(password string) bool {
 // DefaultCharset represents the default Charset to use.
 const DefaultCharSet Charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-// Generate returns a randomly generated string with the provided length and with runes from the given charset.
-//
-// When an error occurs, it is guaranteed to return "", err.
-// rand is used as a source for randomness
+// rand is used as a source for randomness.
 func Generate(rand io.Reader, length int, charset Charset) (string, error) {
 	if length < 0 {
 		panic("length < 0")

@@ -59,10 +59,10 @@ type Connection struct {
 	outgoing chan queuedMessage
 }
 
-// state is the state of the connection
+// state is the state of the connection.
 type state int32
 
-// Different connection states
+// Different connection states.
 const (
 	stateConnecting state = iota
 	stateOpen

@@ -88,7 +88,7 @@ var (
 	errValidate = errors.New("<validate>")
 )
 
-// testForm makes a form that can pass or fail the validate and success stages
+// testForm makes a form that can pass or fail the validate and success stages.
 func makeTestForm(t *testing.T) form.Form[bool] {
 	if t != nil {
 		t.Helper()

@@ -16,14 +16,12 @@ import (
 
 //spellchecker:words nolint errorlint
 
-// special status codes for testing
-// these are declared as reserved by the websocket protocol
-// so it is guaranteed that no valid test uses them
+// so it is guaranteed that no valid test uses them.
 const (
-	// do nothing and simply exit the handler code
+	// do nothing and simply exit the handler code.
 	shutdownDoNothing websocketx.StatusCode = iota + 100
 
-	// force close the handler without waiting
+	// force close the handler without waiting.
 	shutdownForceClose
 )
 
@@ -355,7 +353,7 @@ func TestServer_ClientClose(t *testing.T) {
 	}
 }
 
-// closeCauseEquals compares two [CloseCause]s
+// closeCauseEquals compares two [CloseCause]s.
 func closeCauseEquals(left, right websocketx.CloseCause) bool {
 	return left.Frame == right.Frame && left.WasClean == right.WasClean && fmt.Sprint(left.Err) == fmt.Sprint(right.Err)
 }

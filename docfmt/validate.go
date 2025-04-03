@@ -31,7 +31,7 @@ func (v ValidationResult) Error() string {
 	return fmt.Sprintf("part %d word %d %q: %s", v.PartIndex, v.WordIndex, v.Word, v.Kind)
 }
 
-// ValidationKind represents different types of validation errors
+// ValidationKind represents different types of validation errors.
 type ValidationKind string
 
 const (
@@ -130,7 +130,7 @@ partLoop:
 	return errors
 }
 
-// IsValidWord checks that word fulfills the rules for a valid word
+// IsValidWord checks that word fulfills the rules for a valid word.
 func validateWord(word string, exceptions map[string]struct{}) ValidationKind {
 	// NOTE: Return the exact validation result
 	runes := []rune(word)
@@ -228,12 +228,12 @@ func allEqual[T any, V comparable](s []T, f func(e T) V) (value V, ok bool) {
 	return first, true
 }
 
-// all checks that f returns v for all elements of s
+// all checks that f returns v for all elements of s.
 func all[T any, V comparable](s []T, f func(e T) V, v V) (ok bool) {
 	return slices.IndexFunc(s, func(e T) bool { return f(e) != v }) == -1
 }
 
-// nonSequential checks that f does not return true for sequential values of s
+// nonSequential checks that f does not return true for sequential values of s.
 func nonSequential[T any](s []T, f func(value T) bool) bool {
 	if len(s) <= 1 {
 		return true
@@ -250,7 +250,7 @@ func nonSequential[T any](s []T, f func(value T) bool) bool {
 	return true
 }
 
-// check returns kind if valid is false else ValidationOK
+// check returns kind if valid is false else ValidationOK.
 func check(valid bool, kind ValidationKind) ValidationKind {
 	if valid {
 		return ValidationOK

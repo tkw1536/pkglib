@@ -12,7 +12,7 @@ import (
 
 //spellchecker:words pkglib
 
-// counter is used for testing
+// counter is used for testing.
 type counter struct {
 	Value int
 }

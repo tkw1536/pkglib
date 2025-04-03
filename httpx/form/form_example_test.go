@@ -66,7 +66,7 @@ func ExampleForm() {
 	// "POST" returned code 200 with text/html; charset=utf-8 "<!doctype html><title>Success</title>Welcome Picard, Andrea"
 }
 
-// makeFormRequest makes a request to a form
+// makeFormRequest makes a request to a form.
 func makeFormRequest(t *testing.T, form http.Handler, body map[string]string) string {
 	if t != nil {
 		t.Helper()

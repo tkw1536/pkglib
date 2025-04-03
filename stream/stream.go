@@ -17,17 +17,17 @@ type IOStream struct {
 	Stdout, Stderr io.Writer
 }
 
-// StdinIsATerminal checks if standard input is a terminal
+// StdinIsATerminal checks if standard input is a terminal.
 func (str IOStream) StdinIsATerminal() bool {
 	return nobufio.IsTerminal(str.Stdin)
 }
 
-// StdoutIsATerminal checks if standard output is a terminal
+// StdoutIsATerminal checks if standard output is a terminal.
 func (str IOStream) StdoutIsATerminal() bool {
 	return nobufio.IsTerminal(str.Stdout)
 }
 
-// StderrIsATerminal checks if standard error is a terminal
+// StderrIsATerminal checks if standard error is a terminal.
 func (str IOStream) StderrIsATerminal() bool {
 	return nobufio.IsTerminal(str.Stderr)
 }
@@ -81,9 +81,7 @@ func NewIOStream(stdout, stderr io.Writer, stdin io.Reader) IOStream {
 	}
 }
 
-// NonInteractive creates a new non-interactive writer from a single output stream.
-//
-// It is roughly equivalent to NewIOStream(w, w, nil)
+// It is roughly equivalent to NewIOStream(w, w, nil).
 func NonInteractive(w io.Writer) IOStream {
 	return NewIOStream(w, w, nil).NonInteractive()
 }

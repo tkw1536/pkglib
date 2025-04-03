@@ -26,7 +26,7 @@ type PasswordSource interface {
 	Passwords() <-chan string
 }
 
-// NewPasswordSource creates a new password source from a function
+// NewPasswordSource creates a new password source from a function.
 func NewPasswordSource(open func() (io.Reader, error), name string) PasswordSource {
 	return &commonPasswordReader{
 		open: open,
@@ -86,7 +86,7 @@ type CommonPassword struct {
 	Source   string
 }
 
-// CommonPasswordError
+// CommonPasswordError.
 type CommonPasswordError struct {
 	CommonPassword
 }
@@ -98,7 +98,7 @@ func (cpe CommonPasswordError) Error() string {
 //go:embed common
 var commonEmbed embed.FS
 
-// CommonSources returns a list of common password sources
+// CommonSources returns a list of common password sources.
 func CommonSources() []PasswordSource {
 	sources, err := NewSources(commonEmbed, "**/*.txt")
 	if err != nil {
@@ -140,16 +140,7 @@ func Passwords(sources ...PasswordSource) <-chan CommonPassword {
 	return common
 }
 
-// CheckCommonPassword checks if a password is a common password.
-//
-// check is called with each candidate password to perform the check.
-// check should return a boolean indicating if the password in question corresponds to the candidate.
-//
-// CheckCommonPassword returns one of three error values.
-//
-// - a CommonPasswordError (when a password matches a common password)
-// - an error returned by check (assuming some check went wrong)
-// - or nil (when a password is not a common password
+// - or nil (when a password is not a common password.
 func CheckCommonPassword(check func(candidate string) (bool, error), sources ...PasswordSource) error {
 	for common := range Passwords(sources...) {
 		ok, err := check(common.Password)

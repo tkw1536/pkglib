@@ -67,7 +67,7 @@ func ExampleValidate() {
 	// <nil>
 }
 
-// Demonstrates a failing validation
+// Demonstrates a failing validation.
 func ExampleValidate_fail() {
 
 	// Create a validator collection

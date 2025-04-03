@@ -27,7 +27,7 @@ func Methods(handler http.Handler, methods ...string) http.Handler {
 	})
 }
 
-// methodNotAllowed is the response returned when there is no response
+// methodNotAllowed is the response returned when there is no response.
 var methodNotAllowed = httpx.Response{
 	StatusCode: http.StatusMethodNotAllowed,
 	Body:       []byte("Method Not Allowed"),

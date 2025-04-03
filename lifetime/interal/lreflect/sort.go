@@ -50,7 +50,7 @@ func SortSliceByRank(slice reflect.Value) error {
 	return nil
 }
 
-// rankTyp describes the type of a rank method
+// rankTyp describes the type of a rank method.
 type rankTyp string
 
 const (
@@ -62,7 +62,7 @@ const (
 	rankTypeString  rankTyp = "string"
 )
 
-// LessMethod returns a method that compare two reflect values of the given rank method
+// LessMethod returns a method that compare two reflect values of the given rank method.
 func (t rankTyp) LessMethod() func(l, r reflect.Value) bool {
 	switch t {
 	case rankTypeBool:
@@ -80,7 +80,7 @@ func (t rankTyp) LessMethod() func(l, r reflect.Value) bool {
 	return nil
 }
 
-// getRankMethod returns the rank method of the given type (if any)
+// getRankMethod returns the rank method of the given type (if any).
 func getRankMethod(typ reflect.Type) (string, rankTyp, bool) {
 	// get the name of the method
 	name := typ.Name()

@@ -65,7 +65,7 @@ func (err errorPage) Response(res Response) Response {
 var errpageHTML string
 var errpageHTMLTemplate = template.Must(template.New("errpage.html").Parse(errpageHTML))
 
-// context passed to error page template
+// context passed to error page template.
 type errPageContext struct {
 	Error    errorPage
 	Original Response
@@ -85,7 +85,7 @@ func (err errorPage) FormatHTML(res Response) template.HTML {
 	return template.HTML(builder.String()) // #nosec G203 -- template not attacker controlled
 }
 
-// sError represents a stringified error
+// sError represents a stringified error.
 type sError struct {
 	Error  string // Error is the result of calling the Error() method
 	Type   string // Type is the type of error
@@ -94,7 +94,7 @@ type sError struct {
 	Unwrap []sError // The source of wrapped errors
 }
 
-// newSError safely turns an error into an error
+// newSError safely turns an error into an error.
 func newSError(err error) sError {
 	e := sError{
 		Error:  fmt.Sprintf("%s", err),

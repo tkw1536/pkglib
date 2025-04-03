@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// HasAPrivateField has a private field
+// HasAPrivateField has a private field.
 type HasAPrivateField struct {
 	private string
 }
@@ -16,7 +16,7 @@ func (hp HasAPrivateField) Private() string {
 	return hp.private
 }
 
-// SomeInterface provides two Methods
+// SomeInterface provides two Methods.
 type SomeInterface interface {
 	MethodA()
 	MethodB()
@@ -26,7 +26,7 @@ type SomeInterface interface {
 // And SomeInterface is a superset of OtherInterface.
 type OtherInterface interface{ MethodA() }
 
-// SomeStruct implements SomeInterface
+// SomeStruct implements SomeInterface.
 type SomeStruct struct {
 	Value int
 }
@@ -34,7 +34,7 @@ type SomeStruct struct {
 func (SomeStruct) MethodA() {}
 func (SomeStruct) MethodB() {}
 
-// OtherStruct implements OtherInterface
+// OtherStruct implements OtherInterface.
 type OtherStruct struct {
 	Value int
 }

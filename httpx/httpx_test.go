@@ -16,7 +16,7 @@ import (
 
 //spellchecker:words modtime
 
-// Using a response with a plain http status
+// Using a response with a plain http status.
 func ExampleResponse() {
 	response := httpx.Response{
 		StatusCode:  http.StatusOK,
@@ -68,8 +68,7 @@ func ExampleResponse_defaults() {
 	// Got body: Hello world
 }
 
-// Using now one can set the time when the response was modified.
-// This means that appropriate 'if-modified-since' headers are respected
+// This means that appropriate 'if-modified-since' headers are respected.
 func ExampleResponse_Now() {
 	response := httpx.Response{
 		Body: []byte("Hello world"),

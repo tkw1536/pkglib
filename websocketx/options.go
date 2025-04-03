@@ -86,7 +86,7 @@ func (opt Options) CompressionEnabled() bool {
 	return opt.CompressionLevel != flate.NoCompression
 }
 
-// Defaults for [Options]
+// Defaults for [Options].
 const (
 	DefaultWriteInterval    = 10 * time.Second
 	DefaultReadInterval     = time.Minute

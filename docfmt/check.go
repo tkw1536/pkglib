@@ -7,10 +7,7 @@ import (
 	"strings"
 )
 
-// AssertValid asserts that message is properly formatted and calling Validate on it returns no results.
-//
-// When checking is disabled, no runtime checking is performed.
-// When checking is enabled and a message fails to pass validation, calls panic()
+// When checking is enabled and a message fails to pass validation, calls panic().
 func AssertValid(message string) {
 	if Enabled {
 		if errors := Validate(message); len(errors) != 0 {
@@ -42,10 +39,7 @@ func (ve ValidationError) Error() string {
 	return fmt.Sprintf("message %q failed validation: %s", ve.Message, strings.Join(messages, "\n"))
 }
 
-// AssertValidArgs checks that args does not contain exactly one argument of type error.
-//
-// When checking is disabled, no runtime checking is performed.
-// When checking is enabled and the check is failed, calls panic()
+// When checking is enabled and the check is failed, calls panic().
 func AssertValidArgs(args ...any) {
 	if Enabled {
 		if len(args) != 1 {

@@ -15,7 +15,7 @@ import (
 
 //spellchecker:words inuse
 
-// Snapshot holds metrics at a specific instance
+// Snapshot holds metrics at a specific instance.
 type Snapshot struct {
 	// Time the snapshot was captured
 	Time time.Time
@@ -27,19 +27,19 @@ type Snapshot struct {
 	Objects int64
 }
 
-// Now returns a snapshot for the current time
+// Now returns a snapshot for the current time.
 func Now() (s Snapshot) {
 	s.Time = time.Now()
 	s.Bytes, s.Objects = perf()
 	return
 }
 
-// BytesString returns a human-readable string representing the bytes
+// BytesString returns a human-readable string representing the bytes.
 func (snapshot Snapshot) BytesString() string {
 	return human(snapshot.Bytes)
 }
 
-// ObjectsString returns a human-readable string representing the number of objects
+// ObjectsString returns a human-readable string representing the number of objects.
 func (snapshot Snapshot) ObjectsString() string {
 	if snapshot.Objects == 1 {
 		return "1 object"
@@ -60,19 +60,19 @@ func (s Snapshot) Sub(other Snapshot) Diff {
 	}
 }
 
-// Diff represents the difference between two snapshots
+// Diff represents the difference between two snapshots.
 type Diff struct {
 	Time    time.Duration
 	Bytes   int64
 	Objects int64
 }
 
-// BytesString returns a human-readable string representing the bytes
+// BytesString returns a human-readable string representing the bytes.
 func (diff Diff) BytesString() string {
 	return human(diff.Bytes)
 }
 
-// ObjectsString returns a human-readable string representing the number of objects
+// ObjectsString returns a human-readable string representing the number of objects.
 func (diff Diff) ObjectsString() string {
 	if diff.Objects == 1 {
 		return "1 object"
@@ -91,8 +91,7 @@ func human(bytes int64) string {
 	return humanize.Bytes(uint64(bytes))
 }
 
-// Since returns changes in metrics since start.
-// It is a shortcut for start.Sub(perf.Now())
+// It is a shortcut for start.Sub(perf.Now()).
 func Since(start Snapshot) (diff Diff) {
 	diff.Bytes, diff.Objects = perf()
 	diff.Time = time.Since(start.Time)

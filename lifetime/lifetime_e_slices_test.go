@@ -27,7 +27,7 @@ type Green struct{}
 func (Green) isComponent()  {}
 func (Green) Color() string { return "green" }
 
-// Declare the wheel component
+// Declare the wheel component.
 type Wheel struct {
 	dependencies struct {
 		// Wheel depends on all ColorComponents.

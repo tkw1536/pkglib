@@ -233,7 +233,7 @@ func TestServer_timeout(t *testing.T) {
 
 const testServerTimeout = time.Minute
 
-// testServer create a new testing server and initiates a client
+// testServer create a new testing server and initiates a client.
 func testServer(t *testing.T, initHandler func(server *websocketx.Server) websocketx.Handler, doClient func(client *websocket.Conn, server *websocketx.Server)) {
 	t.Helper()
 

@@ -54,7 +54,7 @@ type JSONHandler[T any] struct {
 	LogJSONEncodeError httpx.ErrorLogger
 }
 
-// ServeHTTP calls j(r) and returns json
+// ServeHTTP calls j(r) and returns json.
 func (j JSONHandler[T]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	result, err := recovery.Safe(func() (T, error) { return j.Handler(r) })
 	{

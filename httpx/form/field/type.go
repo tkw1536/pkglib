@@ -1,7 +1,7 @@
 //spellchecker:words field
 package field
 
-// InputType represents the type of input
+// InputType represents the type of input.
 type InputType string
 
 //spellchecker:words datetime

@@ -15,7 +15,7 @@ import (
 // See also io.Discard.
 var Null io.ReadWriteCloser = nullStream{}
 
-// IsNullWriter checks if a writer is known to be a writer that discards any input
+// IsNullWriter checks if a writer is known to be a writer that discards any input.
 func IsNullWriter(writer io.Writer) bool {
 	return writer == Null || writer == io.Discard
 }

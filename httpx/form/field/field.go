@@ -28,7 +28,7 @@ type Field struct {
 	EmptyOnError bool // indicates if the field should be reset on error
 }
 
-// fieldContext is passed to the template context
+// fieldContext is passed to the template context.
 type fieldContext struct {
 	Field
 	Value string
@@ -41,5 +41,5 @@ func (field Field) WriteTo(w io.Writer, template *template.Template, value strin
 	return template.Execute(w, fieldContext{Field: field, Value: value})
 }
 
-// CheckboxChecked is the default value of a checked checkbox
+// CheckboxChecked is the default value of a checked checkbox.
 const CheckboxChecked = "on"

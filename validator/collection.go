@@ -64,21 +64,21 @@ var (
 	strTyp = reflect.TypeFor[string]()
 )
 
-// UnknownValidatorError is an error returned from Validate if a validator does not exist
+// UnknownValidatorError is an error returned from Validate if a validator does not exist.
 type UnknownValidatorError string
 
 func (uv UnknownValidatorError) Error() string {
 	return fmt.Sprintf("unknown validator %q", string(uv))
 }
 
-// NotAValidatorError is an error returned from Validate if an entry in the validators map is not a validator
+// NotAValidatorError is an error returned from Validate if an entry in the validators map is not a validator.
 type NotAValidatorError string
 
 func (nv NotAValidatorError) Error() string {
 	return fmt.Sprintf("entry %q in validators is not a validator", string(nv))
 }
 
-// IncompatibleValidatorError is returned when a validator in the validators map is incompatible
+// IncompatibleValidatorError is returned when a validator in the validators map is incompatible.
 type IncompatibleValidatorError struct {
 	Validator    string
 	GotType      reflect.Type

@@ -88,7 +88,7 @@ func (ei ErrInterceptor) match(err error) (Response, bool) {
 	return ei.Fallback, false
 }
 
-// statuses intercepted by StatusInterceptor
+// statuses intercepted by StatusInterceptor.
 var statuses = []StatusCode{
 	ErrInternalServerError,
 	ErrBadRequest,

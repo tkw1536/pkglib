@@ -134,8 +134,7 @@ func writeString(w io.Writer) func(string) (int, error) {
 	}
 }
 
-// write the string into w repeatedly
-// only compute the number of bytes written if something goes wrong
+// only compute the number of bytes written if something goes wrong.
 func repeat(w func(string) (int, error), s string, count int) (int, error) {
 	// NOTE: This function exists to save having to repeatedly call
 	// io.WriteString; which always rechecks if the passed type fulfils the interface.

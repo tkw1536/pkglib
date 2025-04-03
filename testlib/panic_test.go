@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-// DoesPanic behavior for a panicking function
+// DoesPanic behavior for a panicking function.
 func ExampleDoesPanic_panic() {
 	didPanic, recovered := DoesPanic(func() {
 		panic("some error message")
@@ -18,7 +18,7 @@ func ExampleDoesPanic_panic() {
 	// recover() = some error message
 }
 
-// DoesPanic behavior for a function that does not panic
+// DoesPanic behavior for a function that does not panic.
 func ExampleDoesPanic_normal() {
 	didPanic, _ := DoesPanic(func() {
 		/* do nothing */

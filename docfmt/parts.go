@@ -24,7 +24,7 @@ func SplitParts(message string) (parts []string) {
 	return splitString([]rune(message), isPartSeparator, false)
 }
 
-// isPartSeparator checks if r is a part separator
+// isPartSeparator checks if r is a part separator.
 func isPartSeparator(r rune) bool {
 	return r == ':' || r == '.'
 }

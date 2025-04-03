@@ -256,7 +256,7 @@ func RunErrorGroup[Item any](writer io.Writer, group Group[Item, error], items [
 	return UseErrorGroup(status, group, items)
 }
 
-// GroupError represents the error of an ErrorGroup
+// GroupError represents the error of an ErrorGroup.
 type GroupError []GroupMemberError
 
 func (errs GroupError) Unwrap() []error {
@@ -275,7 +275,7 @@ func (errs GroupError) Error() string {
 	return strings.Join(messages, "\n")
 }
 
-// GroupMemberError represents the error of a single group member
+// GroupMemberError represents the error of a single group member.
 type GroupMemberError struct {
 	Err     error  // Err is the error produced
 	Logfile string // Path to the detailed logfile

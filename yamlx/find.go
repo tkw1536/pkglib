@@ -143,7 +143,7 @@ func (fe findError) Error() string {
 	return string(fe)
 }
 
-// Common errors for finding a node
+// Common errors for finding a node.
 var (
 	ErrNodeIsNil          error = findError("node is nil")
 	ErrUnexpectedScalar   error = findError("unexpected scalar node")
@@ -151,14 +151,14 @@ var (
 	ErrExpectedMapping    error = findError("expected mapping node")
 )
 
-// ChildNotFoundError indicates that the given child was not found
+// ChildNotFoundError indicates that the given child was not found.
 type ChildNotFoundError string
 
 func (cnf ChildNotFoundError) Error() string {
 	return fmt.Sprintf("child not found: %q", string(cnf))
 }
 
-// ChildError indicates an error that has occurred inside a specific child node
+// ChildError indicates an error that has occurred inside a specific child node.
 type ChildError struct {
 	Child string
 	Err   error
@@ -172,7 +172,7 @@ func (pe ChildError) Unwrap() error {
 	return pe.Err
 }
 
-// ExpectedScalarError is returned by [Child] to indicate that a scalar node was expected
+// ExpectedScalarError is returned by [Child] to indicate that a scalar node was expected.
 type ExpectedScalarError struct {
 	Index int
 }

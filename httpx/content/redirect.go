@@ -33,7 +33,7 @@ type RedirectHandler struct {
 	Interceptor httpx.ErrInterceptor
 }
 
-// ServeHTTP calls r(r) and returns json
+// ServeHTTP calls r(r) and returns json.
 func (rh RedirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// call the function
 	url, code, err := recovery.Safe2(func() (string, int, error) { return rh.Handler(r) })

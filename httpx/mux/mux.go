@@ -78,7 +78,7 @@ func (mux *Mux) Match(r *http.Request) (http.Handler, bool) {
 
 }
 
-// ServeHTTP serves requests to this mux
+// ServeHTTP serves requests to this mux.
 func (mux *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// find the right handler, or go into not found mode
 	handler, ok := mux.Match(r)

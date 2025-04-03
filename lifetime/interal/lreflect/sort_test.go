@@ -11,14 +11,12 @@ import (
 
 type RankableStruct string
 
-// RankableStruct implements a special method RankRankableStruct
-// That can be used to sort the slice by length
+// That can be used to sort the slice by length.
 func (r RankableStruct) RankRankableStruct() uint64 {
 	return uint64(len(r))
 }
 
-// RankableStruct also implements a special method RankRankableInterface.
-// That can be used to sort the slice in inverted length fashion
+// That can be used to sort the slice in inverted length fashion.
 func (r RankableStruct) RankRankableInterface() int {
 	return -int(len(r))
 }

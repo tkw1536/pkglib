@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Marshal marshals a value into a new yaml node
+// Marshal marshals a value into a new yaml node.
 func Marshal(value any) (*yaml.Node, error) {
 	node := new(yaml.Node)
 	err := node.Encode(value)

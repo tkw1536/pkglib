@@ -8,7 +8,7 @@ import (
 	"github.com/tkw1536/pkglib/lifetime"
 )
 
-// RankComponent is anything with a rank method
+// RankComponent is anything with a rank method.
 type RankComponent interface {
 	Component
 	Rank() string
@@ -43,7 +43,7 @@ func (Admiral) Rank() string {
 	return "Admiral"
 }
 
-// Demonstrates the use of order when exporting slices
+// Demonstrates the use of order when exporting slices.
 func ExampleLifetime_gExportSliceOrder() {
 	// Register components as normal.
 	lt := &lifetime.Lifetime[Component, struct{}]{

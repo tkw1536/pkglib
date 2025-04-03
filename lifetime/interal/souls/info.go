@@ -10,7 +10,7 @@ import (
 	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
 )
 
-// soul holds information about a specific component
+// soul holds information about a specific component.
 type soul struct {
 	Elem reflect.Type // the element type of the component
 
@@ -21,11 +21,11 @@ type soul struct {
 	DIFields map[string]reflect.Type // fields []I where I is an interface inside auto field that implements component
 }
 
-// DependenciesField is the name of the dependencies field
+// DependenciesField is the name of the dependencies field.
 const dependenciesFieldName = "dependencies"
 const injectFieldName = "inject"
 
-// newSoul creates a soul for the given concrete component
+// newSoul creates a soul for the given concrete component.
 func newSoul(component reflect.Type, concrete reflect.Type) (s soul, err error) {
 	if component == nil || concrete == nil || concrete.Kind() != reflect.Pointer || concrete.Elem().Kind() != reflect.Struct {
 		return s, newGenericError{Concrete: concrete, Err: errNotPointerToStruct}
@@ -63,9 +63,7 @@ func newSoul(component reflect.Type, concrete reflect.Type) (s soul, err error) 
 var errFieldHasTag = errors.New("field has tag")
 var errNotInjectField = errors.New("not an injected field")
 
-// scanFields scans the struct type for fields of component-like fields.
-// they are then written to the cFields and iFields maps.
-// inDependenciesStruct indicates if we are inside a dependency struct
+// inDependenciesStruct indicates if we are inside a dependency struct.
 func (s soul) scanFields(component reflect.Type, structType reflect.Type, inDependenciesStruct bool, cFields map[string]reflect.Type, iFields map[string]reflect.Type) error {
 	for i := range structType.NumField() {
 		field := structType.Field(i)

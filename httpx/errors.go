@@ -18,7 +18,7 @@ import (
 //nolint:errname
 type StatusCode int
 
-// check that StatusCode indeed implements error and http.Handler
+// check that StatusCode indeed implements error and http.Handler.
 var (
 	_ error        = (StatusCode)(0)
 	_ http.Handler = (StatusCode)(0)

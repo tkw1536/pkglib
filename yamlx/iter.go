@@ -20,7 +20,7 @@ func Iterate(node *yaml.Node) traversal.Iterator[Path] {
 	})
 }
 
-// Path represents a path inside a given struct
+// Path represents a path inside a given struct.
 type Path struct {
 	Path []string
 	Node *yaml.Node
@@ -31,9 +31,7 @@ func (path Path) HasChildren() bool {
 	return node.Kind == yaml.MappingNode
 }
 
-// iterPaths generates all paths in the given node.
-// merge_keys contains the keys already encountered during a merge
-// the return value indicates if the caller should continue
+// the return value indicates if the caller should continue.
 func iterPaths(g traversal.Generator[Path], node *yaml.Node, path []string, merge_keys map[string]struct{}) bool {
 	// resolve the alias
 	node = resolveAlias(node)

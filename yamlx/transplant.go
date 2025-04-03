@@ -46,9 +46,7 @@ func ReplaceWith(node *yaml.Node, replacement any, path ...string) error {
 	return Replace(node, *mNode, path...)
 }
 
-// Replace replaces the node found by Find(node, path...) with replacement.
-// If the original node is an anchor, it will not be replaced.
-// If the original node is not an anchor, it will be replaced
+// If the original node is not an anchor, it will be replaced.
 func Replace(node *yaml.Node, replacement yaml.Node, path ...string) error {
 	found, err := Find(node, path...)
 	if err != nil {

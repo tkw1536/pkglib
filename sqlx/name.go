@@ -7,12 +7,12 @@ import (
 	"unicode"
 )
 
-// IsSafeDatabaseSingleQuote checks if value can safely be put inside 's inside a database query
+// IsSafeDatabaseSingleQuote checks if value can safely be put inside 's inside a database query.
 func IsSafeDatabaseSingleQuote(value string) bool {
 	return !strings.ContainsAny(value, "'`") // TODO: This should be safer, but it's relatively controlled
 }
 
-// IsSafeDatabaseLiteral checks if a value is safe to be used as a database query literal
+// IsSafeDatabaseLiteral checks if a value is safe to be used as a database query literal.
 func IsSafeDatabaseLiteral(value string) bool {
 	// the empty name is not allowed!
 	if len(value) == 0 {

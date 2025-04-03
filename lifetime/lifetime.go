@@ -55,7 +55,7 @@ type Lifetime[Component any, InitParams any] struct {
 	souls lazy.Lazy[*souls.Souls]
 }
 
-// getSouls retrieves the souls associated with this lifetime
+// getSouls retrieves the souls associated with this lifetime.
 func (lt *Lifetime[Component, InitParams]) getSouls(params InitParams) *souls.Souls {
 	return lt.souls.Get(func() *souls.Souls {
 		// get the component

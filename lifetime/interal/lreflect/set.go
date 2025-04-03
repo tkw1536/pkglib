@@ -62,7 +62,7 @@ func (err typeUnaddressableError) Error() string {
 	return fmt.Sprintf("value of type %s is not addressable", err.X)
 }
 
-// invalidValueError indicates that an invalid value was passed for the variable with the given name
+// invalidValueError indicates that an invalid value was passed for the variable with the given name.
 type invalidValueError string
 
 func (err invalidValueError) Error() string {
