@@ -32,4 +32,5 @@ linters:
     - reassign
     - recvcheck
     - tagalign
+    - testableexamples
     - staticcheck
