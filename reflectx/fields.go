@@ -24,26 +24,6 @@ func IterFields(typ reflect.Type) iter.Seq2[reflect.StructField, int] {
 	}
 }
 
-// IterateFields iterates over the struct fields of typ and calls f for each field.
-// Does not recurse into embedded fields.
-//
-// The return value of f indicates if the iteration should be stopped early.
-// Returns the last value returned by f, or false.
-//
-// Deprecated: Use [IterFields] instead.
-func IterateFields(typ reflect.Type, f func(field reflect.StructField, index int) (stop bool)) (cancelled bool) {
-	if typ.Kind() != reflect.Struct {
-		panic("IterateFields: T is not a Struct")
-	}
-
-	for field, indexes := range iterFields(false, nil, typ) {
-		if f(field, indexes[0]) {
-			return true
-		}
-	}
-	return false
-}
-
 // IterateAllFields iterates over the struct fields of typ and their indexes.
 // Fields are iterated in the order they are returned by reflect.Field().
 //
@@ -58,27 +38,6 @@ func IterAllFields(typ reflect.Type) iter.Seq2[reflect.StructField, []int] {
 	}
 
 	return iterFields(true, nil, typ)
-}
-
-// IterateAllFields iterates over the struct fields of typ and calls f for each field.
-//
-// The return value of f indicates if the iteration should be stopped early.
-// If f returns true, no further calls to f are made.
-// IterateAllFields returns the return value of the last call to f, or false.
-//
-// Deprecated: Use [IterAllFields] instead.
-func IterateAllFields(typ reflect.Type, f func(field reflect.StructField, index ...int) (stop bool)) (stopped bool) {
-	if typ.Kind() != reflect.Struct {
-		panic("IterateAllFields: typ is not a Struct")
-	}
-
-	for field, index := range iterFields(true, nil, typ) {
-		if f(field, index...) {
-			return true
-		}
-	}
-
-	return false
 }
 
 func iterFields(embeds bool, index []int, typ reflect.Type) iter.Seq2[reflect.StructField, []int] {

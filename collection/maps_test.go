@@ -19,27 +19,6 @@ func ExampleIterSorted() {
 	// 1: world
 }
 
-func ExampleIterateSorted() {
-	m := map[int]string{
-		0: "hello",
-		1: "world",
-		2: "i",
-		3: "like",
-		4: "you",
-	}
-
-	IterateSorted(m, func(k int, v string) bool {
-		fmt.Printf("%d: %v\n", k, v)
-
-		// We return false to stop the iteration.
-		// Here this happens at k = 1.
-		return k < 1
-	})
-
-	// Output: 0: hello
-	// 1: world
-}
-
 func ExampleMapValues() {
 	m := map[int]string{
 		0: "hi",

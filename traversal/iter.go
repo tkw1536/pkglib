@@ -3,13 +3,6 @@ package traversal
 
 import "iter"
 
-//spellchecker:words rangefunc
-
-// RangeFunc is a deprecated alias for [iter.Seq].
-//
-// Deprecated: Use [iter.Seq] instead.
-type RangeFunc[V any] = iter.Seq[V]
-
 // Sequence creates a new iterator from the given RangeFunc.
 func Sequence[T any](seq iter.Seq[T]) Iterator[T] {
 	return New(func(sender Generator[T]) {

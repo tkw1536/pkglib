@@ -28,20 +28,6 @@ func IterSorted[K cmp.Ordered, V any](m map[K]V) iter.Seq2[K, V] {
 	}
 }
 
-// IterateSorted iterates over the map, calling f for each element.
-// If f returns false, iteration is stopped early.
-// IterateSorted returns false if the iteration was stopped early, and true otherwise.
-//
-// Deprecated: Use [IterSorted] instead.
-func IterateSorted[K cmp.Ordered, V any](m map[K]V, f func(k K, v V) bool) bool {
-	for key, value := range IterSorted(m) {
-		if !f(key, value) {
-			return false
-		}
-	}
-	return true
-}
-
 // MapValues creates a new map which has the same keys as m.
 // The values of the map are determined by passing the old key and values into f.
 func MapValues[K comparable, V1, V2 any](m map[K]V1, f func(K, V1) V2) map[K]V2 {
