@@ -5,6 +5,7 @@ package status
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 )
@@ -58,7 +59,11 @@ func (lb *LineBuffer) Write(b []byte) (int, error) {
 	}
 
 	defer lb.flush()
-	return lb.buffer.Write(b)
+	n, err := lb.buffer.Write(b)
+	if err != nil {
+		return n, fmt.Errorf("failed to write: %w", err)
+	}
+	return n, nil
 }
 
 // WriteByte is like [Write], but takes a single byte.
@@ -71,7 +76,11 @@ func (lb *LineBuffer) WriteByte(b byte) error {
 	}
 
 	defer lb.flush()
-	return lb.buffer.WriteByte(b)
+	err := lb.buffer.WriteByte(b)
+	if err != nil {
+		return fmt.Errorf("failed to write byte: %w", err)
+	}
+	return nil
 }
 
 // WriteRune is like [Write], but takes a single rune.
@@ -84,7 +93,11 @@ func (lb *LineBuffer) WriteRune(r rune) (int, error) {
 	}
 
 	defer lb.flush()
-	return lb.buffer.WriteRune(r)
+	n, err := lb.buffer.WriteRune(r)
+	if err != nil {
+		return n, fmt.Errorf("failed to write rune: %w", err)
+	}
+	return n, nil
 }
 
 // WriteString is like [Write], but takes a string.
@@ -97,7 +110,12 @@ func (lb *LineBuffer) WriteString(s string) (int, error) {
 	}
 
 	defer lb.flush()
-	return lb.buffer.WriteString(s)
+
+	n, err := lb.buffer.WriteString(s)
+	if err != nil {
+		return n, fmt.Errorf("failed to write string: %w", err)
+	}
+	return n, nil
 }
 
 // runeR and runeN represent the bytes corresponding to '\r' and '\n' respectively.

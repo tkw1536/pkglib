@@ -14,7 +14,7 @@ import (
 // T must be comparable, meaning it is of kind int, uint, float or string.
 // If no such function exists on the element type of slice, it is returned unchanged.
 //
-// The sort performed is guaranteed to be stable, meaning to equally do not change positions.
+// The sort performed is guaranteed to be stable.
 func SortSliceByRank(slice reflect.Value) error {
 	// check that we have some valid value
 	if !slice.IsValid() {

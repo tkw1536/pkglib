@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//spellchecker:words errorlint nolint
+//spellchecker:words errorlint nolint wrapcheck
 
 // ReadLine reads the current line from the provided reader.
 // It does not use a buffer, and does not read beyond the end of line marker.
@@ -39,7 +39,7 @@ func ReadLine(reader io.Reader) (value string, err error) {
 			// flag is set, but we didn't encounter a '\n' or EOF.
 			// so we need to write it back to the buffer
 			if _, err := builder.WriteRune('\r'); err != nil {
-				return "", err
+				return "", err //nolint:wrapcheck
 			}
 			lastR = false
 		}
@@ -50,7 +50,7 @@ func ReadLine(reader io.Reader) (value string, err error) {
 
 		// store it to the builder
 		if _, err := builder.WriteRune(r); err != nil {
-			return "", err
+			return "", err //nolint:wrapcheck
 		}
 	}
 

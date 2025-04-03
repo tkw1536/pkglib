@@ -5,6 +5,7 @@ package form
 
 //spellchecker:words html template http strings embed github gorilla csrf pkglib httpx content form field
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
@@ -99,7 +100,7 @@ func (form *Form[Data]) Values(r *http.Request) (map[string]string, Data, error)
 	// parse the form
 	if err := r.ParseForm(); err != nil {
 		var data Data
-		return nil, data, err
+		return nil, data, fmt.Errorf("failed to parse form: %w", err)
 	}
 
 	// pick each of the values

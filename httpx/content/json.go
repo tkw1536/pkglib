@@ -4,6 +4,7 @@ package content
 //spellchecker:words encoding json http github pkglib httpx recovery
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/tkw1536/pkglib/httpx"
@@ -40,6 +41,7 @@ func WriteJSONI[T any](result T, err error, interceptor httpx.ErrInterceptor, w 
 		err := json.NewEncoder(w).Encode(result)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			err = fmt.Errorf("failed to encode json: %w", err)
 		}
 		return err
 	}

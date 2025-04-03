@@ -39,7 +39,7 @@ func NewPasswordSource(open func() (io.Reader, error), name string) PasswordSour
 func NewSources(fsys fs.FS, pattern string) ([]PasswordSource, error) {
 	matches, err := fs.Glob(fsys, pattern)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to apply pattern: %w", err)
 	}
 
 	sources := make([]PasswordSource, len(matches))

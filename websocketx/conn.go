@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//spellchecker:words nolint containedctx errorlint
+//spellchecker:words nolint containedctx errorlint wrapcheck
 
 // accept accepts a websocket connection with the specified handler.
 // The caller should call [connection.serve] to start serving the connection.
@@ -230,13 +230,23 @@ func (conn *Connection) writeRaw(message queuedMessage) (err error) {
 		}
 	}()
 	if err := conn.conn.SetWriteDeadline(time.Now().Add(conn.opts.WriteInterval)); err != nil {
-		return err
+		return fmt.Errorf("failed to set deadline: %w", err)
 	}
 
 	if message.prep != nil {
-		return conn.conn.WritePreparedMessage(message.prep)
+		err := conn.conn.WritePreparedMessage(message.prep)
+		if err != nil {
+			return fmt.Errorf("failed to write prepared message: %w", err)
+		}
+		return nil
 	}
-	return conn.conn.WriteMessage(message.msg.Type, message.msg.Body)
+	{
+		err := conn.conn.WriteMessage(message.msg.Type, message.msg.Body)
+		if err != nil {
+			return fmt.Errorf("failed to write message: %w", err)
+		}
+		return nil
+	}
 }
 
 // Write queues the provided message for sending

@@ -9,6 +9,8 @@ import (
 	"unicode/utf8"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // ReadRune reads the next rune from r.
 // It does not read from reader beyond the rune.
 //
@@ -19,7 +21,7 @@ import (
 func ReadRune(reader io.Reader) (r rune, size int, err error) {
 	// try to directly read the rune
 	if reader, ok := reader.(io.RuneReader); ok {
-		return reader.ReadRune()
+		return reader.ReadRune() //nolint:wrapcheck
 	}
 
 	runeBuffer := make([]byte, 0, utf8.MaxRune)

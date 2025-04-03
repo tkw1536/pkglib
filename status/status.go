@@ -196,7 +196,10 @@ func (st *Status) flushCompat(changed uint64) error {
 		return nil
 	}
 	_, err := fmt.Fprintln(st.w.Out, line)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to flush writer: %w", err)
+	}
+	return nil
 }
 
 // flushLogs flushes to the given log file.
@@ -210,7 +213,10 @@ func (st *Status) flushLogs(changed uint64) error {
 		return nil
 	}
 	_, err := fmt.Fprintln(logger, line)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to flush logger: %w", err)
+	}
+	return nil
 }
 
 // flushNormal implements flushing in normal mode.
@@ -235,7 +241,11 @@ func (st *Status) flushNormal(force bool) error {
 	}
 
 	// flush the output
-	return st.w.Flush()
+	err := st.w.Flush()
+	if err != nil {
+		return fmt.Errorf("failed to flush writer: %w", err)
+	}
+	return nil
 }
 
 // Keep instructs this Status to not keep any log files, and returns a map from ids to file names.
@@ -328,7 +338,11 @@ func (st *Status) closeLogger(id uint64) error {
 
 	// delete it if ok
 	if ok {
-		return handle.Close()
+		err := handle.Close()
+		if err != nil {
+			return fmt.Errorf("failed to close logger for id %d: %w", id, err)
+		}
+		return nil
 	}
 	return nil
 }

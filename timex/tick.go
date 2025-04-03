@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // TickContext is like [time.Tick], but closes the returned channel once the context closes.
 // As such it can be recovered by the garbage collector; see [time.TickContext].
 //

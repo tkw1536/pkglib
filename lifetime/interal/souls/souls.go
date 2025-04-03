@@ -14,6 +14,8 @@ import (
 	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // Souls holds the set of all (possibly initialized) components.
 type Souls struct {
 	all        reflect.Value // all holds all components
@@ -39,7 +41,7 @@ func New(all any) *Souls {
 // If this souls has already been initialized, this call is a noop.
 func (r *Souls) Init() error {
 	// do an initialization
-	return r.initErr.Get(func() error {
+	return r.initErr.Get(func() error { //nolint:wrapcheck
 		// set allT and componentT correctly
 		{
 			if !r.all.IsValid() {
@@ -60,7 +62,7 @@ func (r *Souls) Init() error {
 		l := r.all.Len()
 		rand.Shuffle(l, reflect.Swapper(r.all.Interface()))
 		if err := lreflect.SortSliceByRank(r.all); err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 
 		// initialize maps for components and classes
@@ -156,7 +158,7 @@ func (r *Souls) export(typ reflect.Type) (reflect.Value, error) {
 	// get the first assignable element
 	c, err := lreflect.FirstAssignableInterfaceElement(r.all, typ)
 	if err != nil {
-		return reflect.Value{}, err
+		return reflect.Value{}, err //nolint:wrapcheck
 	}
 
 	// if it is nil, don't do anything with it
@@ -179,12 +181,12 @@ func (r *Souls) exportClass(typ reflect.Type) (reflect.Value, error) {
 	// get the class
 	clz, err := lreflect.FilterSliceInterface(r.all, typ)
 	if err != nil {
-		return reflect.Value{}, err
+		return reflect.Value{}, err //nolint:wrapcheck
 	}
 
 	// sort the slice by rank
 	if err := lreflect.SortSliceByRank(clz); err != nil {
-		return reflect.Value{}, err
+		return reflect.Value{}, err //nolint:wrapcheck
 	}
 
 	// store it in the cache and return it

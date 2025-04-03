@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // DefaultDirPerm should be used by callers to use a consistent mode for new directories.
 const DefaultDirPerm fs.FileMode = fs.ModeDir | fs.ModePerm
 
@@ -14,7 +16,7 @@ func Mkdir(path string, mode fs.FileMode) error {
 	m.Lock()
 	defer m.Unlock()
 
-	return os.Mkdir(path, fs.ModeDir|mode)
+	return os.Mkdir(path, fs.ModeDir|mode) //nolint:wrapcheck
 }
 
 // MkdirAll is like [os.MkdirAll].
@@ -22,5 +24,5 @@ func MkdirAll(path string, mode fs.FileMode) error {
 	m.Lock()
 	defer m.Unlock()
 
-	return os.MkdirAll(path, fs.ModeDir|mode)
+	return os.MkdirAll(path, fs.ModeDir|mode) //nolint:wrapcheck
 }

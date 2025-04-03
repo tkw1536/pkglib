@@ -45,14 +45,14 @@ func WriterGroup[T any](writer io.Writer, count int, handler func(value T, outpu
 			{
 				_, err := fmt.Fprintln(writer, group.PrefixString(item, index))
 				if err != nil {
-					return err
+					return fmt.Errorf("failed to write on index %d: %w", index, err)
 				}
 			}
 
 			{
 				err := handler(item, writer)
 				if err != nil {
-					return err
+					return fmt.Errorf("failed to call handler on index %d: %w", index, err)
 				}
 			}
 		}

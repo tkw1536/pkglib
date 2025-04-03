@@ -4,16 +4,20 @@ package umaskfree
 //spellchecker:words errors time
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"time"
 )
+
+//spellchecker:words nolint wrapcheck
 
 // Create is like [os.Create] with an additional mode argument.
 func Create(path string, mode fs.FileMode) (*os.File, error) {
 	m.Lock()
 	defer m.Unlock()
 
+	//nolint:wrapcheck
 	return os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode) // #nosec G304 -- path is an explicit parameter
 }
 
@@ -33,7 +37,7 @@ func WriteFile(path string, data []byte, mode fs.FileMode) (err error) {
 	}()
 
 	if _, err := handle.Write(data); err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	return nil
@@ -56,14 +60,20 @@ func Touch(path string, perm fs.FileMode) error {
 	case errors.Is(err, fs.ErrNotExist):
 		f, err := Create(path, perm)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create file: %w", err)
 		}
-		return f.Close()
+		if err := f.Close(); err != nil {
+			return fmt.Errorf("failed to close file: %w", err)
+		}
+		return nil
 	case err != nil:
-		return err
+		return fmt.Errorf("failed to stat path: %w", err)
 	default:
 		now := time.Now().Local()
-		return os.Chtimes(path, now, now)
+		if err := os.Chtimes(path, now, now); err != nil {
+			return fmt.Errorf("failed to change file time: %w", err)
+		}
+		return nil
 	}
 }
 

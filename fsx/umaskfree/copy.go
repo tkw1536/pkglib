@@ -13,6 +13,8 @@ import (
 	"github.com/tkw1536/pkglib/fsx"
 )
 
+//spellchecker:words nolint wrapcheck
+
 var ErrCopySameFile = errors.New("src and dst must be different")
 
 // CopyFile copies a file from src to dst.
@@ -22,7 +24,7 @@ var ErrCopySameFile = errors.New("src and dst must be different")
 // When ctx is closed, the file is not copied.
 func CopyFile(ctx context.Context, dst, src string) (err error) {
 	if err := ctx.Err(); err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	if fsx.Same(src, dst) {
@@ -32,7 +34,7 @@ func CopyFile(ctx context.Context, dst, src string) (err error) {
 	// open the source
 	srcFile, err := os.Open(src) // #nosec G304 -- src is an explicit parameter
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 	defer func() {
 		errClose := srcFile.Close()
@@ -44,7 +46,7 @@ func CopyFile(ctx context.Context, dst, src string) (err error) {
 	// stat it to get the mode!
 	srcStat, err := srcFile.Stat()
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	// open or create the destination
@@ -61,14 +63,14 @@ func CopyFile(ctx context.Context, dst, src string) (err error) {
 
 	// and do the copy!
 	_, err = contextx.Copy(ctx, dstFile, srcFile)
-	return err
+	return err //nolint:wrapcheck
 }
 
 // CopyLink copies a link from src to dst.
 // If dst already exists, it is deleted and then re-created.
 func CopyLink(ctx context.Context, dst, src string) error {
 	if err := ctx.Err(); err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	// if they're the same file that is an error
@@ -79,24 +81,24 @@ func CopyLink(ctx context.Context, dst, src string) error {
 	// read the link target
 	target, err := os.Readlink(src)
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck
 	}
 
 	// delete it if it already exists
 	{
 		exists, err := fsx.Exists(dst)
 		if err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 		if exists {
 			if err := os.Remove(dst); err != nil {
-				return err
+				return err //nolint:wrapcheck
 			}
 		}
 	}
 
 	// make the symbolic link!
-	return os.Symlink(target, dst)
+	return os.Symlink(target, dst) //nolint:wrapcheck
 }
 
 var ErrDstFile = errors.New("dst is a file")
@@ -118,13 +120,14 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 	{
 		isRegular, err := fsx.IsRegular(dst, true)
 		if err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 		if isRegular {
 			return ErrDstFile
 		}
 	}
 
+	//nolint:wrapcheck
 	return filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
 		// someone previously returned an error
 		if err != nil {
@@ -140,7 +143,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		var relPath string
 		relPath, err = filepath.Rel(src, path)
 		if err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 		dst := filepath.Join(dst, relPath)
 
@@ -152,7 +155,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		// stat the directory, so that we can get mode, and info later!
 		info, err := d.Info()
 		if err != nil {
-			return err
+			return err //nolint:wrapcheck
 		}
 
 		// if we have a symbolic link, copy the link!
@@ -171,7 +174,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		if errors.Is(err, fs.ErrExist) {
 			isDir, isDirE := fsx.IsDirectory(dst, false)
 			if isDirE != nil {
-				return isDirE
+				return isDirE //nolint:wrapcheck
 			}
 			if isDir {
 				err = nil

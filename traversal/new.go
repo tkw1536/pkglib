@@ -1,7 +1,7 @@
 //spellchecker:words traversal
 package traversal
 
-//spellchecker:words wrapcheck
+//spellchecker:words wrapcheck nolint
 
 // New creates a new iterator generator pair and returns the iterator.
 //

@@ -57,7 +57,12 @@ func (f *writeSyncToStdout) Write(d []byte) (int, error) {
 
 	// do the write!
 	f.NumWrites--
-	return os.Stdout.Write(d)
+
+	n, err := os.Stdout.Write(d)
+	if err != nil {
+		return n, fmt.Errorf("failed to write to stdout: %w", err)
+	}
+	return n, nil
 }
 
 func ExampleWriter_concurrent() {

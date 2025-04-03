@@ -3,6 +3,7 @@ package field
 
 //spellchecker:words html template
 import (
+	"fmt"
 	"html/template"
 	"io"
 )
@@ -38,7 +39,11 @@ func (field Field) WriteTo(w io.Writer, template *template.Template, value strin
 	if template == nil {
 		template = DefaultFieldTemplate
 	}
-	return template.Execute(w, fieldContext{Field: field, Value: value})
+	err := template.Execute(w, fieldContext{Field: field, Value: value})
+	if err != nil {
+		return fmt.Errorf("failed to execute template: %w", err)
+	}
+	return nil
 }
 
 // CheckboxChecked is the default value of a checked checkbox.

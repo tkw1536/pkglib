@@ -5,6 +5,7 @@ package password
 
 //spellchecker:words math strings crypto rand crand
 import (
+	"fmt"
 	"io"
 	"math/big"
 	"strings"
@@ -60,13 +61,13 @@ func Generate(rand io.Reader, length int, charset Charset) (string, error) {
 		// grab a random bIndex!
 		bIndex, err := crand.Int(rand, runeCount)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("failed to select random rune: %w", err)
 		}
 
 		// and use that index!
 		index := int(bIndex.Int64())
 		if _, err := password.WriteRune(runes[index]); err != nil {
-			return "", err
+			return "", fmt.Errorf("failed to write password rune to buffer: %w", err)
 		}
 	}
 

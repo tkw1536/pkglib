@@ -7,6 +7,8 @@ import (
 	"sync"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // Run adds context-like functionality to a function that only supports explicit cancellation functionality.
 //
 // In principle, it calls f and returns the provided returns f(), nil.
@@ -32,7 +34,7 @@ func Run[T any](ctx context.Context, f func(start func()) T, cancel func()) (t T
 func Run2[T1, T2 any](ctx context.Context, f func(start func()) (T1, T2), cancel func()) (t1 T1, t2 T2, err error) {
 	// special case: context is already closed
 	if err := ctx.Err(); err != nil {
-		return t1, t2, err
+		return t1, t2, err //nolint:wrapcheck
 	}
 
 	cancelled := make(chan struct{}, 1)

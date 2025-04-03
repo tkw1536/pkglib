@@ -3,6 +3,7 @@ package content
 
 //spellchecker:words html template http github pkglib httpx minify recovery
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -48,6 +49,7 @@ func WriteHTMLI[C any](context C, e error, template *template.Template, intercep
 		err := template.Execute(minifier, context)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			err = fmt.Errorf("failed to execute template: %w", err)
 		}
 		return err
 	}

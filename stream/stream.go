@@ -11,6 +11,8 @@ import (
 	"github.com/tkw1536/pkglib/nobufio"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // IOStream represents a set of input and output streams commonly associated to a process.
 type IOStream struct {
 	Stdin          io.Reader
