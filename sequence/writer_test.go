@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 )
 
 func ExampleWriter() {
@@ -27,22 +28,65 @@ func ExampleWriter() {
 	// 22 <nil>
 }
 
-var errNoWritesLeft = errors.New("no writes left")
+var (
+	errNoWritesLeft    = errors.New("no writes left")
+	errConcurrentWrite = errors.New("concurrent write not allowed")
+)
 
-// finWrites is a writer that writes to stdout a finite number of times.
-type finWrites int
+// writeSyncToStdout is a writer that allows only a finite number of writes.
+// Concurrent writes are an error.
+// Writes are passed to stdout.
+type writeSyncToStdout struct {
+	NumWrites int
+	l         sync.Mutex
+}
 
-func (f *finWrites) Write(d []byte) (int, error) {
-	if f == nil || *f <= 0 {
+func (f *writeSyncToStdout) Write(d []byte) (int, error) {
+	// lock and bail out if concurrent
+	if !f.l.TryLock() {
+		return 0, errConcurrentWrite
+	}
+	defer f.l.Unlock()
+
+	// check that we have some amount of Write() calls left
+	if f.NumWrites <= 0 {
 		return 0, errNoWritesLeft
 	}
-	*f--
+
+	// do the write!
+	f.NumWrites--
 	return os.Stdout.Write(d)
+}
+
+func ExampleWriter_concurrent() {
+	// create a writer that can only be written to once
+	writeOnce := writeSyncToStdout{NumWrites: 2}
+
+	w := Writer{
+		Writer: &writeOnce,
+	}
+
+	// write a bunch of times concurrently
+	var wg sync.WaitGroup
+	for range 100 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, _ = w.Write([]byte("something\n"))
+		}()
+	}
+
+	wg.Wait()
+	fmt.Println(w.Sum())
+
+	// Output: something
+	// something
+	// 20 no writes left
 }
 
 func ExampleWriter_fail() {
 	// create a writer that can only be written to once
-	writeOnce := finWrites(1)
+	writeOnce := writeSyncToStdout{NumWrites: 1}
 
 	w := Writer{
 		Writer: &writeOnce,

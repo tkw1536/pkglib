@@ -6,20 +6,26 @@ package sequence
 import (
 	"fmt"
 	"io"
+	"sync"
+	"sync/atomic"
 )
 
-// Writer wraps an io.Writer.
+// Writer wraps an io.Writer and allows sequential writes.
 //
-// The first write behaves like a normal write would.
-// Subsequent writes are only passed through as long as no errors occur.
-// In case a write is not passed through, a [PreviousWriteFailed] is returned instead.
+// Writes are passed to the original writes as long as no errors occur.
+// If a write fails a [PreviousWriteFailedError] is returned instead.
 //
 // A Writer keeps track of overall number of bytes written and the previous error.
 // It can be retrieved using the [Sum] method, and reset using [Reset].
 //
-// The zero value is ready to use once the Writer field is set.
-// A Writer is not safe to be used concurrently.
+// The [Write] and [WriteString] methods may be used concurrently by multiple goroutines.
+// The writes to the underlying writer are serialized automatically.
+//
+// Concurrent writes of the Writer field or other methods are not safe.
 type Writer struct {
+	hadError atomic.Bool // do
+	l        sync.Mutex  // lock (if needed)
+
 	n   int
 	err error
 
@@ -28,12 +34,21 @@ type Writer struct {
 
 // write performs the write operation w
 //
-// - if an error occurred previously, w is not called and 0, PreviousWriteFailed is returned
+// - if an error occurred previously, w is not called and 0, a [PreviousWriteFailed] is returned
 // - if no error occurred, w is called and the state is updated
 func (sw *Writer) write(w func() (int, error)) (int, error) {
+	// fast path: we had an error, just return it!
+	if sw.hadError.Load() {
+		return 0, PreviousWriteFailedError{err: sw.err}
+	}
+
+	// slow path
+	sw.l.Lock()
+	defer sw.l.Unlock()
+
 	// if there was an error, return it and don't do a write
 	if sw.err != nil {
-		return 0, PreviousWriteFailed{err: sw.err}
+		return 0, PreviousWriteFailedError{err: sw.err}
 	}
 
 	// call the writer
@@ -42,6 +57,11 @@ func (sw *Writer) write(w func() (int, error)) (int, error) {
 	// update the state
 	sw.n += n
 	sw.err = err
+
+	// if we had an error don't need to lock anymore!
+	if err != nil {
+		sw.hadError.Store(true)
+	}
 
 	// and return
 	return n, err
@@ -72,18 +92,19 @@ func (cw *Writer) Sum() (int, error) {
 func (sw *Writer) Reset() {
 	sw.err = nil
 	sw.n = 0
+	sw.hadError.Store(false)
 }
 
-// PreviousWriteFailed indicates that a previous write returned an error.
+// PreviousWriteFailedError indicates that a previous write returned an error.
 // The previous error can be retrieved via the Unwrap() method.
-type PreviousWriteFailed struct {
+type PreviousWriteFailedError struct {
 	err error
 }
 
-func (pw PreviousWriteFailed) Error() string {
+func (pw PreviousWriteFailedError) Error() string {
 	return fmt.Sprintf("previous write failed: %s", pw.err)
 }
 
-func (pw PreviousWriteFailed) Unwrap() error {
+func (pw PreviousWriteFailedError) Unwrap() error {
 	return pw.err
 }
