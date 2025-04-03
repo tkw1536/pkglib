@@ -37,4 +37,6 @@ linters:
     - thelper
     - tparallel
     - unconvert
+    - unparam
+    - usestdlibvars
     - staticcheck
