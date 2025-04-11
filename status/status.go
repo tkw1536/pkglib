@@ -3,6 +3,8 @@
 //spellchecker:words status
 package status
 
+import "slices"
+
 //spellchecker:words errors maps sync atomic time github gosuri uilive pkglib nobufio noop stream
 import (
 	"errors"
@@ -531,7 +533,7 @@ func (st *Status) listen() {
 
 			// update the list of active ids
 			// and rebuild the inverse index map
-			st.ids = append(st.ids[:index], st.ids[index+1:]...)
+			st.ids = slices.Delete(st.ids, index, index+1)
 			for key, value := range st.ids {
 				st.idsI[value] = key
 			}

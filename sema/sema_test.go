@@ -195,7 +195,7 @@ func BenchmarkNewSemaphore_uncontested(b *testing.B) {
 	sema := sema.New(2)
 	nothing := time.Nanosecond
 
-	for range b.N {
+	for b.Loop() {
 		sema.Lock()
 		sema.Lock()
 
@@ -214,7 +214,7 @@ func BenchmarkNewSemaphore_contested(b *testing.B) {
 
 	// contest the semaphore in a concurrent goroutine
 	go func() {
-		for range b.N {
+		for b.Loop() {
 			sema.Lock()
 			time.Sleep(nothing)
 
@@ -225,7 +225,7 @@ func BenchmarkNewSemaphore_contested(b *testing.B) {
 	}()
 
 	// do the attempting to acquire
-	for range b.N {
+	for b.Loop() {
 		sema.Lock()
 		time.Sleep(nothing)
 		sema.Unlock()

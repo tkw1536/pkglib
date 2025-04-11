@@ -75,7 +75,7 @@ func BenchmarkLineBuffer(b *testing.B) {
 
 	data := []byte("world\nhello")
 
-	for range b.N {
+	for b.Loop() {
 		_, _ = buffer.Write(data)
 	}
 }

@@ -18,7 +18,7 @@ func TestAssertValid(t *testing.T) {
 			t.Parallel()
 
 			var wantPanic bool
-			var wantError interface{}
+			var wantError any
 
 			if docfmt.Enabled {
 				wantPanic = tt.wantError != nil
