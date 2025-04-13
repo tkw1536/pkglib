@@ -109,9 +109,7 @@ bike:
 
 			// iterate over the node and record the paths
 			gotPaths := make([][]string, 0, len(tt.wantPaths))
-			iter := yamlx.Iterate(node)
-			for iter.Next() {
-				datum := iter.Datum()
+			for datum := range yamlx.Iterate(node) {
 
 				// check that Find(node, path.Path...) == path.Node holds
 				wantNode := datum.Node
@@ -126,11 +124,6 @@ bike:
 
 				// record the found path
 				gotPaths = append(gotPaths, datum.Path)
-			}
-
-			// check that there was no error
-			if err := iter.Err(); err != nil {
-				t.Errorf("IteratePaths returned error: %v", err)
 			}
 
 			// check that the paths we got are identical

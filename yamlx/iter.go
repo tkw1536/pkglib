@@ -3,9 +3,9 @@ package yamlx
 
 //spellchecker:words slices github pkglib traversal gopkg yaml
 import (
+	"iter"
 	"slices"
 
-	"github.com/tkw1536/pkglib/traversal"
 	"gopkg.in/yaml.v3"
 )
 
@@ -13,11 +13,10 @@ import (
 //
 // Calling Find(node, path.Path) == path.Node is guaranteed for all paths.
 // See also [Find].
-func Iterate(node *yaml.Node) traversal.Iterator[Path] {
-	return traversal.New(func(g traversal.Generator[Path]) {
-		defer g.Return()
-		iterPaths(g, node, nil, nil)
-	})
+func Iterate(node *yaml.Node) iter.Seq[Path] {
+	return func(yield func(Path) bool) {
+		iterPaths(yield, node, nil, nil)
+	}
 }
 
 // Path represents a path inside a given struct.
@@ -32,7 +31,7 @@ func (path Path) HasChildren() bool {
 }
 
 // the return value indicates if the caller should continue.
-func iterPaths(g traversal.Generator[Path], node *yaml.Node, path []string, merge_keys map[string]struct{}) bool {
+func iterPaths(yield func(Path) bool, node *yaml.Node, path []string, merge_keys map[string]struct{}) bool {
 	// resolve the alias
 	node = resolveAlias(node)
 	if node == nil {
@@ -43,7 +42,7 @@ func iterPaths(g traversal.Generator[Path], node *yaml.Node, path []string, merg
 	// and directly iterate on the children
 	if node.Kind == yaml.DocumentNode {
 		for _, doc := range node.Content {
-			if !iterPaths(g, doc, path, nil) {
+			if !iterPaths(yield, doc, path, nil) {
 				return false
 			}
 		}
@@ -53,7 +52,7 @@ func iterPaths(g traversal.Generator[Path], node *yaml.Node, path []string, merg
 
 	// send the node itself (unless we did the merge)
 	if merge_keys == nil {
-		if !g.Yield(Path{Path: path, Node: node}) {
+		if !yield(Path{Path: path, Node: node}) {
 			return false
 		}
 	}
@@ -89,7 +88,7 @@ func iterPaths(g traversal.Generator[Path], node *yaml.Node, path []string, merg
 
 			// recursively iterate the children
 			path := append(slices.Clone(path), key.Value)
-			if !iterPaths(g, value, path, nil) {
+			if !iterPaths(yield, value, path, nil) {
 				return false
 			}
 			merge_keys[key.Value] = struct{}{}
@@ -97,7 +96,7 @@ func iterPaths(g traversal.Generator[Path], node *yaml.Node, path []string, merg
 
 		// iterate through the merged children
 		for _, node := range merged {
-			if !iterPaths(g, node, path, merge_keys) {
+			if !iterPaths(yield, node, path, merge_keys) {
 				return false
 			}
 		}
