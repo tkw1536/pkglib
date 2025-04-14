@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/feiin/sqlstring v0.3.0
-	github.com/gorilla/csrf v1.7.2
+	github.com/gorilla/csrf v1.7.3
 	github.com/gorilla/websocket v1.5.3
 	github.com/gosuri/uilive v0.0.4
 	github.com/tdewolff/minify v2.3.6+incompatible
