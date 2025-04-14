@@ -110,7 +110,6 @@ bike:
 			// iterate over the node and record the paths
 			gotPaths := make([][]string, 0, len(tt.wantPaths))
 			for datum := range yamlx.Iterate(node) {
-
 				// check that Find(node, path.Path...) == path.Node holds
 				wantNode := datum.Node
 				gotNode, err := yamlx.Find(node, datum.Path...)
