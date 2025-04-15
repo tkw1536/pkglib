@@ -6,11 +6,12 @@ package perf
 //spellchecker:words math runtime time github dustin humanize
 import (
 	"fmt"
+	"io"
 	"math"
 	"runtime"
+	"strconv"
+	"strings"
 	"time"
-
-	"github.com/dustin/go-humanize"
 )
 
 //spellchecker:words inuse
@@ -84,11 +85,53 @@ func (diff Diff) String() string {
 	return fmt.Sprintf("%s, %s, %s", diff.Time, diff.BytesString(), diff.ObjectsString())
 }
 
+var (
+	humanPrefixes = []string{"B", "kB", "MB", "GB", "TB", "PB", "EB"}
+	maxPrefixSize = float64(len(humanPrefixes)) - 1
+)
+
 func human(bytes int64) string {
-	if bytes < 0 {
-		return "-" + humanize.Bytes(uint64(-bytes))
+	var builder strings.Builder
+	_ = fmtHuman(&builder, float64(bytes)) // ignore return value, its always nil anyways
+	return builder.String()
+}
+func fmtHuman(w io.StringWriter, fBytes float64) error {
+	// for negative bytes, write a minus
+	// and then deal with the positive part
+	if fBytes < 0 {
+		_, err := w.WriteString("-")
+		if err != nil {
+			return fmt.Errorf("failed to write -: %w", err)
+		}
+		fBytes = -fBytes
 	}
-	return humanize.Bytes(uint64(bytes))
+
+	// find the power of 10 to use
+	prefix := math.Floor(math.Log10(fBytes) / 3)
+	prefix = max(0, min(prefix, maxPrefixSize))
+
+	// compute the actual factor to be printed
+	factor := math.Floor((fBytes/math.Pow10(int(3*prefix-1)))+0.5) / 10
+	{
+		prec := 0
+		if factor < 10 {
+			prec = 1
+		}
+		_, err := w.WriteString(strconv.FormatFloat(factor, 'f', prec, 64))
+		if err != nil {
+			return fmt.Errorf("failed to format number: %w", err)
+		}
+	}
+
+	if _, err := w.WriteString(" "); err != nil {
+		return fmt.Errorf("failed to write space: %w", err)
+	}
+
+	if _, err := w.WriteString(humanPrefixes[int(prefix)]); err != nil {
+		return fmt.Errorf("failed to write suffix: %w", err)
+	}
+
+	return nil
 }
 
 // It is a shortcut for start.Sub(perf.Now()).

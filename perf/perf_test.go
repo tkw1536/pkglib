@@ -24,7 +24,7 @@ func TestSnapshot_BytesString(t *testing.T) {
 		fields fields
 		want   string
 	}{
-		{"0", fields{Bytes: 0}, "0 B"},
+		{"0", fields{Bytes: 0}, "0.0 B"},
 
 		{"1 kB", fields{Bytes: 1024}, "1.0 kB"},
 		{"1 MB", fields{Bytes: 1024 * 1024}, "1.0 MB"},
@@ -182,7 +182,7 @@ func TestDiff_BytesString(t *testing.T) {
 		fields fields
 		want   string
 	}{
-		{"0", fields{Bytes: 0}, "0 B"},
+		{"0", fields{Bytes: 0}, "0.0 B"},
 
 		{"1 kB", fields{Bytes: 1024}, "1.0 kB"},
 		{"1 MB", fields{Bytes: 1024 * 1024}, "1.0 MB"},
