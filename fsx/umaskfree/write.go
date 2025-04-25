@@ -1,3 +1,6 @@
+// Package umaskfree provides file system functionality that ignore the umask.
+// This is achieved using explicit calls to [os.Chmod] or [os.File.Chmod].
+//
 //spellchecker:words umaskfree
 package umaskfree
 
@@ -14,30 +17,50 @@ import (
 
 // Create is like [os.Create] with an additional mode argument.
 func Create(path string, mode fs.FileMode) (*os.File, error) {
-	m.Lock()
-	defer m.Unlock()
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode) // #nosec G304 -- path is an explicit parameter
+	if err != nil {
+		return nil, fmt.Errorf("failed to create file: %w", err)
+	}
 
-	//nolint:wrapcheck
-	return os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode) // #nosec G304 -- path is an explicit parameter
+	if err := file.Chmod(mode); err != nil {
+		err = fmt.Errorf("failed to chmod file: %w", err)
+
+		// close the file
+		if closeErr := file.Close(); closeErr != nil {
+			closeErr = fmt.Errorf("failed to close erroneous file: %w", err)
+			err = errors.Join(err, closeErr)
+		}
+
+		return nil, err
+	}
+
+	return file, nil
 }
 
 // WriteFile is like [os.WriteFile].
-func WriteFile(path string, data []byte, mode fs.FileMode) (err error) {
+func WriteFile(path string, data []byte, perm fs.FileMode) (err error) {
 	var handle *os.File
-	handle, err = Create(path, mode)
+	handle, err = Create(path, perm)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
 		errClose := handle.Close()
+		if errClose == nil {
+			return
+		}
+		errClose = fmt.Errorf("failed to close file: %w", errClose)
+
 		if err == nil {
 			err = errClose
+		} else {
+			err = errors.Join(err, errClose)
 		}
 	}()
 
 	if _, err := handle.Write(data); err != nil {
-		return err //nolint:wrapcheck
+		return fmt.Errorf("failed to write data to file: %w", err)
 	}
 
 	return nil
@@ -60,7 +83,7 @@ func Touch(path string, perm fs.FileMode) error {
 	case errors.Is(err, fs.ErrNotExist):
 		f, err := Create(path, perm)
 		if err != nil {
-			return fmt.Errorf("failed to create file: %w", err)
+			return err
 		}
 		if err := f.Close(); err != nil {
 			return fmt.Errorf("failed to close file: %w", err)
@@ -76,5 +99,3 @@ func Touch(path string, perm fs.FileMode) error {
 		return nil
 	}
 }
-
-//spellchecker:words nosec

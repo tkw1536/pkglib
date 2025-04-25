@@ -5,6 +5,7 @@ package umaskfree
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -22,9 +23,9 @@ var ErrCopySameFile = errors.New("src and dst must be different")
 //
 // When dst and src are the same file, returns [ErrCopySameFile].
 // When ctx is closed, the file is not copied.
-func CopyFile(ctx context.Context, dst, src string) (err error) {
+func CopyFile(ctx context.Context, dst, src string) (e error) {
 	if err := ctx.Err(); err != nil {
-		return err //nolint:wrapcheck
+		return fmt.Errorf("context was closed: %w", err)
 	}
 
 	if fsx.Same(src, dst) {
@@ -34,19 +35,26 @@ func CopyFile(ctx context.Context, dst, src string) (err error) {
 	// open the source
 	srcFile, err := os.Open(src) // #nosec G304 -- src is an explicit parameter
 	if err != nil {
-		return err //nolint:wrapcheck
+		return fmt.Errorf("failed to open source file: %w", err)
 	}
 	defer func() {
 		errClose := srcFile.Close()
-		if err == nil {
-			err = errClose
+		if errClose == nil {
+			return
+		}
+		errClose = fmt.Errorf("failed to close source file: %w", err)
+
+		if e == nil {
+			e = errClose
+		} else {
+			e = errors.Join(e, errClose)
 		}
 	}()
 
 	// stat it to get the mode!
 	srcStat, err := srcFile.Stat()
 	if err != nil {
-		return err //nolint:wrapcheck
+		return fmt.Errorf("failed to stat source file: %w", err)
 	}
 
 	// open or create the destination
@@ -56,21 +64,31 @@ func CopyFile(ctx context.Context, dst, src string) (err error) {
 	}
 	defer func() {
 		errClose := dstFile.Close()
-		if err == nil {
-			err = errClose
+		if errClose == nil {
+			return
+		}
+		errClose = fmt.Errorf("failed to close destination file: %w", err)
+
+		if e == nil {
+			e = errClose
+		} else {
+			e = errors.Join(err, errClose)
 		}
 	}()
 
 	// and do the copy!
 	_, err = contextx.Copy(ctx, dstFile, srcFile)
-	return err //nolint:wrapcheck
+	if err != nil {
+		return fmt.Errorf("failed to copy file: %w", err)
+	}
+	return nil
 }
 
 // CopyLink copies a link from src to dst.
 // If dst already exists, it is deleted and then re-created.
 func CopyLink(ctx context.Context, dst, src string) error {
 	if err := ctx.Err(); err != nil {
-		return err //nolint:wrapcheck
+		return fmt.Errorf("context was closed: %w", err)
 	}
 
 	// if they're the same file that is an error
@@ -81,24 +99,27 @@ func CopyLink(ctx context.Context, dst, src string) error {
 	// read the link target
 	target, err := os.Readlink(src)
 	if err != nil {
-		return err //nolint:wrapcheck
+		return fmt.Errorf("failed to read source link: %w", err)
 	}
 
 	// delete it if it already exists
 	{
 		exists, err := fsx.Exists(dst)
 		if err != nil {
-			return err //nolint:wrapcheck
+			return fmt.Errorf("failed to check destination file: %w", err)
 		}
 		if exists {
 			if err := os.Remove(dst); err != nil {
-				return err //nolint:wrapcheck
+				return fmt.Errorf("failed to remove destination file: %w", err)
 			}
 		}
 	}
 
 	// make the symbolic link!
-	return os.Symlink(target, dst) //nolint:wrapcheck
+	if err := os.Symlink(target, dst); err != nil {
+		return fmt.Errorf("failed to create symlink: %w", err)
+	}
+	return nil
 }
 
 var ErrDstFile = errors.New("dst is a file")
@@ -120,7 +141,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 	{
 		isRegular, err := fsx.IsRegular(dst, true)
 		if err != nil {
-			return err //nolint:wrapcheck
+			return fmt.Errorf("failed to check destination file: %w", err)
 		}
 		if isRegular {
 			return ErrDstFile
@@ -143,7 +164,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		var relPath string
 		relPath, err = filepath.Rel(src, path)
 		if err != nil {
-			return err //nolint:wrapcheck
+			return err
 		}
 		dst := filepath.Join(dst, relPath)
 
@@ -155,7 +176,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		// stat the directory, so that we can get mode, and info later!
 		info, err := d.Info()
 		if err != nil {
-			return err //nolint:wrapcheck
+			return err
 		}
 
 		// if we have a symbolic link, copy the link!
@@ -174,7 +195,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		if errors.Is(err, fs.ErrExist) {
 			isDir, isDirE := fsx.IsDirectory(dst, false)
 			if isDirE != nil {
-				return isDirE //nolint:wrapcheck
+				return isDirE
 			}
 			if isDir {
 				err = nil
