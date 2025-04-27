@@ -1,12 +1,14 @@
 //spellchecker:words contextx
 package contextx
 
-//spellchecker:words context errors time
+//spellchecker:words context errors time github pkglib errorsx
 import (
 	"context"
 	"errors"
 	"io"
 	"time"
+
+	"github.com/tkw1536/pkglib/errorsx"
 )
 
 // Copy copies from src to dst, stopping once ctx is closed.
@@ -44,7 +46,7 @@ func CancelRead(reader io.Reader) error {
 		errCloser = closer.Close()
 	}
 
-	return errors.Join(errDeadline, errCloser)
+	return errorsx.Combine(errDeadline, errCloser)
 }
 
 // CancelWrite attempts to cancel any in-progress and future writes on the given writer.

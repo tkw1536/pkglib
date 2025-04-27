@@ -1,7 +1,7 @@
 //spellchecker:words yamlx
 package yamlx
 
-//spellchecker:words slices github pkglib traversal gopkg yaml
+//spellchecker:words iter slices gopkg yaml
 import (
 	"iter"
 	"slices"

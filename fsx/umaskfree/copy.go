@@ -1,7 +1,7 @@
 //spellchecker:words umaskfree
 package umaskfree
 
-//spellchecker:words context errors path filepath github pkglib contextx
+//spellchecker:words context errors path filepath github pkglib contextx errorsx
 import (
 	"context"
 	"errors"
@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/tkw1536/pkglib/contextx"
+	"github.com/tkw1536/pkglib/errorsx"
 	"github.com/tkw1536/pkglib/fsx"
 )
 
@@ -22,7 +23,7 @@ var ErrCopySameFile = errors.New("src and dst must be different")
 // When src points to a symbolic link, will copy the symbolic link.
 //
 // When dst and src are the same file, returns [ErrCopySameFile].
-// When ctx is closed, the file is not copied.
+// When ctx is closed, copying is interrupted.
 func CopyFile(ctx context.Context, dst, src string) (e error) {
 	if err := ctx.Err(); err != nil {
 		return fmt.Errorf("context was closed: %w", err)
@@ -37,19 +38,7 @@ func CopyFile(ctx context.Context, dst, src string) (e error) {
 	if err != nil {
 		return fmt.Errorf("failed to open source file: %w", err)
 	}
-	defer func() {
-		errClose := srcFile.Close()
-		if errClose == nil {
-			return
-		}
-		errClose = fmt.Errorf("failed to close source file: %w", err)
-
-		if e == nil {
-			e = errClose
-		} else {
-			e = errors.Join(e, errClose)
-		}
-	}()
+	defer errorsx.Close(srcFile, &e, "source file")
 
 	// stat it to get the mode!
 	srcStat, err := srcFile.Stat()
@@ -62,19 +51,7 @@ func CopyFile(ctx context.Context, dst, src string) (e error) {
 	if err != nil {
 		return err
 	}
-	defer func() {
-		errClose := dstFile.Close()
-		if errClose == nil {
-			return
-		}
-		errClose = fmt.Errorf("failed to close destination file: %w", err)
-
-		if e == nil {
-			e = errClose
-		} else {
-			e = errors.Join(err, errClose)
-		}
-	}()
+	defer errorsx.Close(dstFile, &e, "destination file")
 
 	// and do the copy!
 	_, err = contextx.Copy(ctx, dstFile, srcFile)

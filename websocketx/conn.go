@@ -1,10 +1,9 @@
 //spellchecker:words websocketx
 package websocketx
 
-//spellchecker:words context errors http runtime debug sync time github gorilla websocket
+//spellchecker:words context http runtime debug sync time github gorilla websocket pkglib errorsx
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/tkw1536/pkglib/errorsx"
 )
 
 //spellchecker:words nolint containedctx errorlint wrapcheck
@@ -130,7 +130,7 @@ func (conn *Connection) setConnOpts() error {
 		return nil
 	})
 
-	return errors.Join(errs...)
+	return errorsx.Combine(errs...)
 }
 
 func (conn *Connection) handle(handler Handler) {

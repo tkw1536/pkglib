@@ -1,7 +1,7 @@
 //spellchecker:words websocketx
 package websocketx
 
-//spellchecker:words errors strconv strings time github gorilla websocket
+//spellchecker:words errors strconv strings time github gorilla websocket pkglib errorsx
 import (
 	"errors"
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/tkw1536/pkglib/errorsx"
 )
 
 //spellchecker:words nolint errname
@@ -98,7 +99,7 @@ func (conn *Connection) forceClose(err error) error {
 	// we're now in closed state
 	conn.state = stateClosed
 
-	return errors.Join(errs...)
+	return errorsx.Combine(errs...)
 }
 
 var (

@@ -3,7 +3,7 @@
 //spellchecker:words perf
 package perf
 
-//spellchecker:words math runtime time github dustin humanize
+//spellchecker:words math runtime strconv strings time
 import (
 	"fmt"
 	"io"

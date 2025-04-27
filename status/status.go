@@ -3,24 +3,23 @@
 //spellchecker:words status
 package status
 
-import "slices"
-
-//spellchecker:words errors maps sync atomic time github gosuri uilive pkglib nobufio noop stream
+//spellchecker:words maps slices sync atomic time github gosuri uilive pkglib errorsx nobufio noop stream
 import (
-	"errors"
 	"fmt"
 	"io"
 	"maps"
 	"os"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/gosuri/uilive"
+	"github.com/tkw1536/pkglib/errorsx"
 	"github.com/tkw1536/pkglib/nobufio"
 	"github.com/tkw1536/pkglib/noop"
 	"github.com/tkw1536/pkglib/stream"
-)
+) //spellchecker:words errors maps sync atomic time github gosuri uilive pkglib nobufio noop stream
 
 //spellchecker:words annot compat
 
@@ -188,7 +187,7 @@ func (st *Status) flush(force bool, changed uint64) error {
 		rErr = st.flushNormal(force)
 	}
 
-	return errors.Join(lErr, rErr)
+	return errorsx.Combine(lErr, rErr)
 }
 
 // flushCompat flushes the provided updated message, if it is valid.

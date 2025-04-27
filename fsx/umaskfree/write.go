@@ -1,16 +1,18 @@
-// Package umaskfree provides file system functionality that ignore the umask.
+// Package umaskfree provides file system functionality that ignores the umask.
 // This is achieved using explicit calls to [os.Chmod] or [os.File.Chmod].
 //
 //spellchecker:words umaskfree
 package umaskfree
 
-//spellchecker:words errors time
+//spellchecker:words errors time github pkglib errorsx
 import (
 	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"time"
+
+	"github.com/tkw1536/pkglib/errorsx"
 )
 
 //spellchecker:words nolint wrapcheck
@@ -44,20 +46,7 @@ func WriteFile(path string, data []byte, perm fs.FileMode) (err error) {
 	if err != nil {
 		return err
 	}
-
-	defer func() {
-		errClose := handle.Close()
-		if errClose == nil {
-			return
-		}
-		errClose = fmt.Errorf("failed to close file: %w", errClose)
-
-		if err == nil {
-			err = errClose
-		} else {
-			err = errors.Join(err, errClose)
-		}
-	}()
+	defer errorsx.Close(handle, &err, "file")
 
 	if _, err := handle.Write(data); err != nil {
 		return fmt.Errorf("failed to write data to file: %w", err)

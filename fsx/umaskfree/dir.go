@@ -1,6 +1,7 @@
 //spellchecker:words umaskfree
 package umaskfree
 
+//spellchecker:words path filepath syscall
 import (
 	"fmt"
 	"io/fs"
