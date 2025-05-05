@@ -28,7 +28,7 @@ func (nullStream) Read(bytes []byte) (int, error) {
 	return 0, io.EOF
 }
 func (nullStream) ReadFrom(r io.Reader) (n int64, err error) {
-	return io.Copy(io.Discard, r) //nolint:wrapcheck
+	return io.Copy(io.Discard, r) //nolint:wrapcheck // overkill for discarding
 }
 
 func (nullStream) Write(bytes []byte) (int, error) {

@@ -30,7 +30,7 @@ func WithValuesOf(parent, values context.Context) context.Context {
 	}
 }
 
-//nolint:containedctx
+//nolint:containedctx // custom context implementation
 type valuesOf struct {
 	context.Context
 	values context.Context

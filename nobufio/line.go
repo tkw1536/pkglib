@@ -24,7 +24,7 @@ func ReadLine(reader io.Reader) (value string, err error) {
 	for {
 		// read the next valid rune
 		r, _, err := ReadRune(reader)
-		if err == io.EOF { //nolint:errorlint
+		if err == io.EOF { //nolint:errorlint // io.EOF
 			break // at EOF, we are done!
 		}
 		readSomething = true
@@ -39,7 +39,7 @@ func ReadLine(reader io.Reader) (value string, err error) {
 			// flag is set, but we didn't encounter a '\n' or EOF.
 			// so we need to write it back to the buffer
 			if _, err := builder.WriteRune('\r'); err != nil {
-				return "", err //nolint:wrapcheck
+				panic("never reached")
 			}
 			lastR = false
 		}
@@ -50,7 +50,7 @@ func ReadLine(reader io.Reader) (value string, err error) {
 
 		// store it to the builder
 		if _, err := builder.WriteRune(r); err != nil {
-			return "", err //nolint:wrapcheck
+			panic("never reached")
 		}
 	}
 

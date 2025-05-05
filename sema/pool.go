@@ -63,7 +63,7 @@ func (pool *Pool[V]) Use(f func(V) error) error {
 	ok, err := func() (ok bool, err error) {
 		defer func() { _ = recover() }() // silently ignore errors
 
-		ok = false //nolint:wastedassign
+		ok = false //nolint:wastedassign // false positive because panic
 		err = f(entry)
 		ok = err == nil
 		return

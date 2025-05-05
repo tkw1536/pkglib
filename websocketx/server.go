@@ -21,7 +21,7 @@ type Server struct {
 	m        sync.Mutex // protects modifying context below
 	initDone bool       // true once we have initialized the server
 
-	//nolint:containedctx
+	//nolint:containedctx // not a user-passed context
 	context context.Context         // closed upon closing / shutting down server
 	cancel  context.CancelCauseFunc // used to cancel the server
 	conns   sync.WaitGroup          // holds 2 for every active connection
@@ -258,7 +258,8 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 			// server is shutting down with a specific code =>
 			// close the server with that specific code
-			if cc, ok := cause.(CloseCause); ok { //nolint:errorlint
+			var cc CloseCause
+			if errors.As(cause, &cc) {
 				conn.ShutdownWith(cc.Frame)
 				return
 			}

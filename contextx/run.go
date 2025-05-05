@@ -34,7 +34,7 @@ func Run[T any](ctx context.Context, f func(start func()) T, cancel func()) (t T
 func Run2[T1, T2 any](ctx context.Context, f func(start func()) (T1, T2), cancel func()) (t1 T1, t2 T2, err error) {
 	// special case: context is already closed
 	if err := ctx.Err(); err != nil {
-		return t1, t2, err //nolint:wrapcheck
+		return t1, t2, err //nolint:wrapcheck // return context error directly
 	}
 
 	cancelled := make(chan struct{}, 1)

@@ -31,7 +31,7 @@ func TestNullStream_Read(t *testing.T) {
 			t.Parallel()
 
 			got, err := stream.Null.Read(tt.args.bytes)
-			if (err == io.EOF) != tt.wantEOF { //nolint:errorlint
+			if (err == io.EOF) != tt.wantEOF { //nolint:errorlint // testing code
 				t.Errorf("NullStream.Read() error = %v, wantEOF %v", err, tt.wantEOF)
 				return
 			}

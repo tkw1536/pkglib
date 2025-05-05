@@ -41,7 +41,7 @@ func New(all any) *Souls {
 // If this souls has already been initialized, this call is a noop.
 func (r *Souls) Init() error {
 	// do an initialization
-	return r.initErr.Get(func() error { //nolint:wrapcheck
+	return r.initErr.Get(func() error { //nolint:wrapcheck // ignore wrapping from held error
 		// set allT and componentT correctly
 		{
 			if !r.all.IsValid() {
@@ -62,7 +62,7 @@ func (r *Souls) Init() error {
 		l := r.all.Len()
 		rand.Shuffle(l, reflect.Swapper(r.all.Interface()))
 		if err := lreflect.SortSliceByRank(r.all); err != nil {
-			return err //nolint:wrapcheck
+			return err //nolint:wrapcheck // don't wrap lreflect errors
 		}
 
 		// initialize maps for components and classes
@@ -158,7 +158,7 @@ func (r *Souls) export(typ reflect.Type) (reflect.Value, error) {
 	// get the first assignable element
 	c, err := lreflect.FirstAssignableInterfaceElement(r.all, typ)
 	if err != nil {
-		return reflect.Value{}, err //nolint:wrapcheck
+		return reflect.Value{}, err //nolint:wrapcheck // don't wrap lreflect errors
 	}
 
 	// if it is nil, don't do anything with it
@@ -181,12 +181,12 @@ func (r *Souls) exportClass(typ reflect.Type) (reflect.Value, error) {
 	// get the class
 	clz, err := lreflect.FilterSliceInterface(r.all, typ)
 	if err != nil {
-		return reflect.Value{}, err //nolint:wrapcheck
+		return reflect.Value{}, err //nolint:wrapcheck // don't wrap lreflect errors
 	}
 
 	// sort the slice by rank
 	if err := lreflect.SortSliceByRank(clz); err != nil {
-		return reflect.Value{}, err //nolint:wrapcheck
+		return reflect.Value{}, err //nolint:wrapcheck // don't wrap lreflect errors
 	}
 
 	// store it in the cache and return it

@@ -125,7 +125,7 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 		}
 	}
 
-	//nolint:wrapcheck
+	//nolint:wrapcheck // no need to wrap
 	return filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
 		// someone previously returned an error
 		if err != nil {

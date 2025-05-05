@@ -19,7 +19,7 @@ func ExampleIterFields() {
 		EmbeddedField string // field in an embedded struct
 	}
 
-	//nolint:unused
+	//nolint:unused // false positive: used by TypeFor below
 	type SomeStruct struct {
 		Field   string // regular field
 		string         // embedded non-struct, not called recursively
@@ -43,7 +43,7 @@ func ExampleIterAllFields() {
 		EmbeddedField string // field in an embedded struct
 	}
 
-	//nolint:unused
+	//nolint:unused // false positive: used by TypeFor call below
 	type SomeStruct struct {
 		Field   string // regular field
 		string         // embedded non-struct, not called recursively

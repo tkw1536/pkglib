@@ -15,7 +15,7 @@ import (
 // StatusCode implements both [error] and [http.Handler].
 // When used as a handler, it sets the appropriate status code, and returns a simple text response.
 //
-//nolint:errname
+//nolint:errname // not primarily used as an error
 type StatusCode int
 
 // check that StatusCode indeed implements error and http.Handler.

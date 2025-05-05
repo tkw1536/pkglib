@@ -104,7 +104,7 @@ func newSError(err error) sError {
 
 	// find the child errors
 	var children []error
-	switch x := err.(type) { //nolint:errorlint
+	switch x := err.(type) { //nolint:errorlint // want to unwrap directly
 	case interface{ Unwrap() error }:
 		children = []error{x.Unwrap()}
 	case interface{ Unwrap() []error }:

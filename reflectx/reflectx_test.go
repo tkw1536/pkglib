@@ -16,7 +16,7 @@ import (
 
 // counter is used for testing.
 //
-//nolint:recvcheck
+//nolint:recvcheck // testing code
 type counter struct {
 	Value int
 }

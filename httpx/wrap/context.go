@@ -35,7 +35,7 @@ func Context(handler http.Handler, f ContextFunc) http.Handler {
 
 		// use the new context
 		if ctx != nil {
-			r = r.WithContext(ctx) //nolint:contextcheck
+			r = r.WithContext(ctx) //nolint:contextcheck // explicitly use the context
 		}
 
 		// do the handling

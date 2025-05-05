@@ -4,6 +4,7 @@ package websocketx
 //spellchecker:words context http runtime debug sync time github gorilla websocket pkglib errorsx
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -51,8 +52,8 @@ type Connection struct {
 	handlerDone chan struct{}  // once the handler has returned
 
 	// context that is open as long as user read/writes are permitted
-	context context.Context         //nolint:containedctx
-	cancel  context.CancelCauseFunc //nolint:containedctx
+	context context.Context         //nolint:containedctx // not a user-defined context
+	cancel  context.CancelCauseFunc //nolint:containedctx // not a user-defined context
 
 	// incoming and outgoing messages
 	incoming chan Message
@@ -154,7 +155,7 @@ func (conn *Connection) handle(handler Handler) {
 					Code: StatusInternalErr,
 				},
 				WasClean: true,
-				Err:      fmt.Errorf("%v", value), //nolint:err113
+				Err:      fmt.Errorf("%v", value), //nolint:err113 // need to represent exact error value
 			}, nil, false)
 		}()
 
@@ -296,7 +297,7 @@ func (conn *Connection) write(message queuedMessage) error {
 
 	_, ok := <-done
 	if !ok {
-		return context.Cause(conn.context) //nolint:wrapcheck
+		return context.Cause(conn.context) //nolint:wrapcheck // returning context cause
 	}
 
 	return nil
@@ -322,8 +323,9 @@ func (conn *Connection) recvMessages() {
 
 			// intercept any unexpected CloseErrors
 			// this only has an effect if the context has not yet been closed.
-			if ce, ok := err.(*websocket.CloseError); ok { //nolint:errorlint
-				err = fmt.Errorf("%s", ce.Text) //nolint:err113
+			var ce *websocket.CloseError
+			if errors.As(err, &ce) {
+				err = errors.New(ce.Text) //nolint:err113 // want only the text
 			}
 			if err != nil {
 				conn.close(CloseCause{

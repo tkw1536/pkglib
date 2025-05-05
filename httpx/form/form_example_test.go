@@ -70,7 +70,7 @@ func ExampleForm() {
 
 // makeFormRequest makes a request to a form.
 //
-//nolint:thelper
+//nolint:thelper // Helper call conditional
 func makeFormRequest(t *testing.T, form http.Handler, body map[string]string) string {
 	if t != nil {
 		t.Helper()

@@ -36,32 +36,32 @@ func (str IOStream) StderrIsATerminal() bool {
 
 // Printf is like [fmt.Printf] but prints to str.Stdout.
 func (str IOStream) Printf(format string, args ...any) (n int, err error) {
-	return fmt.Fprintf(str.Stdout, format, args...) //nolint:wrapcheck
+	return fmt.Fprintf(str.Stdout, format, args...) //nolint:wrapcheck  // don't wrap fmt here
 }
 
 // EPrintf is like [fmt.Printf] but prints to io.Stderr.
 func (str IOStream) EPrintf(format string, args ...any) (n int, err error) {
-	return fmt.Fprintf(str.Stderr, format, args...) //nolint:wrapcheck
+	return fmt.Fprintf(str.Stderr, format, args...) //nolint:wrapcheck  // don't wrap fmt here
 }
 
 // Print is like [fmt.Print] but prints to str.Stdout.
 func (str IOStream) Print(args ...any) (n int, err error) {
-	return fmt.Fprint(str.Stdout, args...) //nolint:wrapcheck
+	return fmt.Fprint(str.Stdout, args...) //nolint:wrapcheck // don't wrap fmt here
 }
 
 // EPrint is like [fmt.Print] but prints to str.Stderr.
 func (str IOStream) EPrint(args ...any) (n int, err error) {
-	return fmt.Fprint(str.Stderr, args...) //nolint:wrapcheck
+	return fmt.Fprint(str.Stderr, args...) //nolint:wrapcheck  // don't wrap fmt here
 }
 
 // Println is like [fmt.Println] but prints to str.Stdout.
 func (str IOStream) Println(args ...any) (n int, err error) {
-	return fmt.Fprintln(str.Stdout, args...) //nolint:wrapcheck
+	return fmt.Fprintln(str.Stdout, args...) //nolint:wrapcheck  // don't wrap fmt here
 }
 
 // EPrintln is like [fmt.Println] but prints to io.Stderr.
 func (str IOStream) EPrintln(args ...any) (n int, err error) {
-	return fmt.Fprintln(str.Stderr, args...) //nolint:wrapcheck
+	return fmt.Fprintln(str.Stderr, args...) //nolint:wrapcheck  // don't wrap fmt here
 }
 
 // NewIOStream creates a new IOStream with the provided readers and writers.

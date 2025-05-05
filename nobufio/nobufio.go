@@ -21,7 +21,7 @@ import (
 func ReadRune(reader io.Reader) (r rune, size int, err error) {
 	// try to directly read the rune
 	if reader, ok := reader.(io.RuneReader); ok {
-		return reader.ReadRune() //nolint:wrapcheck
+		return reader.ReadRune() //nolint:wrapcheck // directly use RuneReader
 	}
 
 	runeBuffer := make([]byte, 0, utf8.MaxRune)

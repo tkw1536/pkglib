@@ -37,7 +37,7 @@ func ExampleMarshal() {
 	//     "69": nice
 }
 
-//nolint:thelper
+//nolint:thelper // helper is conditional
 func mustMarshal(tb testing.TB, node *yaml.Node) string {
 	if tb != nil {
 		tb.Helper()
@@ -55,7 +55,7 @@ func mustMarshal(tb testing.TB, node *yaml.Node) string {
 	return string(result)
 }
 
-//nolint:thelper
+//nolint:thelper // helper call is conditional
 func mustUnmarshal(tb testing.TB, source string) *yaml.Node {
 	if tb != nil {
 		tb.Helper()
