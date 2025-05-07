@@ -3,7 +3,6 @@ module github.com/tkw1536/pkglib
 go 1.24.2
 
 require (
-	github.com/feiin/sqlstring v0.3.0
 	github.com/gorilla/csrf v1.7.3
 	github.com/gorilla/websocket v1.5.3
 	github.com/gosuri/uilive v0.0.4
