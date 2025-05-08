@@ -1,7 +1,7 @@
 //spellchecker:words errorsx
 package errorsx
 
-//spellchecker:words strings
+//spellchecker:words errors
 import (
 	"errors"
 )

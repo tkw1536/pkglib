@@ -1,7 +1,7 @@
 //spellchecker:words websocketx
 package websocketx
 
-//spellchecker:words context http runtime debug sync time github gorilla websocket pkglib errorsx
+//spellchecker:words context errors http runtime debug sync time github gorilla websocket pkglib errorsx
 import (
 	"context"
 	"errors"
