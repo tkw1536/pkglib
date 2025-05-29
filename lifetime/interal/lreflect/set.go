@@ -3,7 +3,6 @@ package lreflect
 
 //spellchecker:words reflect
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -17,10 +16,10 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 	// ensure both arguments are valid
 	{
 		if !v.IsValid() {
-			return invalidValueError("v")
+			return vIsInvalidValueErr
 		}
 		if !x.IsValid() {
-			return invalidValueError("x")
+			return xIsInvalidValueErr
 		}
 	}
 
@@ -31,40 +30,19 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 		return typeUnassignableError{X: xT, V: vT}
 	}
 
-	// check if the value was obtained from an unexported field
-	// and "forget" where the value was obtained
-	if !v.CanSet() {
-		if !v.CanAddr() {
-			return typeUnaddressableError{X: vT}
-		}
-
-		v = reflect.NewAt(vT, v.Addr().UnsafePointer()).Elem()
+	// if we can directly set the value, do it!
+	if v.CanSet() {
+		v.Set(x)
+		return nil
 	}
 
-	// do the actual setting!
-	v.Set(x)
+	// ensure that we can address v!
+	if !v.CanAddr() {
+		return typeUnaddressableError{X: vT}
+	}
+
+	// forget that the value was retrieved from an unexported field
+	// and immediately set it!
+	reflect.NewAt(vT, v.Addr().UnsafePointer()).Elem().Set(x)
 	return nil
-}
-
-type typeUnassignableError struct {
-	X, V reflect.Type
-}
-
-func (err typeUnassignableError) Error() string {
-	return fmt.Sprintf("value of type %s not assignable to type %s", err.X, err.V)
-}
-
-type typeUnaddressableError struct {
-	X reflect.Type
-}
-
-func (err typeUnaddressableError) Error() string {
-	return fmt.Sprintf("value of type %s is not addressable", err.X)
-}
-
-// invalidValueError indicates that an invalid value was passed for the variable with the given name.
-type invalidValueError string
-
-func (err invalidValueError) Error() string {
-	return string(err) + " is not a valid value"
 }

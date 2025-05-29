@@ -18,13 +18,13 @@ import (
 func SortSliceByRank(slice reflect.Value) error {
 	// check that we have some valid value
 	if !slice.IsValid() {
-		return invalidValueError("slice")
+		return sliceInvalidErr
 	}
 
 	// check that we have a slice type
 	S := slice.Type()
 	if S.Kind() != reflect.Slice {
-		return noSliceError("slice")
+		return sliceNotASliceErr
 	}
 
 	// get the name of the rank method
