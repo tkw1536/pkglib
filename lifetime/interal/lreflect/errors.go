@@ -6,22 +6,22 @@ import (
 )
 
 const (
-	ifaceIsNilTypeErr  = nilTypeError("iface")
-	ifaceNotAnIfaceErr = noInterfaceError("iface")
+	errIfaceIsNilType  = nilTypeError("iface")
+	errIfaceNotAnIface = noInterfaceError("iface")
 
-	sliceInvalidErr   = invalidValueError("slice")
-	sliceIsNilTypeErr = nilTypeError("slice")
-	sliceNotASliceErr = noSliceError("slice")
+	errSliceInvalid   = invalidValueError("slice")
+	errSliceNotASlice = noSliceError("slice")
 
-	sliceTypeNotAnInterfaceSlice = noInterfaceSliceError("slice.Type()")
-	sliceTypeNotASlice           = noSliceError("slice.Type()")
+	errSliceTypeNotAnInterfaceSlice = noInterfaceSliceError("slice.Type()")
+	errSliceTypeNotASlice           = noSliceError("slice.Type()")
+	errSliceTypeIsNilType           = nilTypeError("slice")
 
-	sPtrNilErr = nilTypeError("sPtr")
+	errSPtrIsNilType = nilTypeError("sPtr")
 
-	vIsInvalidValueErr = invalidValueError("v")
-	vIsNilTypeErr      = nilTypeError("v")
+	errVIsInvalidValue = invalidValueError("v")
+	errVIsNilType      = nilTypeError("v")
 
-	xIsInvalidValueErr = invalidValueError("x")
+	errXIsInvalidValue = invalidValueError("x")
 )
 
 // noSliceError indicates that the type with the provided name is not a slice.

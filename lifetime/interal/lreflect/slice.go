@@ -14,13 +14,13 @@ func ImplementsAsSliceInterface(iface reflect.Type, slice reflect.Type) (bool, e
 	// check for valid arguments
 	{
 		if slice == nil {
-			return false, sliceIsNilTypeErr
+			return false, errSliceTypeIsNilType
 		}
 		if iface == nil {
-			return false, ifaceIsNilTypeErr
+			return false, errIfaceIsNilType
 		}
 		if iface.Kind() != reflect.Interface {
-			return false, ifaceNotAnIfaceErr
+			return false, errIfaceNotAnIface
 		}
 	}
 
@@ -34,13 +34,13 @@ func FilterSliceInterface(slice reflect.Value, iface reflect.Type) (reflect.Valu
 	{
 		S := slice.Type()
 		if S.Kind() != reflect.Slice {
-			return reflect.Value{}, sliceTypeNotASlice
+			return reflect.Value{}, errSliceTypeNotASlice
 		}
 		if iface == nil {
-			return reflect.Value{}, ifaceIsNilTypeErr
+			return reflect.Value{}, errIfaceIsNilType
 		}
 		if iface.Kind() != reflect.Interface {
-			return reflect.Value{}, ifaceNotAnIfaceErr
+			return reflect.Value{}, errIfaceNotAnIface
 		}
 	}
 
@@ -69,11 +69,11 @@ func FirstAssignableInterfaceElement(slice reflect.Value, v reflect.Type) (refle
 		s := slice.Type()
 
 		if s.Kind() != reflect.Slice || s.Elem().Kind() != reflect.Interface {
-			return reflect.Value{}, sliceTypeNotAnInterfaceSlice
+			return reflect.Value{}, errSliceTypeNotAnInterfaceSlice
 		}
 
 		if v == nil {
-			return reflect.Value{}, vIsNilTypeErr
+			return reflect.Value{}, errVIsNilType
 		}
 	}
 

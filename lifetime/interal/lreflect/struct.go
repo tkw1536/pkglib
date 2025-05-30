@@ -17,13 +17,13 @@ import (
 func ImplementsAsStructPointer(iface reflect.Type, sPtr reflect.Type) (bool, error) {
 	{
 		if iface == nil {
-			return false, ifaceIsNilTypeErr
+			return false, errIfaceIsNilType
 		}
 		if iface.Kind() != reflect.Interface {
-			return false, ifaceNotAnIfaceErr
+			return false, errIfaceNotAnIface
 		}
 		if sPtr == nil {
-			return false, sPtrNilErr
+			return false, errSPtrIsNilType
 		}
 	}
 

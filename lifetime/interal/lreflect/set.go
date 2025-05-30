@@ -16,10 +16,10 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 	// ensure both arguments are valid
 	{
 		if !v.IsValid() {
-			return vIsInvalidValueErr
+			return errVIsInvalidValue
 		}
 		if !x.IsValid() {
-			return xIsInvalidValueErr
+			return errXIsInvalidValue
 		}
 	}
 
