@@ -52,17 +52,6 @@ func ExampleJSON() {
 func TestJSON_LogJSONEncodeError(t *testing.T) {
 	t.Parallel()
 
-	// create a redirect based on the url
-	handler := content.JSON(func(r *http.Request) (any, error) {
-		switch r.URL.Path {
-		case "/ok":
-			return nil, nil
-		case "/broken":
-			return BrokenMarshalJSON{}, nil
-		}
-		panic("never reached")
-	})
-
 	for _, tt := range []struct {
 		Path       string
 		WantCalled bool
@@ -73,8 +62,16 @@ func TestJSON_LogJSONEncodeError(t *testing.T) {
 		t.Run(tt.Path, func(t *testing.T) {
 			t.Parallel()
 
-			// setup a LogTemplateError that records if it was called or not
 			called := false
+			handler := content.JSON(func(r *http.Request) (any, error) {
+				switch r.URL.Path {
+				case "/ok":
+					return nil, nil
+				case "/broken":
+					return BrokenMarshalJSON{}, nil
+				}
+				panic("never reached")
+			})
 			handler.LogJSONEncodeError = func(r *http.Request, err error) {
 				called = true
 			}
