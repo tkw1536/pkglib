@@ -43,6 +43,6 @@ func UnsafeSetAnyValue(v, x reflect.Value) error {
 
 	// forget that the value was retrieved from an unexported field
 	// and immediately set it!
-	reflect.NewAt(vT, v.Addr().UnsafePointer()).Elem().Set(x)
+	UnsafeForgetUnexported(v, vT).Set(x)
 	return nil
 }

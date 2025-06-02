@@ -25,6 +25,9 @@ func (window *Window) isComponent() {}
 
 // Open opens the window.
 func (window *Window) Open() {
+	if window == nil {
+		panic("window is nil")
+	}
 	fmt.Println("opening the window")
 }
 
