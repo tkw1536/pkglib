@@ -7,6 +7,7 @@ package sema
 // The resource is assumed to be entirely available.
 //
 // A size <= 0 indicates an infinite limit, and all Lock and Unlock calls are no-ops.
+// A size == 1 indicates a [sync.Mutex] should be used instead.
 //
 // Note that if size is statically known to be 1, a Mutex should be used instead.
 func New(size int) Semaphore {
@@ -17,11 +18,10 @@ func New(size int) Semaphore {
 	return sema
 }
 
-// Semaphore guards parallel access to a shared resource.
-// It should always be created using [New].
+// Semaphore guards concurrent access to a shared resource.
+// The resource can be acquired using [Semaphore.Lock] and released using [Semaphore.Unlock].
 //
-// The resource can be acquired using a call to [Lock].
-// and released using a call to [Unlock].
+// A Semaphore is typically created using [New], the zero value implements all operations as no-ops.
 type Semaphore struct {
 	// if the limit is infinite, the channel is nil;
 	// else it is a buffered channel.
@@ -33,14 +33,12 @@ type Semaphore struct {
 
 // Len returns the maximum size of the resource guarded by this semaphore, or 0 if said limit is infinite.
 func (s Semaphore) Len() int {
-	if s.c == nil {
-		return 0
-	}
 	return len(s.c)
 }
 
-// Lock atomically acquires a unit of the guarded resource.
-// When the resource is not available, it blocks until such a resource is available.
+// Lock acquires the guarded resource.
+// If the resource is unavailable, the calling goroutine
+// blocks until it is.
 func (s Semaphore) Lock() {
 	if s.c == nil {
 		return
@@ -48,10 +46,12 @@ func (s Semaphore) Lock() {
 	s.c <- struct{}{}
 }
 
-// TryLock attempts to atomically acquire the resource without blocking.
-// When it succeeds, it returns true, otherwise it returns false.
+// TryLock tries to acquire s and reports whether it succeeded.
+// Calls never block, and always return immediately.
 //
-// Calls to [TryLock] never block; they always return immediately.
+// Note that while correct uses of TryLock do exist, they are rare,
+// and use of TryLock is often a sign of a deeper problem
+// in a particular use of semaphores.
 func (s Semaphore) TryLock() bool {
 	if s.c == nil {
 		return true
@@ -70,12 +70,13 @@ func (s Semaphore) TryLock() bool {
 //
 // Calls to Unlock without an acquired resource are a programming error and may block forever.
 func (s Semaphore) Unlock() {
+	if s.c == nil {
+		return
+	}
+
 	select {
 	case <-s.c:
 	default:
-		if s.c == nil {
-			return
-		}
 		panic("Semaphore: Unlock without Lock")
 	}
 }
