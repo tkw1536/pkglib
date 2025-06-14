@@ -58,7 +58,7 @@ func ExampleWithValuesOf() {
 	// now creates a derived context that overrides the values of primary with secondary.
 	derived := contextx.WithValuesOf(primary, secondary)
 
-	// found only in primary
+	// found only in primary => not in derived
 	fmt.Println(derived.Value(oneContextKey))
 
 	// found in both, the secondary overrides
@@ -70,7 +70,7 @@ func ExampleWithValuesOf() {
 	// found in neither
 	fmt.Println(derived.Value(fourContextKey))
 
-	// Output: hello earth
+	// Output: <nil>
 	// bye mars
 	// bye venus
 	// <nil>

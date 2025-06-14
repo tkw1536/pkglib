@@ -20,25 +20,19 @@ func WithValues(parent context.Context, values map[any]any) context.Context {
 	return ctx
 }
 
-// WithValuesOf creates a new context that inherits from parent, but values stored in values take precedence over already associated values.
-// If a value is not found in values, the parent context is searched.
-// For explicitly associating a specific map of values see [WithValues].
+// WithValuesOf creates a new context that holds values store in values, but is canceled when parent is canceled.
+// Any values stored only in parent are ignored.
 func WithValuesOf(parent, values context.Context) context.Context {
-	return &valuesOf{
-		Context: parent,
-		values:  values,
-	}
-}
+	ctx, cancel := context.WithCancelCause(context.WithoutCancel(values))
 
-//nolint:containedctx // custom context implementation
-type valuesOf struct {
-	context.Context
-	values context.Context
-}
+	// forward the cancel cause of the child
+	go func() {
+		select {
+		case <-parent.Done():
+			cancel(context.Cause(ctx))
+		case <-ctx.Done():
+		}
+	}()
 
-func (vv *valuesOf) Value(key any) any {
-	if value := vv.values.Value(key); value != nil {
-		return value
-	}
-	return vv.Context.Value(key)
+	return ctx
 }

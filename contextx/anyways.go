@@ -16,6 +16,5 @@ func Anyways(parent context.Context, timeout time.Duration) (context.Context, co
 	}
 
 	// context is cancelled => create a new one with a custom timeout
-	child, cancel := context.WithTimeout(context.Background(), timeout)
-	return WithValuesOf(child, parent), cancel
+	return context.WithTimeout(context.WithoutCancel(parent), timeout)
 }
