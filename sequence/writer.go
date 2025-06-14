@@ -13,66 +13,62 @@ import (
 
 // Writer wraps an io.Writer and allows sequential writes.
 //
-// Writes are passed to the original writes as long as no errors occur.
+// Writes (using the Write* methods) are passed to the original writer as long as no errors occur.
 // If a write fails a [PreviousWriteFailedError] is returned instead.
+// It keeps track of overall number of bytes written and the previous error.
 //
-// A Writer keeps track of overall number of bytes written and the previous error.
-// It can be retrieved using the [Sum] method, and reset using [Reset].
+// The Write* methods return an integer and wrap the error using [PreviousWriteFailedError].
+// The underlying error can also be retrieved directly sing the [Writer.Sum] method.
 //
-// The [Write] and [WriteString] methods may be used concurrently by multiple goroutines.
+// The [Writer.Write] and [Writer.WriteString] methods may be used concurrently by multiple goroutines.
 // The writes to the underlying writer are serialized automatically.
 //
 // Concurrent writes of the Writer field or other methods are not safe.
 type Writer struct {
-	hadError atomic.Bool // do
-	l        sync.Mutex  // lock (if needed)
+	hadError atomic.Bool
 
-	n   int
-	err error
+	l   sync.Mutex // protects n and error
+	err PreviousWriteFailedError
 
 	Writer io.Writer
 }
 
-// - if no error occurred, w is called and the state is updated.
+// performs the write operation described by w.
 func (sw *Writer) write(w func() (int, error)) (int, error) {
-	// fast path: we had an error, just return it!
-	if sw.hadError.Load() {
-		return 0, PreviousWriteFailedError{err: sw.err}
+	if !sw.hadError.Load() {
+		return sw.writeSlow(w)
 	}
 
-	// slow path
+	return 0, sw.err
+}
+
+func (sw *Writer) writeSlow(w func() (int, error)) (int, error) {
 	sw.l.Lock()
 	defer sw.l.Unlock()
 
-	// if there was an error, return it and don't do a write
-	if sw.err != nil {
-		return 0, PreviousWriteFailedError{err: sw.err}
+	if sw.err.Err != nil {
+		return 0, sw.err
 	}
 
-	// call the writer
 	n, err := w()
+	sw.err.N += n
+	sw.err.Err = err
 
-	// update the state
-	sw.n += n
-	sw.err = err
-
-	// if we had an error don't need to lock anymore!
 	if err != nil {
 		sw.hadError.Store(true)
 	}
 
-	// and return
 	return n, err
 }
 
-// Write writes p to this Writer as described in the struct description.
+// Write writes p to the underlying writer.
 func (sw *Writer) Write(p []byte) (int, error) {
 	return sw.write(func() (int, error) {
 		return sw.Writer.Write(p)
 	})
 }
 
-// WriteString writes s to this SequenceWriter as described in the struct description.
+// WriteString writes s to the underlying writer.
 func (sw *Writer) WriteString(s string) (int, error) {
 	return sw.write(func() (int, error) {
 		return io.WriteString(sw.Writer, s)
@@ -80,29 +76,33 @@ func (sw *Writer) WriteString(s string) (int, error) {
 }
 
 // Sum returns the total number of bytes written the underlying writer, and any error that occurred.
-// The underlying error is not wrapped.
 func (cw *Writer) Sum() (int, error) {
-	return cw.n, cw.err
+	return cw.err.N, cw.err.Err
 }
 
 // Reset resets the underlying error and total count of bytes written.
 // Future writes will again be passed through to the underlying writer.
 func (sw *Writer) Reset() {
-	sw.err = nil
-	sw.n = 0
+	sw.err.Err = nil
+	sw.err.N = 0
 	sw.hadError.Store(false)
 }
 
-// PreviousWriteFailedError indicates that a previous write returned an error.
-// The previous error can be retrieved via the Unwrap() method.
+// PreviousWriteFailedError indicates that a previous write operation to [Writer.Write] failed.
 type PreviousWriteFailedError struct {
-	err error
+	N   int   // number of bytes written before the error occurred
+	Err error // error returned by [io.Writer.Write]
 }
 
 func (pw PreviousWriteFailedError) Error() string {
-	return fmt.Sprintf("previous write failed: %s", pw.err)
+	s := ""
+	if pw.N != 1 {
+		s = "s"
+	}
+
+	return fmt.Sprintf("previous write failed after %d byte%s: %s", pw.N, s, pw.Err)
 }
 
 func (pw PreviousWriteFailedError) Unwrap() error {
-	return pw.err
+	return pw.Err
 }

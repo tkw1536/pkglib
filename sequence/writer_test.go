@@ -112,6 +112,6 @@ func ExampleWriter_fail() {
 	// Output: hello world
 	// 12 <nil>
 	// 0 no writes left
-	// 0 previous write failed: no writes left
+	// 0 previous write failed after 12 bytes: no writes left
 	// 12 no writes left
 }
