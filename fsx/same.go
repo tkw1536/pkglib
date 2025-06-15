@@ -47,10 +47,10 @@ func Same(path1, path2 string) bool {
 // authoritative indicates if the result is authoritative.
 func couldBeSameFile(path1, path2 string) (same, authoritative bool) {
 	{
-		info1, other1, err1 := stat(path1, true)
-		info2, other2, err2 := stat(path2, true)
+		info1, notExists1, err1 := stat(path1, true)
+		info2, notExists2, err2 := stat(path2, true)
 
-		// both files exist => check using env.SameFile
+		// both files exist => check using os.SameFile
 		// the result is always authoritative
 		if err1 == nil && err2 == nil {
 			same = os.SameFile(info1, info2)
@@ -64,7 +64,7 @@ func couldBeSameFile(path1, path2 string) (same, authoritative bool) {
 		}
 
 		// only 1 file does not exist => they could be different
-		if other1 != other2 {
+		if notExists1 != notExists2 {
 			return
 		}
 	}
