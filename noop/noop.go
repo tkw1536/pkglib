@@ -5,6 +5,11 @@ package noop
 
 import "io"
 
+var (
+	_ io.WriteCloser = (*Writer)(nil)
+	_ io.ReadCloser  = (*Reader)(nil)
+)
+
 // Writer extends an io.Writer by adding a noop close operation.
 type Writer struct {
 	io.Writer
