@@ -1,5 +1,7 @@
+//spellchecker:words pkglib
 package pkglib
 
+//spellchecker:words runtime strings testing
 import (
 	"runtime"
 	"strings"

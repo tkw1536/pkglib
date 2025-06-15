@@ -3,7 +3,7 @@
 //spellchecker:words minify
 package minify
 
-//spellchecker:words regexp github tdewolff minify html pkglib noop
+//spellchecker:words sync github tdewolff minify html json pkglib noop
 import (
 	"io"
 	"sync"

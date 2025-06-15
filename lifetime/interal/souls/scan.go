@@ -1,5 +1,7 @@
+//spellchecker:words souls
 package souls
 
+//spellchecker:words errors iter reflect github pkglib lifetime interal lreflect reflectx
 import (
 	"errors"
 	"fmt"

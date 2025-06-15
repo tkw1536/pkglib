@@ -1,7 +1,7 @@
 //spellchecker:words souls
 package souls
 
-//spellchecker:words errors reflect github pkglib lifetime interal lreflect
+//spellchecker:words reflect
 import (
 	"reflect"
 )

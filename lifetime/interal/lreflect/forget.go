@@ -1,5 +1,7 @@
+//spellchecker:words lreflect
 package lreflect
 
+//spellchecker:words reflect
 import "reflect"
 
 // UnsafeForgetUnexported returns the same value as v, but forgets it was retrieved from an unexported field.

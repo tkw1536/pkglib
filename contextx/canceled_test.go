@@ -1,7 +1,7 @@
 //spellchecker:words contextx
 package contextx_test
 
-//spellchecker:words github pkglib contextx
+//spellchecker:words context errors github pkglib contextx
 import (
 	"context"
 	"errors"
