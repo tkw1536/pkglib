@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/tkw1536/pkglib/fsx"
+	"go.tkw01536.de/pkglib/fsx"
 )
 
 func makePaths(t *testing.T) (paths struct {

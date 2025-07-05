@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/websocket"
-	"github.com/tkw1536/pkglib/websocketx/websockettest"
+	"go.tkw01536.de/pkglib/websocketx/websockettest"
 )
 
 func TestNewServer(t *testing.T) {

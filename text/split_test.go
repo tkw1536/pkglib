@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/pkglib/text"
+	"go.tkw01536.de/pkglib/text"
 )
 
 func TestSplitter(t *testing.T) {

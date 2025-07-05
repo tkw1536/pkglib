@@ -12,7 +12,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/tkw1536/pkglib/errorsx"
+	"go.tkw01536.de/pkglib/errorsx"
 )
 
 //spellchecker:words nolint wrapcheck

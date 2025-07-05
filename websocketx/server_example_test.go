@@ -5,8 +5,8 @@ package websocketx_test
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/websocketx"
-	"github.com/tkw1536/pkglib/websocketx/websockettest"
+	"go.tkw01536.de/pkglib/websocketx"
+	"go.tkw01536.de/pkglib/websocketx/websockettest"
 
 	"github.com/gorilla/websocket"
 )

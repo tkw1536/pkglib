@@ -8,7 +8,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/tkw1536/pkglib/errorsx"
+	"go.tkw01536.de/pkglib/errorsx"
 )
 
 // Copy copies from src to dst, stopping once ctx is closed.

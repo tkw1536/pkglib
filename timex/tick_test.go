@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tkw1536/pkglib/timex"
+	"go.tkw01536.de/pkglib/timex"
 )
 
 func ExampleStopTimer() {

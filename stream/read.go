@@ -2,7 +2,7 @@
 package stream
 
 //spellchecker:words github pkglib nobufio
-import "github.com/tkw1536/pkglib/nobufio"
+import "go.tkw01536.de/pkglib/nobufio"
 
 //spellchecker:words nolint wrapcheck
 

@@ -8,7 +8,7 @@ import (
 	"crypto/rand"
 	"testing"
 
-	"github.com/tkw1536/pkglib/password"
+	"go.tkw01536.de/pkglib/password"
 )
 
 func TestPassword(t *testing.T) {

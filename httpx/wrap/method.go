@@ -5,7 +5,7 @@ package wrap
 import (
 	"net/http"
 
-	"github.com/tkw1536/pkglib/httpx"
+	"go.tkw01536.de/pkglib/httpx"
 )
 
 // Methods wraps handler, rejecting requests not using any of the provided methods.

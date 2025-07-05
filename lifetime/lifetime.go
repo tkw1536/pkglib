@@ -7,8 +7,8 @@ package lifetime
 import (
 	"reflect"
 
-	"github.com/tkw1536/pkglib/lazy"
-	"github.com/tkw1536/pkglib/lifetime/interal/souls"
+	"go.tkw01536.de/pkglib/lazy"
+	"go.tkw01536.de/pkglib/lifetime/interal/souls"
 )
 
 // Lifetime implements a dependency injection framework.

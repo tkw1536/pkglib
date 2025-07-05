@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/tkw1536/pkglib/sema"
+	"go.tkw01536.de/pkglib/sema"
 )
 
 type Thing uint64

@@ -15,7 +15,7 @@ import (
 	"github.com/tdewolff/minify/v2/json"
 	"github.com/tdewolff/minify/v2/svg"
 	"github.com/tdewolff/minify/v2/xml"
-	"github.com/tkw1536/pkglib/noop"
+	"go.tkw01536.de/pkglib/noop"
 )
 
 //spellchecker:words minifier nominify

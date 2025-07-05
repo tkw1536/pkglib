@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
+	"go.tkw01536.de/pkglib/lifetime/interal/lreflect"
 )
 
 func Test_ImplementsAsSliceInterface(t *testing.T) {

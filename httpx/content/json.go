@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/tkw1536/pkglib/httpx"
-	"github.com/tkw1536/pkglib/recovery"
+	"go.tkw01536.de/pkglib/httpx"
+	"go.tkw01536.de/pkglib/recovery"
 )
 
 //spellchecker:words httpx jsoni

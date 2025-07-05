@@ -10,8 +10,8 @@ import (
 	"math/rand"
 	"reflect"
 
-	"github.com/tkw1536/pkglib/lazy"
-	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
+	"go.tkw01536.de/pkglib/lazy"
+	"go.tkw01536.de/pkglib/lifetime/interal/lreflect"
 )
 
 //spellchecker:words nolint wrapcheck

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tkw1536/pkglib/contextx"
+	"go.tkw01536.de/pkglib/contextx"
 )
 
 func ExampleRun() {

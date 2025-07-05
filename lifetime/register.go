@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
-	"github.com/tkw1536/pkglib/reflectx"
+	"go.tkw01536.de/pkglib/lifetime/interal/lreflect"
+	"go.tkw01536.de/pkglib/reflectx"
 )
 
 // Registry allows registering components with a lifetime using [lifetime.Lifetime.Register].

@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/gosuri/uilive"
-	"github.com/tkw1536/pkglib/errorsx"
-	"github.com/tkw1536/pkglib/nobufio"
-	"github.com/tkw1536/pkglib/noop"
-	"github.com/tkw1536/pkglib/stream"
+	"go.tkw01536.de/pkglib/errorsx"
+	"go.tkw01536.de/pkglib/nobufio"
+	"go.tkw01536.de/pkglib/noop"
+	"go.tkw01536.de/pkglib/stream"
 ) //spellchecker:words errors maps sync atomic time github gosuri uilive pkglib nobufio noop stream
 
 //spellchecker:words annot compat

@@ -8,8 +8,8 @@ import (
 	"iter"
 	"reflect"
 
-	"github.com/tkw1536/pkglib/lifetime/interal/lreflect"
-	"github.com/tkw1536/pkglib/reflectx"
+	"go.tkw01536.de/pkglib/lifetime/interal/lreflect"
+	"go.tkw01536.de/pkglib/reflectx"
 )
 
 // dependency represents a single dependency.

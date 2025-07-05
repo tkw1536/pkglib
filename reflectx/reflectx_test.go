@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/pkglib/reflectx"
+	"go.tkw01536.de/pkglib/reflectx"
 )
 
 //spellchecker:words pkglib nolint recvcheck
@@ -98,7 +98,7 @@ func TestNameOf(t *testing.T) {
 		{
 			"type in this library",
 			reflect.TypeFor[TypeForTesting](),
-			"github.com/tkw1536/pkglib/reflectx_test.TypeForTesting",
+			"go.tkw01536.de/pkglib/reflectx_test.TypeForTesting",
 		},
 
 		{

@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/tkw1536/pkglib/errorsx"
+	"go.tkw01536.de/pkglib/errorsx"
 )
 
 // MinifyBytes minifies the bytes described.

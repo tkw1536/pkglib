@@ -10,7 +10,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/tkw1536/pkglib/httpx/wrap"
+	"go.tkw01536.de/pkglib/httpx/wrap"
 )
 
 func ExampleTime() {

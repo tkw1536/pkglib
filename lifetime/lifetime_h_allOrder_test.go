@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/tkw1536/pkglib/lifetime"
+	"go.tkw01536.de/pkglib/lifetime"
 )
 
 // Shape is a component type with a RankShape() method to rank it.

@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/tkw1536/pkglib/lifetime"
+	"go.tkw01536.de/pkglib/lifetime"
 )
 
 // Demonstrates the use of the ExportSlice function.

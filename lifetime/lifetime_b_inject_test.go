@@ -5,7 +5,7 @@ package lifetime_test
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/lifetime"
+	"go.tkw01536.de/pkglib/lifetime"
 )
 
 // House is a component with a public window.

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tkw1536/pkglib/nobufio"
+	"go.tkw01536.de/pkglib/nobufio"
 )
 
 func ExampleReadLine() {

@@ -12,7 +12,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/tkw1536/pkglib/httpx"
+	"go.tkw01536.de/pkglib/httpx"
 )
 
 //spellchecker:words modtime

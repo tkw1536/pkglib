@@ -7,7 +7,7 @@ package testlib_test
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/testlib"
+	"go.tkw01536.de/pkglib/testlib"
 )
 
 // DoesPanic behavior for a panicking function.

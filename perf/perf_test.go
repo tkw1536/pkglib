@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tkw1536/pkglib/perf"
+	"go.tkw01536.de/pkglib/perf"
 )
 
 func TestSnapshot_BytesString(t *testing.T) {

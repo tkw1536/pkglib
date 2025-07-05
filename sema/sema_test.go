@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tkw1536/pkglib/sema"
-	"github.com/tkw1536/pkglib/testlib"
+	"go.tkw01536.de/pkglib/sema"
+	"go.tkw01536.de/pkglib/testlib"
 )
 
 func ExampleNew() {

@@ -5,7 +5,7 @@ package collection_test
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/collection"
+	"go.tkw01536.de/pkglib/collection"
 )
 
 func ExampleIterSorted() {

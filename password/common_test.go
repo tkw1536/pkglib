@@ -5,7 +5,7 @@ package password_test
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/password"
+	"go.tkw01536.de/pkglib/password"
 )
 
 func ExamplePasswords() {

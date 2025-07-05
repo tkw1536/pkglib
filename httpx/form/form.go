@@ -13,9 +13,9 @@ import (
 	_ "embed"
 
 	"github.com/gorilla/csrf"
-	"github.com/tkw1536/pkglib/httpx"
-	"github.com/tkw1536/pkglib/httpx/content"
-	"github.com/tkw1536/pkglib/httpx/form/field"
+	"go.tkw01536.de/pkglib/httpx"
+	"go.tkw01536.de/pkglib/httpx/content"
+	"go.tkw01536.de/pkglib/httpx/form/field"
 )
 
 //spellchecker:words nolint contextcheck errname

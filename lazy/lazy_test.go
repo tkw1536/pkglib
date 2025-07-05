@@ -5,7 +5,7 @@ package lazy_test
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/lazy"
+	"go.tkw01536.de/pkglib/lazy"
 )
 
 func ExampleLazy() {

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/tkw1536/pkglib/minify"
+	"go.tkw01536.de/pkglib/minify"
 )
 
 //spellchecker:words modtime

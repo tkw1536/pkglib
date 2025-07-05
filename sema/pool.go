@@ -7,7 +7,7 @@ import (
 
 	"slices"
 
-	"github.com/tkw1536/pkglib/lazy"
+	"go.tkw01536.de/pkglib/lazy"
 )
 
 //spellchecker:words finalizer nolint wastedassign

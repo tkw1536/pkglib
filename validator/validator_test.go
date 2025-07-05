@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/tkw1536/pkglib/validator"
+	"go.tkw01536.de/pkglib/validator"
 )
 
 var (

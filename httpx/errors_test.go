@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/tkw1536/pkglib/httpx"
+	"go.tkw01536.de/pkglib/httpx"
 )
 
 func ExampleStatusCode() {

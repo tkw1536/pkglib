@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tkw1536/pkglib/text"
+	"go.tkw01536.de/pkglib/text"
 )
 
 func TestJoin(t *testing.T) {

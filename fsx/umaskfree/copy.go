@@ -10,9 +10,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/tkw1536/pkglib/contextx"
-	"github.com/tkw1536/pkglib/errorsx"
-	"github.com/tkw1536/pkglib/fsx"
+	"go.tkw01536.de/pkglib/contextx"
+	"go.tkw01536.de/pkglib/errorsx"
+	"go.tkw01536.de/pkglib/fsx"
 )
 
 //spellchecker:words nolint wrapcheck

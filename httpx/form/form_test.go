@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/tkw1536/pkglib/httpx/form"
-	"github.com/tkw1536/pkglib/httpx/form/field"
+	"go.tkw01536.de/pkglib/httpx/form"
+	"go.tkw01536.de/pkglib/httpx/form/field"
 )
 
 func TestForm_logger(t *testing.T) {

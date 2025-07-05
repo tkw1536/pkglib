@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/tkw1536/pkglib/lifetime"
+	"go.tkw01536.de/pkglib/lifetime"
 )
 
 // ColorComponent a subtype of component that implements the color method.

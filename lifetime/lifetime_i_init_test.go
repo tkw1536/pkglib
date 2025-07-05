@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/tkw1536/pkglib/lifetime"
+	"go.tkw01536.de/pkglib/lifetime"
 )
 
 // Demonstrates the use of the Init hook.

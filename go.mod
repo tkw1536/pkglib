@@ -1,4 +1,4 @@
-module github.com/tkw1536/pkglib
+module go.tkw01536.de/pkglib
 
 go 1.24.4
 

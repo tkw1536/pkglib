@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/pkglib/errorsx"
+	"go.tkw01536.de/pkglib/errorsx"
 )
 
 // This test code is heavily adapted from [errors.Join].

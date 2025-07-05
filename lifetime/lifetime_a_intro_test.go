@@ -5,7 +5,7 @@ package lifetime_test
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/lifetime"
+	"go.tkw01536.de/pkglib/lifetime"
 )
 
 // Component is used as a type for components for a lifetime.

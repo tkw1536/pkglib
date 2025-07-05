@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/pkglib/sshx"
+	"go.tkw01536.de/pkglib/sshx"
 	"golang.org/x/crypto/ssh"
 )
 

@@ -10,7 +10,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/tkw1536/pkglib/sequence"
+	"go.tkw01536.de/pkglib/sequence"
 )
 
 func ExampleWriter() {

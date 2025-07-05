@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tkw1536/pkglib/status"
+	"go.tkw01536.de/pkglib/status"
 )
 
 func ExampleLineBuffer() {

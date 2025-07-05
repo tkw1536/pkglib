@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/tkw1536/pkglib/recovery"
+	"go.tkw01536.de/pkglib/recovery"
 )
 
 var errSomething = errors.New("something")

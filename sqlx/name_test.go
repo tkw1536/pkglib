@@ -5,7 +5,7 @@ package sqlx_test
 import (
 	"testing"
 
-	"github.com/tkw1536/pkglib/sqlx"
+	"go.tkw01536.de/pkglib/sqlx"
 )
 
 func TestIsSafeDatabaseLiteral(t *testing.T) {

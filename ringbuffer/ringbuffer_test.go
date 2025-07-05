@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/pkglib/ringbuffer"
+	"go.tkw01536.de/pkglib/ringbuffer"
 )
 
 // Demonstrates how a ring buffer works by adding to it.

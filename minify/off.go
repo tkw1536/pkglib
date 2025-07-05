@@ -7,7 +7,7 @@ package minify
 import (
 	"io"
 
-	"github.com/tkw1536/pkglib/noop"
+	"go.tkw01536.de/pkglib/noop"
 )
 
 // spellchecker:words minifier nominify

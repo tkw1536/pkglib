@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/tkw1536/pkglib/httpx"
-	"github.com/tkw1536/pkglib/httpx/mux"
+	"go.tkw01536.de/pkglib/httpx"
+	"go.tkw01536.de/pkglib/httpx/mux"
 )
 
 func ExampleMux() {

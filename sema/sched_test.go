@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/tkw1536/pkglib/sema"
+	"go.tkw01536.de/pkglib/sema"
 )
 
 func ExampleSchedule() {

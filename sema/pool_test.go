@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/tkw1536/pkglib/sema"
+	"go.tkw01536.de/pkglib/sema"
 )
 
 func TestPool_Limit(t *testing.T) {

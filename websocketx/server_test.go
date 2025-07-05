@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/tkw1536/pkglib/websocketx"
-	"github.com/tkw1536/pkglib/websocketx/websockettest"
+	"go.tkw01536.de/pkglib/websocketx"
+	"go.tkw01536.de/pkglib/websocketx/websockettest"
 )
 
 func TestServer_subprotocols(t *testing.T) {
