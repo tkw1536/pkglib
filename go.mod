@@ -1,6 +1,6 @@
 module go.tkw01536.de/pkglib
 
-go 1.24.4
+go 1.24.5
 
 require (
 	github.com/gorilla/csrf v1.7.3
