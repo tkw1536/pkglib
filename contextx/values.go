@@ -19,20 +19,3 @@ func WithValues(parent context.Context, values map[any]any) context.Context {
 	}
 	return ctx
 }
-
-// WithValuesOf creates a new context that holds values store in values, but is canceled when parent is canceled.
-// Any values stored only in parent are ignored.
-func WithValuesOf(parent, values context.Context) context.Context {
-	ctx, cancel := context.WithCancelCause(context.WithoutCancel(values))
-
-	// forward the cancel cause of the child
-	go func() {
-		select {
-		case <-parent.Done():
-			cancel(context.Cause(ctx))
-		case <-ctx.Done():
-		}
-	}()
-
-	return ctx
-}

@@ -39,39 +39,3 @@ func ExampleWithValues() {
 	// hello mars
 	// <nil>
 }
-
-func ExampleWithValuesOf() {
-	// create a primary context with 'hello' values.
-	// Note that we only fill '1' and '2' here.
-	primary := contextx.WithValues(context.Background(), map[any]any{
-		oneContextKey: "hello earth",
-		twoContextKey: "hello mars",
-	})
-
-	// create a secondary context with 'bye' values
-	// note that we only fill '2' and '3' here.
-	secondary := contextx.WithValues(context.Background(), map[any]any{
-		twoContextKey:   "bye mars",
-		threeContextKey: "bye venus",
-	})
-
-	// now creates a derived context that overrides the values of primary with secondary.
-	derived := contextx.WithValuesOf(primary, secondary)
-
-	// found only in primary => not in derived
-	fmt.Println(derived.Value(oneContextKey))
-
-	// found in both, the secondary overrides
-	fmt.Println(derived.Value(twoContextKey))
-
-	// found only in secondary
-	fmt.Println(derived.Value(threeContextKey))
-
-	// found in neither
-	fmt.Println(derived.Value(fourContextKey))
-
-	// Output: <nil>
-	// bye mars
-	// bye venus
-	// <nil>
-}
