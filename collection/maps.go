@@ -10,16 +10,15 @@ import (
 )
 
 // IterSorted returns an iterator that iterates over the map in ascending order of keys.
+// The returned iterator may be called repeatedly, and the map may be modified between calling this function and invoking the iterator.
 func IterSorted[K cmp.Ordered, V any](m map[K]V) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
-		// get the keys of the map and sort them
 		keys := make([]K, 0, len(m))
 		for k := range m {
 			keys = append(keys, k)
 		}
 		slices.Sort(keys)
 
-		// and do the iteration
 		for _, key := range keys {
 			if !yield(key, m[key]) {
 				return
