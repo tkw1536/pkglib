@@ -15,7 +15,6 @@ var (
 	oneContextKey   = customInt(1)
 	twoContextKey   = customInt(2)
 	threeContextKey = customInt(3)
-	fourContextKey  = customInt(4)
 )
 
 func ExampleWithValues() {
