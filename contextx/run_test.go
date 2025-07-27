@@ -1,7 +1,7 @@
 //spellchecker:words contextx
 package contextx_test
 
-//spellchecker:words context time github pkglib contextx
+//spellchecker:words context time pkglib contextx
 import (
 	"context"
 	"fmt"

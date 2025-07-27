@@ -1,7 +1,7 @@
 //spellchecker:words sshx
 package sshx_test
 
-//spellchecker:words crypto ecdsa elliptic rand reflect testing github pkglib sshx golang
+//spellchecker:words crypto ecdsa elliptic rand reflect testing pkglib sshx golang
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"

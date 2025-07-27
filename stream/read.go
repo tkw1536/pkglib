@@ -1,7 +1,7 @@
 //spellchecker:words stream
 package stream
 
-//spellchecker:words github pkglib nobufio
+//spellchecker:words pkglib nobufio
 import "go.tkw01536.de/pkglib/nobufio"
 
 //spellchecker:words nolint wrapcheck

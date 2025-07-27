@@ -1,7 +1,7 @@
 //spellchecker:words ringbuffer
 package ringbuffer_test
 
-//spellchecker:words reflect testing github pkglib ringbuffer
+//spellchecker:words reflect testing pkglib ringbuffer
 import (
 	"fmt"
 	"reflect"

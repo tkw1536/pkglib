@@ -1,7 +1,7 @@
 //spellchecker:words nobufio
 package nobufio_test
 
-//spellchecker:words strings github pkglib nobufio
+//spellchecker:words strings pkglib nobufio
 import (
 	"fmt"
 	"strings"

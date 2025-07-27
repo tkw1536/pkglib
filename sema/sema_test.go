@@ -1,7 +1,7 @@
 //spellchecker:words sema
 package sema_test
 
-//spellchecker:words strconv sync atomic testing time github pkglib sema testlib
+//spellchecker:words strconv sync atomic testing time pkglib sema testlib
 import (
 	"fmt"
 	"strconv"

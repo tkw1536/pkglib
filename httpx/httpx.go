@@ -3,7 +3,7 @@
 //spellchecker:words httpx
 package httpx
 
-//spellchecker:words bytes http time github pkglib minify
+//spellchecker:words bytes http time pkglib minify
 import (
 	"bytes"
 	"net/http"

@@ -1,7 +1,7 @@
 //spellchecker:words lifetime
 package lifetime_test
 
-//spellchecker:words github pkglib lifetime
+//spellchecker:words pkglib lifetime
 import (
 	"fmt"
 

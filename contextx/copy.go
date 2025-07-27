@@ -1,7 +1,7 @@
 //spellchecker:words contextx
 package contextx
 
-//spellchecker:words context errors time github pkglib errorsx
+//spellchecker:words context errors time pkglib errorsx
 import (
 	"context"
 	"errors"

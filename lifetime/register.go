@@ -1,7 +1,7 @@
 //spellchecker:words lifetime
 package lifetime
 
-//spellchecker:words reflect sync github pkglib lifetime interal lreflect reflectx
+//spellchecker:words reflect sync pkglib lifetime interal lreflect reflectx
 import (
 	"fmt"
 	"reflect"

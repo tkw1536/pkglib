@@ -1,7 +1,7 @@
 //spellchecker:words minify
 package minify
 
-//spellchecker:words bytes github pkglib errorsx
+//spellchecker:words bytes pkglib errorsx
 import (
 	"bytes"
 	"fmt"

@@ -1,7 +1,7 @@
 //spellchecker:words sema
 package sema_test
 
-//spellchecker:words errors sync atomic time github pkglib sema
+//spellchecker:words errors sync atomic time pkglib sema
 import (
 	"errors"
 	"fmt"

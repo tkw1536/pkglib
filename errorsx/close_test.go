@@ -1,7 +1,7 @@
 //spellchecker:words errorsx
 package errorsx_test
 
-//spellchecker:words errors testing github pkglib errorsx
+//spellchecker:words errors testing pkglib errorsx
 import (
 	"errors"
 	"fmt"

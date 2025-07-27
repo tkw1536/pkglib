@@ -1,7 +1,7 @@
 //spellchecker:words sema
 package sema_test
 
-//spellchecker:words sync atomic testing github pkglib sema
+//spellchecker:words sync atomic testing pkglib sema
 import (
 	"sync"
 	"sync/atomic"

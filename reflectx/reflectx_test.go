@@ -3,7 +3,7 @@
 //spellchecker:words reflectx
 package reflectx_test
 
-//spellchecker:words reflect testing github pkglib reflectx
+//spellchecker:words reflect testing pkglib reflectx
 import (
 	"fmt"
 	"reflect"

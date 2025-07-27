@@ -3,7 +3,7 @@
 //spellchecker:words sequence
 package sequence_test
 
-//spellchecker:words errors sync github pkglib sequence
+//spellchecker:words errors sync pkglib sequence
 import (
 	"errors"
 	"fmt"

@@ -3,7 +3,7 @@
 //spellchecker:words testlib
 package testlib_test
 
-//spellchecker:words github pkglib testlib
+//spellchecker:words pkglib testlib
 import (
 	"fmt"
 

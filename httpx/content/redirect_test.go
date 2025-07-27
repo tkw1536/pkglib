@@ -1,7 +1,7 @@
 //spellchecker:words content
 package content_test
 
-//spellchecker:words context http httptest github pkglib httpx content
+//spellchecker:words context http httptest pkglib httpx content
 import (
 	"context"
 	"fmt"

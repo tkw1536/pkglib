@@ -3,7 +3,7 @@
 //spellchecker:words password
 package password_test
 
-//spellchecker:words crypto rand testing github pkglib password
+//spellchecker:words crypto rand testing pkglib password
 import (
 	"crypto/rand"
 	"testing"

@@ -1,6 +1,6 @@
 package fsx_test
 
-//spellchecker:words path filepath testing github pkglib
+//spellchecker:words path filepath testing pkglib
 import (
 	"io/fs"
 	"os"

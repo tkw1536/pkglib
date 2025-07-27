@@ -1,7 +1,7 @@
 //spellchecker:words sqlx
 package sqlx_test
 
-//spellchecker:words testing github pkglib sqlx
+//spellchecker:words testing pkglib sqlx
 import (
 	"testing"
 

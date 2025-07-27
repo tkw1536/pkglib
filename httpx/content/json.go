@@ -1,7 +1,7 @@
 //spellchecker:words content
 package content
 
-//spellchecker:words encoding json http github pkglib httpx recovery
+//spellchecker:words encoding json http pkglib httpx recovery
 import (
 	"encoding/json"
 	"fmt"

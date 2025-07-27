@@ -1,7 +1,7 @@
 //spellchecker:words sema
 package sema
 
-//spellchecker:words sync slices github pkglib lazy
+//spellchecker:words sync slices pkglib lazy
 import (
 	"sync"
 

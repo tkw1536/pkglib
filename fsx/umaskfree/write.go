@@ -4,7 +4,7 @@
 //spellchecker:words umaskfree
 package umaskfree
 
-//spellchecker:words errors time github pkglib errorsx
+//spellchecker:words errors time pkglib errorsx
 import (
 	"errors"
 	"fmt"

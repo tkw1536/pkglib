@@ -1,6 +1,6 @@
 package mux_test
 
-//spellchecker:words context http httptest github pkglib httpx
+//spellchecker:words context http httptest pkglib httpx
 import (
 	"context"
 	"fmt"

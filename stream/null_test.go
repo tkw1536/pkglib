@@ -1,7 +1,7 @@
 //spellchecker:words stream
 package stream_test
 
-//spellchecker:words testing github pkglib stream
+//spellchecker:words testing pkglib stream
 import (
 	"io"
 	"testing"

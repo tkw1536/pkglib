@@ -1,7 +1,7 @@
 //spellchecker:words text
 package text_test
 
-//spellchecker:words strings testing github pkglib text
+//spellchecker:words strings testing pkglib text
 import (
 	"fmt"
 	"strings"

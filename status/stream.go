@@ -1,7 +1,7 @@
 //spellchecker:words status
 package status
 
-//spellchecker:words github pkglib stream
+//spellchecker:words pkglib stream
 import (
 	"fmt"
 	"io"

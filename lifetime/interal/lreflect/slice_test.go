@@ -1,7 +1,7 @@
 //spellchecker:words lreflect
 package lreflect_test
 
-//spellchecker:words reflect testing github pkglib lifetime interal lreflect
+//spellchecker:words reflect testing pkglib lifetime interal lreflect
 import (
 	"reflect"
 	"testing"

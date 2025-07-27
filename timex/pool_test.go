@@ -1,7 +1,7 @@
 //spellchecker:words timex
 package timex_test
 
-//spellchecker:words time github pkglib timex
+//spellchecker:words time pkglib timex
 import (
 	"fmt"
 	"time"

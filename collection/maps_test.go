@@ -1,7 +1,7 @@
 //spellchecker:words collection
 package collection_test
 
-//spellchecker:words github pkglib collection
+//spellchecker:words pkglib collection
 import (
 	"fmt"
 

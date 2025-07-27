@@ -1,7 +1,7 @@
 //spellchecker:words umaskfree
 package umaskfree
 
-//spellchecker:words context errors path filepath github pkglib contextx errorsx
+//spellchecker:words context errors path filepath pkglib contextx errorsx
 import (
 	"context"
 	"errors"

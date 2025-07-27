@@ -1,7 +1,7 @@
 //spellchecker:words errorsx
 package errorsx_test
 
-//spellchecker:words errors reflect testing github pkglib errorsx
+//spellchecker:words errors reflect testing pkglib errorsx
 import (
 	"errors"
 	"reflect"

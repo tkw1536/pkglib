@@ -1,7 +1,7 @@
 //spellchecker:words content
 package content
 
-//spellchecker:words html template http github pkglib httpx minify recovery
+//spellchecker:words html template http pkglib httpx minify recovery
 import (
 	"fmt"
 	"html/template"

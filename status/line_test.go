@@ -1,7 +1,7 @@
 //spellchecker:words status
 package status_test
 
-//spellchecker:words testing github pkglib status
+//spellchecker:words testing pkglib status
 import (
 	"fmt"
 	"testing"

@@ -1,7 +1,7 @@
 //spellchecker:words lazy
 package lazy_test
 
-//spellchecker:words github pkglib lazy
+//spellchecker:words pkglib lazy
 import (
 	"fmt"
 

@@ -1,7 +1,7 @@
 //spellchecker:words text
 package text_test
 
-//spellchecker:words reflect testing github pkglib text
+//spellchecker:words reflect testing pkglib text
 import (
 	"reflect"
 	"testing"

@@ -3,7 +3,7 @@
 //spellchecker:words timex
 package timex_test
 
-//spellchecker:words context time github pkglib timex
+//spellchecker:words context time pkglib timex
 import (
 	"context"
 	"fmt"

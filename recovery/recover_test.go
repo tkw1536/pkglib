@@ -1,7 +1,7 @@
 //spellchecker:words recovery
 package recovery_test
 
-//spellchecker:words errors github pkglib recovery
+//spellchecker:words errors pkglib recovery
 import (
 	"errors"
 	"fmt"

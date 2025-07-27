@@ -3,7 +3,7 @@
 //spellchecker:words lifetime
 package lifetime
 
-//spellchecker:words reflect github pkglib lazy lifetime interal souls
+//spellchecker:words reflect pkglib lazy lifetime interal souls
 import (
 	"reflect"
 

@@ -1,7 +1,7 @@
 //spellchecker:words yamlx
 package yamlx_test
 
-//spellchecker:words github pkglib yamlx
+//spellchecker:words pkglib yamlx
 import (
 	"fmt"
 

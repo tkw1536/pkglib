@@ -3,7 +3,7 @@
 //spellchecker:words souls
 package souls
 
-//spellchecker:words errors math rand reflect github pkglib lazy lifetime interal lreflect
+//spellchecker:words errors math rand reflect pkglib lazy lifetime interal lreflect
 import (
 	"errors"
 	"fmt"

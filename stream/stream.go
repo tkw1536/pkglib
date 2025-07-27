@@ -3,7 +3,7 @@
 //spellchecker:words stream
 package stream
 
-//spellchecker:words github pkglib nobufio
+//spellchecker:words pkglib nobufio
 import (
 	"fmt"
 	"io"

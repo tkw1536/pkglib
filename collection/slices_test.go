@@ -1,7 +1,7 @@
 //spellchecker:words collection
 package collection_test
 
-//spellchecker:words reflect strings testing slices github pkglib collection
+//spellchecker:words reflect strings testing slices pkglib collection
 import (
 	"fmt"
 	"reflect"

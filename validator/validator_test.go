@@ -1,7 +1,7 @@
 //spellchecker:words validator
 package validator_test
 
-//spellchecker:words errors strconv github pkglib validator
+//spellchecker:words errors strconv pkglib validator
 import (
 	"errors"
 	"fmt"

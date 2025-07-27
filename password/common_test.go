@@ -1,7 +1,7 @@
 //spellchecker:words password
 package password_test
 
-//spellchecker:words github pkglib password
+//spellchecker:words pkglib password
 import (
 	"fmt"
 

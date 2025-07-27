@@ -1,7 +1,7 @@
 //spellchecker:words wrap
 package wrap_test
 
-//spellchecker:words context encoding json http httptest time github pkglib httpx wrap
+//spellchecker:words context encoding json http httptest time pkglib httpx wrap
 import (
 	"context"
 	"encoding/json"

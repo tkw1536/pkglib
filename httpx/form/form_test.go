@@ -1,7 +1,7 @@
 //spellchecker:words form
 package form_test
 
-//spellchecker:words errors html template http strconv testing github pkglib httpx form field
+//spellchecker:words errors html template http strconv testing pkglib httpx form field
 import (
 	"errors"
 	"fmt"
