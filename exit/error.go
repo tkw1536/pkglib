@@ -4,9 +4,38 @@ package exit
 //spellchecker:words errors
 import (
 	"errors"
+	"os/exec"
 )
 
 //spellchecker:words nolint errorlint
+
+// errorWithCode is an error that holds an exit code.
+type errorWithCode interface {
+	error
+	exitCode() ExitCode
+}
+
+var (
+	_ errorWithCode = &codeError{}
+	_ errorWithCode = &exitError{}
+)
+
+// CodeFromError returns the ExitCode contained in error, if any.
+// See [NewErrorWithCode] and [ErrorFromExit].
+// The exit code is found by [errors.As] unwrapping into an error created by this package.
+//
+// When err is nil, returns code 0.
+// When err does not hold any exit code, returns the provided generic code and false.
+func CodeFromError(err error, generic ExitCode) (code ExitCode, ok bool) {
+	if err == nil {
+		return 0, true
+	}
+	var codeErr errorWithCode
+	if !errors.As(err, &codeErr) {
+		return generic, false
+	}
+	return codeErr.exitCode(), true
+}
 
 // NewErrorWithCode creates a new error that additionally holds the given exit code.
 func NewErrorWithCode(message string, code ExitCode) error {
@@ -18,22 +47,36 @@ type codeError struct {
 	message string
 }
 
+func (err *codeError) exitCode() ExitCode {
+	return err.code
+}
+
 func (err *codeError) Error() string {
 	return err.message
 }
 
-// CodeFromError returns the ExitCode contained in error, if any.
-// The exit code is found by [errors.As] unwrapping into an error created by this package.
-//
-// When err is nil, returns code 0.
-// When err does not hold any [Error]s, returns the provided generic code and false.
-func CodeFromError(err error, generic ExitCode) (code ExitCode, ok bool) {
+// FromExitError create a new error wrapping an [exec.ExitError].
+// The private interface is guaranteed to be implemented by [exec.ExitError].
+// The returned error holds the appropriate exit code.
+func FromExitError(err *exec.ExitError) error {
 	if err == nil {
-		return 0, true
+		return nil
 	}
-	var codeErr *codeError
-	if !errors.As(err, &codeErr) {
-		return generic, false
-	}
-	return codeErr.code, true
+	return &exitError{err: err}
+}
+
+type exitError struct {
+	err *exec.ExitError
+}
+
+func (err *exitError) Error() string {
+	return err.err.Error()
+}
+
+func (err *exitError) Unwrap() error {
+	return err.err
+}
+
+func (err *exitError) exitCode() ExitCode {
+	return Code(err.err.ExitCode())
 }

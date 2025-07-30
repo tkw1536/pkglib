@@ -8,12 +8,15 @@ import (
 	"testing"
 
 	"go.tkw01536.de/pkglib/exit"
+	"go.tkw01536.de/pkglib/testlib"
 )
 
 var (
-	errStuff        = exit.NewErrorWithCode("stuff", 1)
-	errStuffWrapped = fmt.Errorf("wrapping: %w", errStuff)
-	errUnrelated    = errors.New("unrelated")
+	errStuff           = exit.NewErrorWithCode("stuff", 1)
+	errStuffWrapped    = fmt.Errorf("wrapping: %w", errStuff)
+	errUnrelated       = errors.New("unrelated")
+	errExitCode        = testlib.ProduceExitError(1)
+	errExitCodeWrapped = exit.FromExitError(errExitCode)
 )
 
 func TestCodeFromError(t *testing.T) {
@@ -29,29 +32,44 @@ func TestCodeFromError(t *testing.T) {
 		{
 			name:     "nil error returns zero value",
 			err:      nil,
-			generic:  1,
+			generic:  10,
 			wantCode: 0,
 			wantOK:   true,
 		},
 		{
 			name:     "Error object returns itself",
 			err:      errStuff,
-			generic:  1,
+			generic:  10,
 			wantCode: 1,
 			wantOK:   true,
 		},
 		{
 			name:     "Wrapped error returns same exit code",
 			err:      errStuffWrapped,
-			generic:  1,
+			generic:  10,
 			wantCode: 1,
 			wantOK:   true,
 		},
 		{
 			name:     "unrelated error returns invalid exit code",
 			err:      errUnrelated,
-			wantCode: 1,
+			generic:  10,
+			wantCode: 10,
 			wantOK:   false,
+		},
+		{
+			name:     "unwrapped exec error doesn't return exit code",
+			err:      errExitCode,
+			generic:  10,
+			wantCode: 10,
+			wantOK:   false,
+		},
+		{
+			name:     "wrapped exec error returns exit code",
+			err:      errExitCodeWrapped,
+			generic:  10,
+			wantCode: 1,
+			wantOK:   true,
 		},
 	}
 	for _, tt := range tests {
