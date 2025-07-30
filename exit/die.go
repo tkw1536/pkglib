@@ -4,28 +4,27 @@ package exit
 //spellchecker:words pkglib stream
 import (
 	"fmt"
-
-	"go.tkw01536.de/pkglib/stream"
+	"io"
 )
 
-var errUnknown = NewErrorWithCode("unknown error", ExitGeneric)
-
-// Die prints a non-nil err to io.Stderr and returns an error with an exit code.
+// Die prints a non-nil err to w and returns an error with an exit code.
+// An error without an error code is wrapped with wrap, which should hold an exit code.
 // If err is nil, it does nothing and returns nil.
-func Die(str stream.IOStream, err error) error {
+func Die(w io.Writer, err error, wrap error) error {
 	// fast case: not an error
 	if err == nil {
 		return nil
 	}
 
-	// if we do not have a code, wrap the error in it!
-	if _, ok := CodeFromError(err); !ok {
-		err = fmt.Errorf("%w: %w", errUnknown, err)
+	// if we do not have a code, wrap the error.
+	// The generic exit code passed here is discarded.
+	if _, ok := CodeFromError(err, 1); !ok {
+		err = fmt.Errorf("%w: %w", wrap, err)
 	}
 
 	// print the error message to standard error in a wrapped way
 	if message := fmt.Sprint(err); message != "" {
-		_, _ = str.EPrintln(message) // no way to report the failure
+		_, _ = fmt.Fprintln(w, message) // no way to report the failure
 	}
 
 	return err

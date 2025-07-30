@@ -25,15 +25,15 @@ func (err *codeError) Error() string {
 // CodeFromError returns the ExitCode contained in error, if any.
 // The exit code is found by [errors.As] unwrapping into an error created by this package.
 //
-// When err is nil, returns [ExitZero] and zero.
-// When err does not hold any [Error]s, returns [ExitGeneric] and false.
-func CodeFromError(err error) (code ExitCode, ok bool) {
+// When err is nil, returns code 0.
+// When err does not hold any [Error]s, returns the provided generic code and false.
+func CodeFromError(err error, generic ExitCode) (code ExitCode, ok bool) {
 	if err == nil {
-		return ExitZero, true
+		return 0, true
 	}
 	var codeErr *codeError
 	if !errors.As(err, &codeErr) {
-		return ExitGeneric, false
+		return generic, false
 	}
 	return codeErr.code, true
 }

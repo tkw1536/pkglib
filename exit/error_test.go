@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	errStuff        = exit.NewErrorWithCode("stuff", exit.ExitGeneric)
+	errStuff        = exit.NewErrorWithCode("stuff", 1)
 	errStuffWrapped = fmt.Errorf("wrapping: %w", errStuff)
 	errUnrelated    = errors.New("unrelated")
 )
@@ -22,31 +22,35 @@ func TestCodeFromError(t *testing.T) {
 	tests := []struct {
 		name     string
 		err      error
+		generic  exit.ExitCode
 		wantCode exit.ExitCode
 		wantOK   bool
 	}{
 		{
 			name:     "nil error returns zero value",
 			err:      nil,
-			wantCode: exit.ExitZero,
+			generic:  1,
+			wantCode: 0,
 			wantOK:   true,
 		},
 		{
 			name:     "Error object returns itself",
 			err:      errStuff,
-			wantCode: exit.ExitGeneric,
+			generic:  1,
+			wantCode: 1,
 			wantOK:   true,
 		},
 		{
 			name:     "Wrapped error returns same exit code",
 			err:      errStuffWrapped,
-			wantCode: exit.ExitGeneric,
+			generic:  1,
+			wantCode: 1,
 			wantOK:   true,
 		},
 		{
 			name:     "unrelated error returns invalid exit code",
 			err:      errUnrelated,
-			wantCode: exit.ExitGeneric,
+			wantCode: 1,
 			wantOK:   false,
 		},
 	}
@@ -54,7 +58,7 @@ func TestCodeFromError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotCode, gotOK := exit.CodeFromError(tt.err)
+			gotCode, gotOK := exit.CodeFromError(tt.err, tt.generic)
 			if tt.wantCode != gotCode {
 				t.Errorf("CodeFromError() code = %v, want %v", gotCode, tt.wantCode)
 			}
