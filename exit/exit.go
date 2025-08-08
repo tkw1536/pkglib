@@ -25,6 +25,5 @@ func Code(code int) ExitCode {
 
 // Return returns this ExitCode to the operating system by invoking [os.Exit].
 func (code ExitCode) Return() {
-	// NOTE: This function is untested
 	os.Exit(int(code))
 }

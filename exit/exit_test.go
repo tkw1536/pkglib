@@ -3,9 +3,14 @@
 //spellchecker:words exit
 package exit_test
 
-//spellchecker:words math testing pkglib exit
+//spellchecker:words math testing pkglib exit os exec fmt
 import (
+	"errors"
+	"fmt"
 	"math"
+	"os"
+	"os/exec"
+	"strconv"
 	"testing"
 
 	"go.tkw01536.de/pkglib/exit"
@@ -39,6 +44,42 @@ func TestCode_outbounds(t *testing.T) {
 
 			if got := exit.Code(tt.code); got != tt.want {
 				t.Errorf("Code() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// environment variable used to setup a pkglib test that exits with a specific code.
+const exitCodeEnv = "PKGLIB_TEST_EXIT_CODE"
+
+func TestExitCode_Return(t *testing.T) {
+	t.Parallel()
+
+	if exitCodeStr := os.Getenv(exitCodeEnv); exitCodeStr != "" {
+		var code exit.ExitCode
+		if _, err := fmt.Sscanf(exitCodeStr, "%d", &code); err != nil {
+			t.Fatalf("Failed to parse exit code: %v", err)
+		}
+		code.Return()
+		return
+	}
+
+	for exitCode := range uint8(255) {
+		exitCodeStr := strconv.FormatUint(uint64(exitCode), 10)
+		t.Run(exitCodeStr, func(t *testing.T) {
+			t.Parallel()
+
+			// invoke the current test executable with the exit code
+			cmd := exec.Command(os.Args[0], "-test.run="+t.Name()) // #nosec G204 -- we need this for the test
+			cmd.Env = append(os.Environ(), exitCodeEnv+"="+exitCodeStr)
+
+			var gotCode int
+			var exitErr *exec.ExitError
+			if errors.As(cmd.Run(), &exitErr) {
+				gotCode = exitErr.ExitCode()
+			}
+			if gotCode != int(exitCode) {
+				t.Errorf("ExitCode.Return() exited with code %d, want %d", gotCode, exitCode)
 			}
 		})
 	}
