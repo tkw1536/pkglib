@@ -8,8 +8,6 @@ package sema
 //
 // A size <= 0 indicates an infinite limit, and all Lock and Unlock calls are no-ops.
 // A size == 1 indicates a [sync.Mutex] should be used instead.
-//
-// Note that if size is statically known to be 1, a Mutex should be used instead.
 func New(size int) Semaphore {
 	var sema Semaphore
 	if size > 0 {
