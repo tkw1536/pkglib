@@ -1,7 +1,7 @@
 //spellchecker:words exit
 package exit_test
 
-//spellchecker:words errors testing pkglib exit
+//spellchecker:words errors testing pkglib exit testlib
 import (
 	"errors"
 	"fmt"

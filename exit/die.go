@@ -1,7 +1,6 @@
 //spellchecker:words exit
 package exit
 
-//spellchecker:words pkglib stream
 import (
 	"fmt"
 	"io"

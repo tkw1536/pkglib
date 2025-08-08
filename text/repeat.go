@@ -3,6 +3,7 @@
 //spellchecker:words text
 package text
 
+//spellchecker:words pkglib sequence
 import (
 	"io"
 

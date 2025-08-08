@@ -1,5 +1,7 @@
+//spellchecker:words testlib
 package testlib_test
 
+//spellchecker:words strconv testing pkglib testlib
 import (
 	"strconv"
 	"testing"

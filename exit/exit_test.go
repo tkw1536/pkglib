@@ -3,7 +3,7 @@
 //spellchecker:words exit
 package exit_test
 
-//spellchecker:words math testing pkglib exit os exec fmt
+//spellchecker:words errors math exec strconv testing pkglib exit
 import (
 	"errors"
 	"fmt"
