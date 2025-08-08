@@ -15,27 +15,29 @@ import (
 // It is like [strings.Join], but writes into a writer instead of allocating a [strings.Builder].
 //
 //nolint:wrapcheck // so that it matches strings.Join better
-func Join(writer io.Writer, elems []string, sep string) (n int, err error) {
+func Join(w io.Writer, elems []string, sep string) (n int, err error) {
 	// this function has been adapted from strings.Join
 
 	switch len(elems) {
 	case 0:
 		return
 	case 1:
-		return io.WriteString(writer, elems[0])
+		return io.WriteString(w, elems[0])
 	}
 
 	// count how many elements we'll have to write
-	{
+	if grower, ok := w.(interface {
+		Grow(length int)
+	}); ok {
 		n := len(sep) * (len(elems) - 1)
 		for _, elem := range elems {
 			n += len(elem)
 		}
-		Grow(writer, n)
+		grower.Grow(n)
 	}
 
 	// figure out what to use for WriteString
-	writeString := writeString(writer)
+	writeString := stringWriter(w)
 
 	// write the first string
 	{
@@ -78,10 +80,14 @@ func RepeatJoin(w io.Writer, s, sep string, count int) (n int, err error) {
 		return
 	}
 
-	n = len(s)*count + len(sep)*(count-1)
-	Grow(w, n)
+	if grower, ok := w.(interface {
+		Grow(length int)
+	}); ok {
+		n = len(s)*count + len(sep)*(count-1)
+		grower.Grow(n)
+	}
 
-	writeString := writeString(w)
+	writeString := stringWriter(w)
 
 	m, err := writeString(s)
 	if err != nil {
@@ -115,20 +121,24 @@ func Repeat(w io.Writer, s string, count int) (n int, err error) {
 	}
 
 	// grow the buffer by the overall number of bytes needed
-	n = len(s) * count
-	Grow(w, n)
+	if grower, ok := w.(interface {
+		Grow(length int)
+	}); ok {
+		n = len(s) * count
+		grower.Grow(n)
+	}
 
 	// do the actual repeat
-	if n, err := repeat(writeString(w), s, count); err != nil {
+	if n, err := repeat(stringWriter(w), s, count); err != nil {
 		return n, err
 	}
 
 	return n, nil
 }
 
-// writeString returns a function that does io.WriteString(w, ...)
+// stringWriter returns a function that does io.WriteString(w, ...)
 // It is used for init time branching.
-func writeString(w io.Writer) func(string) (int, error) {
+func stringWriter(w io.Writer) func(string) (int, error) {
 	if sw, ok := w.(io.StringWriter); ok {
 		return sw.WriteString
 	}
