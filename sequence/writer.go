@@ -18,7 +18,7 @@ import (
 // It keeps track of overall number of bytes written and the previous error.
 //
 // The Write* methods return an integer and wrap the error using [PreviousWriteFailedError].
-// The underlying error can also be retrieved directly sing the [Writer.Sum] method.
+// The underlying error can also be retrieved directly using the [Writer.Sum] method.
 //
 // The [Writer.Write] and [Writer.WriteString] methods may be used concurrently by multiple goroutines.
 // The writes to the underlying writer are serialized automatically.
@@ -27,7 +27,7 @@ import (
 type Writer struct {
 	hadError atomic.Bool
 
-	l   sync.Mutex // protects n and error
+	l   sync.Mutex // protects err and calls to Writer
 	err PreviousWriteFailedError
 
 	Writer io.Writer
@@ -35,11 +35,11 @@ type Writer struct {
 
 // performs the write operation described by w.
 func (sw *Writer) write(w func() (int, error)) (int, error) {
-	if !sw.hadError.Load() {
-		return sw.writeSlow(w)
+	if sw.hadError.Load() {
+		return 0, sw.err
 	}
 
-	return 0, sw.err
+	return sw.writeSlow(w)
 }
 
 func (sw *Writer) writeSlow(w func() (int, error)) (int, error) {
@@ -75,7 +75,7 @@ func (sw *Writer) WriteString(s string) (int, error) {
 	})
 }
 
-// Sum returns the total number of bytes written the underlying writer, and any error that occurred.
+// Sum returns the total number of bytes written to the underlying writer, and any error that occurred.
 func (cw *Writer) Sum() (int, error) {
 	return cw.err.N, cw.err.Err
 }

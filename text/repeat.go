@@ -5,6 +5,8 @@ package text
 
 import (
 	"io"
+
+	"go.tkw01536.de/pkglib/sequence"
 )
 
 //spellchecker:words nolint wrapcheck
@@ -36,39 +38,15 @@ func Join(w io.Writer, elems []string, sep string) (n int, err error) {
 		grower.Grow(n)
 	}
 
-	// figure out what to use for WriteString
-	writeString := stringWriter(w)
+	sw := sequence.Writer{Writer: w}
 
-	// write the first string
-	{
-		m, err := writeString(elems[0])
-		n += m
-		if err != nil {
-			return n, err
-		}
-	}
-
+	_, _ = sw.WriteString(elems[0])
 	for _, s := range elems[1:] {
-		// write a separator
-		{
-			m, err := writeString(sep)
-			n += m
-			if err != nil {
-				return n, err
-			}
-		}
-
-		// write the next string
-		{
-			m, err := writeString(s)
-			n += m
-			if err != nil {
-				return n, err
-			}
-		}
+		_, _ = sw.WriteString(sep)
+		_, _ = sw.WriteString(s)
 	}
 
-	return n, nil
+	return sw.Sum()
 }
 
 // RepeatJoin writes s, followed by (count -1) instances of sep + s into w.
@@ -87,18 +65,15 @@ func RepeatJoin(w io.Writer, s, sep string, count int) (n int, err error) {
 		grower.Grow(n)
 	}
 
-	writeString := stringWriter(w)
+	sw := sequence.Writer{Writer: w}
 
-	m, err := writeString(s)
-	if err != nil {
-		return m, err
+	_, _ = sw.WriteString(s)
+	for range count - 1 {
+		_, _ = sw.WriteString(sep + s)
 	}
 
-	if n, err := repeat(writeString, sep+s, count-1); err != nil {
-		return m + n, err
-	}
-
-	return n, nil
+	//nolint:wrapcheck // explicitly return the underlying error
+	return sw.Sum()
 }
 
 // Repeat writes count instances of s into w.
@@ -128,34 +103,12 @@ func Repeat(w io.Writer, s string, count int) (n int, err error) {
 		grower.Grow(n)
 	}
 
-	// do the actual repeat
-	if n, err := repeat(stringWriter(w), s, count); err != nil {
-		return n, err
+	// do the writing!
+	sw := sequence.Writer{Writer: w}
+	for range count {
+		_, _ = sw.WriteString(s)
 	}
 
-	return n, nil
-}
-
-// stringWriter returns a function that does io.WriteString(w, ...)
-// It is used for init time branching.
-func stringWriter(w io.Writer) func(string) (int, error) {
-	if sw, ok := w.(io.StringWriter); ok {
-		return sw.WriteString
-	}
-
-	return func(s string) (int, error) {
-		return w.Write([]byte(s))
-	}
-}
-
-// only compute the number of bytes written if something goes wrong.
-func repeat(w func(string) (int, error), s string, count int) (int, error) {
-	// NOTE: This function exists to save having to repeatedly call
-	// io.WriteString; which always rechecks if the passed type fulfils the interface.
-	for i := range count {
-		if m, err := w(s); err != nil {
-			return len(s)*i + m, err
-		}
-	}
-	return 0, nil
+	//nolint:wrapcheck // explicitly return the underlying error
+	return sw.Sum()
 }
