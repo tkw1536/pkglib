@@ -1,12 +1,10 @@
-//go:build goexperiment.synctest
-
 //spellchecker:words contextx
 package contextx_test
 
 //spellchecker:words context time github pkglib contextx
 import (
 	"context"
-	"fmt"
+	"testing"
 	"time"
 
 	"testing/synctest"
@@ -14,8 +12,8 @@ import (
 	"go.tkw01536.de/pkglib/contextx"
 )
 
-func ExampleAnyways() {
-	synctest.Run(func() {
+func TestAnyways(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
 		const short = 100 * time.Millisecond
 
 		// on a non-cancelled context it just behaves like short
@@ -28,7 +26,9 @@ func ExampleAnyways() {
 			synctest.Wait()
 			waited := time.Since(start) >= short
 
-			fmt.Println("Background() waited more than short:", waited)
+			if !waited {
+				t.Errorf("Background() waited less than short: %v", waited)
+			}
 		}
 
 		// on a canceled context it delays the cancellation by the timeout
@@ -42,10 +42,9 @@ func ExampleAnyways() {
 			<-ctx.Done()
 			waited := time.Since(start) >= short
 
-			fmt.Println("Canceled() waited more than short:", waited)
+			if !waited {
+				t.Errorf("Canceled() waited less than short: %v", waited)
+			}
 		}
 	})
-
-	// Output: Background() waited more than short: true
-	// Canceled() waited more than short: true
 }
