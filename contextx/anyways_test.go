@@ -3,7 +3,6 @@ package contextx_test
 
 //spellchecker:words context time github pkglib contextx
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -13,12 +12,16 @@ import (
 )
 
 func TestAnyways(t *testing.T) {
+	t.Parallel()
+
 	synctest.Test(t, func(t *testing.T) {
+		t.Helper()
+
 		const short = 100 * time.Millisecond
 
 		// on a non-cancelled context it just behaves like short
 		{
-			ctx, cancel := contextx.Anyways(context.Background(), short)
+			ctx, cancel := contextx.Anyways(t.Context(), short)
 			defer cancel()
 
 			start := time.Now()
