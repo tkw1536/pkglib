@@ -12,6 +12,8 @@ import (
 	"go.tkw01536.de/pkglib/reflectx"
 )
 
+//spellchecker:words sfield
+
 // dependency represents a single dependency.
 type dependency struct {
 	field reflect.StructField

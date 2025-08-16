@@ -16,6 +16,8 @@ import (
 	"go.tkw01536.de/pkglib/exit"
 )
 
+//spellchecker:words nosec outbounds
+
 func TestCode_inbounds(t *testing.T) {
 	t.Parallel()
 

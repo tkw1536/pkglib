@@ -10,6 +10,8 @@ import (
 	"strconv"
 )
 
+//spellchecker:words nosec subshell
+
 // ProduceExitError returns an exec.ExitError that holds the given code.
 // This function expects sh to be available in PATH, but also allows cmd on Windows.
 // code must be in the range [1, 127] to be portable.

@@ -15,7 +15,7 @@ import (
 	"go.tkw01536.de/pkglib/errorsx"
 )
 
-//spellchecker:words nolint wrapcheck
+//spellchecker:words nosec wrapcheck
 
 // Create is like [os.Create] with an additional mode argument.
 func Create(path string, mode fs.FileMode) (*os.File, error) {

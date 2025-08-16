@@ -10,6 +10,8 @@ import (
 	"go.tkw01536.de/pkglib/errorsx"
 )
 
+//spellchecker:words nilreturn errreturn
+
 var (
 	errCloseNotOK    = errors.New("close not ok")
 	errFunctionNotOK = errors.New("function not ok")

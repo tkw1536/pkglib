@@ -1,0 +1,15 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "Makefile",
+    "LICENSE",
+    "password/common/top10_000.txt",
+    "go.sum",
+    "go.mod"
+  ],
+  "words": [
+    "pkglib",
+    "Modtime"
+  ]
+}

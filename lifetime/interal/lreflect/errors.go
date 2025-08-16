@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+//spellchecker:words iface unaddressable
+
 const (
 	errIfaceIsNilType  = nilTypeError("iface")
 	errIfaceNotAnIface = noInterfaceError("iface")
