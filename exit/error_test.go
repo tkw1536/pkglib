@@ -12,15 +12,18 @@ import (
 )
 
 var (
-	errStuff           = exit.NewErrorWithCode("stuff", 1)
-	errStuffWrapped    = fmt.Errorf("wrapping: %w", errStuff)
-	errUnrelated       = errors.New("unrelated")
-	errExitCode        = testlib.ProduceExitError(1)
-	errExitCodeWrapped = exit.FromExitError(errExitCode)
+	errStuff        = exit.NewErrorWithCode("stuff", 1)
+	errStuffWrapped = fmt.Errorf("wrapping: %w", errStuff)
+	errUnrelated    = errors.New("unrelated")
 )
 
 func TestCodeFromError(t *testing.T) {
 	t.Parallel()
+
+	var (
+		errExitCode        = testlib.ProduceExitError(t, 1)
+		errExitCodeWrapped = exit.FromExitError(errExitCode)
+	)
 
 	tests := []struct {
 		name     string

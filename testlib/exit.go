@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strconv"
+	"testing"
 )
 
 //spellchecker:words nosec subshell
@@ -17,7 +18,9 @@ import (
 // code must be in the range [1, 127] to be portable.
 //
 // If something goes wrong, this function panics.
-func ProduceExitError(code int) *exec.ExitError {
+func ProduceExitError(t *testing.T, code int) *exec.ExitError {
+	t.Helper()
+
 	if code < 1 || code > 127 {
 		panic(fmt.Sprintf("ProduceExitError: code must be in the range [1, 127]; got %d", code))
 	}
@@ -26,11 +29,11 @@ func ProduceExitError(code int) *exec.ExitError {
 
 	// look for sh first
 	if _, err := exec.LookPath("sh"); err == nil {
-		cmd = exec.Command("sh", "-c", "exit "+strconv.Itoa(code)) // #nosec: G204 inputs are guarded
+		cmd = exec.CommandContext(t.Context(), "sh", "-c", "exit "+strconv.Itoa(code)) // #nosec: G204 inputs are guarded
 	} else if runtime.GOOS == "windows" {
 		// on windows only, fallback to "cmd"
 		if _, err := exec.LookPath("cmd"); err == nil {
-			cmd = exec.Command("cmd", "/C", "exit "+strconv.Itoa(code)) // #nosec: G204 inputs are guarded
+			cmd = exec.CommandContext(t.Context(), "cmd", "/C", "exit "+strconv.Itoa(code)) // #nosec: G204 inputs are guarded
 		}
 	}
 

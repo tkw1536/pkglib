@@ -19,7 +19,7 @@ func TestProduceExitError(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
-			ee := testlib.ProduceExitError(i)
+			ee := testlib.ProduceExitError(t, i)
 			if ee.ExitCode() != i {
 				t.Errorf("expected exit code %d; got %d", i, ee.ExitCode())
 			}
