@@ -6,25 +6,42 @@ package nobufio
 //spellchecker:words unicode
 import (
 	"io"
+	"sync"
 	"unicode/utf8"
 )
 
 //spellchecker:words nolint wrapcheck
 
 // ReadRune reads the next rune from r.
-// It does not read from reader beyond the rune.
+// If r is a [io.RuneReader], it will be used directly.
+// Otherwise it reads exactly as many bytes from reader as needed to decode the full rune.
 //
 // It returns the rune being read, and its' size in bytes.
 // If no rune can be read, it returns an error.
-//
-// See [io.RuneReader].
 func ReadRune(reader io.Reader) (r rune, size int, err error) {
 	// try to directly read the rune
 	if reader, ok := reader.(io.RuneReader); ok {
 		return reader.ReadRune() //nolint:wrapcheck // directly use RuneReader
 	}
 
-	runeBuffer := make([]byte, 0, utf8.MaxRune)
+	return readRuneSlow(reader)
+}
+
+// runeBufferPool contains []byte of size [utf8.UTFMax].
+var runeBufferPool = sync.Pool{
+	New: func() any {
+		buf := make([]byte, 0, utf8.UTFMax)
+		return &buf
+	},
+}
+
+// readRuneSlow reads the next rune from reader.
+// It does not read more bytes than needed to decode the full rune.
+func readRuneSlow(reader io.Reader) (r rune, size int, err error) {
+	runeBuffer := *(runeBufferPool.Get().(*[]byte))
+	runeBuffer = runeBuffer[:0]
+	defer runeBufferPool.Put(&runeBuffer)
+
 	for !utf8.FullRune(runeBuffer) {
 		runeBuffer = append(runeBuffer, 0)
 
