@@ -89,6 +89,7 @@ func TestRingBuffer(t *testing.T) {
 						}
 					}
 
+					//nolint:paralleltest // needs to be sequential
 					t.Run(fmt.Sprintf("primary buffer iteration %d", iterationNo), func(t *testing.T) {
 						primary.Add(iterationNo)
 						if tt.optimized {
@@ -98,6 +99,8 @@ func TestRingBuffer(t *testing.T) {
 					})
 
 					t.Run(fmt.Sprintf("pop buffer iteration %d", iterationNo), func(t *testing.T) {
+						t.Parallel()
+
 						popBuffer := ringbuffer.MakeRingBuffer[int](tt.bufferSize)
 						for i := range iterationNo + 1 {
 							popBuffer.Add(i)
