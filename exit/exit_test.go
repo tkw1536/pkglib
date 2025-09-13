@@ -72,7 +72,7 @@ func TestExitCode_Return(t *testing.T) {
 			t.Parallel()
 
 			// invoke the current test executable with the exit code
-			cmd := exec.Command(os.Args[0], "-test.run="+t.Name()) // #nosec G204 -- we need this for the test
+			cmd := exec.CommandContext(t.Context(), os.Args[0], "-test.run="+t.Name()) // #nosec G204 -- we need this for the test
 			cmd.Env = append(os.Environ(), exitCodeEnv+"="+exitCodeStr)
 
 			var gotCode int
