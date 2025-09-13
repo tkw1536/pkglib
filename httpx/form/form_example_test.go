@@ -3,6 +3,7 @@ package form_test
 
 //spellchecker:words errors html template http httptest strings testing pkglib httpx content form field
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html/template"
@@ -76,10 +77,15 @@ func makeFormRequest(t *testing.T, form http.Handler, body map[string]string) st
 		t.Helper()
 	}
 
+	ctx := context.Background()
+	if t != nil {
+		ctx = t.Context()
+	}
+
 	var req *http.Request
 	if body == nil {
 		var err error
-		req, err = http.NewRequest(http.MethodGet, "/", nil)
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
 		if err != nil {
 			panic(err)
 		}
@@ -90,7 +96,7 @@ func makeFormRequest(t *testing.T, form http.Handler, body map[string]string) st
 		}
 
 		var err error
-		req, err = http.NewRequest(http.MethodPost, "/", strings.NewReader(form.Encode()))
+		req, err = http.NewRequestWithContext(ctx, http.MethodPost, "/", strings.NewReader(form.Encode()))
 		if err != nil {
 			panic(err)
 		}
