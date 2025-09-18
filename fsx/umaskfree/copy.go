@@ -1,16 +1,15 @@
 //spellchecker:words umaskfree
 package umaskfree
 
-//spellchecker:words context errors path filepath pkglib contextx errorsx
+//spellchecker:words errors path filepath pkglib errorsx
 import (
-	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 
-	"go.tkw01536.de/pkglib/contextx"
 	"go.tkw01536.de/pkglib/errorsx"
 	"go.tkw01536.de/pkglib/fsx"
 )
@@ -23,12 +22,7 @@ var ErrCopySameFile = errors.New("src and dst must be different")
 // When src points to a symbolic link, will copy the symbolic link.
 //
 // When dst and src are the same file, returns [ErrCopySameFile].
-// When ctx is closed, copying is interrupted.
-func CopyFile(ctx context.Context, dst, src string) (e error) {
-	if err := ctx.Err(); err != nil {
-		return fmt.Errorf("context was closed: %w", err)
-	}
-
+func CopyFile(dst, src string) (e error) {
 	if fsx.Same(src, dst) {
 		return ErrCopySameFile
 	}
@@ -54,7 +48,7 @@ func CopyFile(ctx context.Context, dst, src string) (e error) {
 	defer errorsx.Close(dstFile, &e, "destination file")
 
 	// and do the copy!
-	_, err = contextx.Copy(ctx, dstFile, srcFile)
+	_, err = io.Copy(dstFile, srcFile)
 	if err != nil {
 		return fmt.Errorf("failed to copy file: %w", err)
 	}
@@ -63,11 +57,7 @@ func CopyFile(ctx context.Context, dst, src string) (e error) {
 
 // CopyLink copies a link from src to dst.
 // If dst already exists, it is deleted and then re-created.
-func CopyLink(ctx context.Context, dst, src string) error {
-	if err := ctx.Err(); err != nil {
-		return fmt.Errorf("context was closed: %w", err)
-	}
-
+func CopyLink(dst, src string) error {
 	// if they're the same file that is an error
 	if fsx.Same(dst, src) {
 		return ErrCopySameFile
@@ -102,13 +92,12 @@ func CopyLink(ctx context.Context, dst, src string) error {
 var ErrDstFile = errors.New("dst is a file")
 
 // CopyDirectory copies the directory src to dst recursively.
-// Copying is aborted when ctx is closed.
 //
 // Existing files and directories are overwritten.
 // When a directory already exists, additional files are not deleted.
 //
 // onCopy, when not nil, is called for each file or directory being copied.
-func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src string)) error {
+func CopyDirectory(dst, src string, onCopy func(dst, src string)) error {
 	// sanity checks
 	if fsx.Same(src, dst) {
 		return ErrCopySameFile
@@ -129,11 +118,6 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 	return filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
 		// someone previously returned an error
 		if err != nil {
-			return err
-		}
-
-		// context was closed
-		if err := ctx.Err(); err != nil {
 			return err
 		}
 
@@ -158,12 +142,12 @@ func CopyDirectory(ctx context.Context, dst, src string, onCopy func(dst, src st
 
 		// if we have a symbolic link, copy the link!
 		if info.Mode()&fs.ModeSymlink != 0 {
-			return CopyLink(ctx, dst, path)
+			return CopyLink(dst, path)
 		}
 
 		// if we got a file, we should copy it normally
 		if !d.IsDir() {
-			return CopyFile(ctx, dst, path)
+			return CopyFile(dst, path)
 		}
 
 		// create the directory, but ignore an error if the directory already exists.
