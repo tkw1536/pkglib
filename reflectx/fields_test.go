@@ -19,9 +19,9 @@ func ExampleIterFields() {
 		EmbeddedField string // field in an embedded struct
 	}
 
-	//nolint:unused // false positive: used by TypeFor below
 	type SomeStruct struct {
-		Field   string // regular field
+		Field string // regular field
+		//lint:ignore U1000 // false positive: used by TypeFor below
 		string         // embedded non-struct, not called recursively
 		Embed          // an embed
 		Another string //
@@ -43,9 +43,9 @@ func ExampleIterAllFields() {
 		EmbeddedField string // field in an embedded struct
 	}
 
-	//nolint:unused // false positive: used by TypeFor call below
 	type SomeStruct struct {
-		Field   string // regular field
+		Field string // regular field
+		//lint:ignore U1000 // false positive: used by TypeFor call below
 		string         // embedded non-struct, not called recursively
 		Embed          // an embed
 		Another string // another field
