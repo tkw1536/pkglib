@@ -60,3 +60,25 @@ func ExampleIterAllFields() {
 	// encountered field EmbeddedField with index [2 0]
 	// encountered field Another with index [3]
 }
+
+// Iterate over the fields of a struct, stopping early.
+func ExampleIterFields_early() {
+	type Embed struct {
+		EmbeddedField string // field in an embedded struct
+	}
+
+	type SomeStruct struct {
+		Field string // regular field
+		//lint:ignore U1000 // false positive: used by TypeFor below
+		string         // embedded non-struct, not called recursively
+		Embed          // an embed
+		Another string //
+	}
+
+	for f, index := range reflectx.IterFields(reflect.TypeFor[SomeStruct]()) {
+		fmt.Println("encountered field", f.Name, "with index", index)
+		break
+	}
+
+	// Output: encountered field Field with index 0
+}

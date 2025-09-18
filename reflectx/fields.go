@@ -42,22 +42,30 @@ func IterAllFields(typ reflect.Type) iter.Seq2[reflect.StructField, []int] {
 	return iterFields(true, nil, typ)
 }
 
+// iterFields yields all fields in typ.
 func iterFields(embeds bool, index []int, typ reflect.Type) iter.Seq2[reflect.StructField, []int] {
 	return func(yield func(reflect.StructField, []int) bool) {
+		doIterFields(embeds, index, typ)(yield)
+	}
+}
+
+// doIterFields recursively yields all fields in go.
+// It returns false iff the iteration was stopped prematurely.
+func doIterFields(embeds bool, index []int, typ reflect.Type) func(func(reflect.StructField, []int) bool) bool {
+	return func(yield func(reflect.StructField, []int) bool) bool {
 		for i := range typ.NumField() {
 			field := typ.Field(i)
 			fieldIndex := append(slices.Clone(index), i)
 			if embeds && field.Anonymous && field.Type.Kind() == reflect.Struct {
-				for field, indexes := range iterFields(embeds, fieldIndex, field.Type) {
-					if !yield(field, indexes) {
-						return
-					}
+				if !doIterFields(embeds, fieldIndex, field.Type)(yield) {
+					return false
 				}
 				continue
 			}
 			if !yield(field, fieldIndex) {
-				return
+				return false
 			}
 		}
+		return true
 	}
 }
