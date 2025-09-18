@@ -1,5 +1,7 @@
+//spellchecker:words nobufio
 package nobufio_test
 
+//spellchecker:words strings testing unicode pkglib nobufio
 import (
 	"fmt"
 	"io"

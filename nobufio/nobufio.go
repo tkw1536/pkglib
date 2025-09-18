@@ -3,7 +3,7 @@
 //spellchecker:words nobufio
 package nobufio
 
-//spellchecker:words unicode
+//spellchecker:words sync unicode
 import (
 	"io"
 	"sync"

@@ -1,7 +1,7 @@
 //spellchecker:words testlib
 package testlib
 
-//spellchecker:words errors exec runtime strconv
+//spellchecker:words errors exec runtime strconv testing
 import (
 	"errors"
 	"fmt"
