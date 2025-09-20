@@ -11,7 +11,7 @@ import (
 	"go.tkw01536.de/pkglib/testlib"
 )
 
-//spellchecker:words oldname newname
+//spellchecker:words oldname newname nosec
 
 func TestSameFile(t *testing.T) {
 	t.Parallel()
@@ -90,5 +90,3 @@ func TestSameFile(t *testing.T) {
 		})
 	}
 }
-
-//spellchecker:words nosec

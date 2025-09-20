@@ -6,8 +6,6 @@ import (
 	"errors"
 )
 
-//spellchecker:words unsafe
-
 // Combine is like [errors.Join] except if there is only a single non-nil error, it is returned unchanged.
 func Combine(errs ...error) error {
 	var anError error

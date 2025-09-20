@@ -7,8 +7,6 @@ import (
 	"os/exec"
 )
 
-//spellchecker:words nolint errorlint
-
 // errorWithCode is an error that holds an exit code.
 type errorWithCode interface {
 	error

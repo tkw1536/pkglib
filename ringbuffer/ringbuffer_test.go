@@ -10,6 +10,8 @@ import (
 	"go.tkw01536.de/pkglib/ringbuffer"
 )
 
+//spellchecker:words nolint paralleltest
+
 // Demonstrates how a ring buffer works by adding to it.
 func ExampleRingBuffer() {
 	buffer := ringbuffer.MakeRingBuffer[string](2)
