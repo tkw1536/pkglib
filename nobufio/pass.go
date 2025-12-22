@@ -10,6 +10,7 @@ import (
 	"golang.org/x/term"
 )
 
+// Reads a password from reader.
 // When reader is not a terminal, behaves like [ReadLine].
 func ReadPassword(reader io.Reader) (value string, err error) {
 	value, err = ReadPasswordStrict(reader)
