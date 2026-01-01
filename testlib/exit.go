@@ -4,13 +4,14 @@ package testlib
 //spellchecker:words errors exec runtime strconv testing
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"sync"
 	"testing"
+
+	"go.tkw01536.de/pkglib/errorsx"
 )
 
 //spellchecker:words nosec subshell
@@ -19,7 +20,7 @@ const (
 	minExitCode = 1   // minimum valid exit code
 	maxExitCode = 127 // maximum valid exit code
 
-	// total number of exit codes
+	// total number of exit codes.
 	exitCodeCount = maxExitCode - minExitCode + 1
 )
 
@@ -79,8 +80,8 @@ func makeExitError(code int) exec.ExitError {
 
 	err := cmd.Run()
 
-	var exitErr *exec.ExitError
-	if !errors.As(err, &exitErr) {
+	exitErr, ok := errorsx.AsType[*exec.ExitError](err)
+	if !ok {
 		panic(fmt.Sprintf("makeExitError: produced type %T, expected *exec.ExitError", err))
 	}
 	got := exitErr.ExitCode()

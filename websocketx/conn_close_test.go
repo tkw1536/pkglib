@@ -4,13 +4,13 @@ package websocketx_test
 //spellchecker:words context errors testing time github gorilla websocket pkglib websocketx uber goleak
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"testing"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"go.tkw01536.de/pkglib/errorsx"
 	"go.tkw01536.de/pkglib/websocketx"
 	"go.uber.org/goleak"
 )
@@ -341,8 +341,8 @@ func TestServer_ClientClose(t *testing.T) {
 				}
 			})
 
-			var gotCloseCause websocketx.CloseCause
-			if !errors.As(gotCancelCause, &gotCloseCause) {
+			gotCloseCause, ok := errorsx.AsType[websocketx.CloseCause](gotCancelCause)
+			if !ok {
 				t.Errorf("server-side didn't return a close cause")
 				return
 			}

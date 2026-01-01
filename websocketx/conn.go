@@ -323,8 +323,7 @@ func (conn *Connection) recvMessages() {
 
 			// intercept any unexpected CloseErrors
 			// this only has an effect if the context has not yet been closed.
-			var ce *websocket.CloseError
-			if errors.As(err, &ce) {
+			if ce, ok := errorsx.AsType[*websocket.CloseError](err); ok {
 				err = errors.New(ce.Text) //nolint:err113 // want only the text
 			}
 			if err != nil {

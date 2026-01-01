@@ -5,7 +5,6 @@ package exit_test
 
 //spellchecker:words errors math exec strconv testing pkglib exit
 import (
-	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"strconv"
 	"testing"
 
+	"go.tkw01536.de/pkglib/errorsx"
 	"go.tkw01536.de/pkglib/exit"
 )
 
@@ -76,8 +76,7 @@ func TestExitCode_Return(t *testing.T) {
 			cmd.Env = append(os.Environ(), exitCodeEnv+"="+exitCodeStr)
 
 			var gotCode int
-			var exitErr *exec.ExitError
-			if errors.As(cmd.Run(), &exitErr) {
+			if exitErr, ok := errorsx.AsType[*exec.ExitError](cmd.Run()); ok {
 				gotCode = exitErr.ExitCode()
 			}
 			if gotCode != int(exitCode) {
