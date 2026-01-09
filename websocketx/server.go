@@ -3,7 +3,7 @@
 //spellchecker:words websocketx
 package websocketx
 
-//spellchecker:words context errors http sync github gorilla websocket
+//spellchecker:words context errors http sync github gorilla websocket pkglib errorsx
 import (
 	"context"
 	"errors"

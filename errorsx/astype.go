@@ -1,5 +1,7 @@
+//spellchecker:words errorsx
 package errorsx
 
+//spellchecker:words errors
 import "errors"
 
 // AsType is like [errors.As], except that it returns the type error and a boolean.
