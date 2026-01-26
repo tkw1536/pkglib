@@ -50,7 +50,7 @@ func (fe FieldError) Unwrap() error {
 	return fe.Err
 }
 
-var ErrNotAStruct = errors.New("validate called on non-struct type")
+var ErrNotAStruct = errors.New("cannot validate non-struct type")
 
 func validate(datum reflect.Value, validators Collection) error {
 	// make sure that we have a struct type

@@ -104,10 +104,10 @@ func (conn *Connection) forceClose(err error) error {
 
 var (
 	// ErrConnectionShutdownWith indicates the connection closed because connection.ShutdownWith was called.
-	ErrConnectionShutdownWith = errors.New("Connection.ShutdownWith called")
+	ErrConnectionShutdownWith = errors.New(`called "Connection.ShutdownWith"`)
 
 	// ErrConnectionClose indicates that the connection closed because connection.Close was called.
-	ErrConnectionClose = errors.New("connection.Close called")
+	ErrConnectionClose = errors.New(`called "Connection.Close"`)
 )
 
 // ShutdownWith shuts down this connection with the given code and text for the client.

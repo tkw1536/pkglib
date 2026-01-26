@@ -16,7 +16,7 @@ import (
 
 //spellchecker:words nolint wrapcheck
 
-var ErrCopySameFile = errors.New("src and dst must be different")
+var ErrCopySameFile = errors.New(`src and dst must be different`)
 
 // CopyFile copies a file from src to dst.
 // When src points to a symbolic link, will copy the symbolic link.

@@ -190,13 +190,13 @@ func scan(component reflect.Type, typ reflect.Type, inDependenciesStruct bool) i
 
 var (
 	errFieldHasTag    = errors.New("field has tag")
-	errNotInjectField = errors.New("not an injected field")
+	errNotInjectField = errors.New("field is not an injected field")
 
-	errNotPointerToStruct      = errors.New("not a pointer to a slice")
-	errNotAStruct              = errors.New("not a struct")
+	errNotPointerToStruct      = errors.New("expected pointer to struct")
+	errNotAStruct              = errors.New("expected struct")
 	errComponentNotImplemented = errors.New("type does not implement component")
 
-	errNoSuchField = errors.New("no such field")
+	errNoSuchField = errors.New("field does not exist")
 )
 
 func newDepsError(dep dependency, concrete reflect.Type, err error) error {

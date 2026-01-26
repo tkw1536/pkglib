@@ -131,7 +131,7 @@ func ExampleValidate_notAStruct() {
 	err := validator.Validate(&value, nil)
 
 	fmt.Println(err)
-	// Output: validate called on non-struct type
+	// Output: cannot validate non-struct type
 }
 
 // Demonstrates that non-validators cause an error.

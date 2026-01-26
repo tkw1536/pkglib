@@ -25,7 +25,7 @@ func minifyInto(mediaType string, buf *bytes.Buffer, in []byte) (e error) {
 	defer errorsx.Close(writer, &e, "writer")
 
 	if _, err := writer.Write(in); err != nil {
-		return fmt.Errorf("failed to close writer: %w", err)
+		return fmt.Errorf("failed to write: %w", err)
 	}
 	return nil
 }

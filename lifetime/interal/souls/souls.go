@@ -243,7 +243,7 @@ func (r *Souls) ExportClass(typ reflect.Type) (reflect.Value, error) {
 	return r.exportClass(typ)
 }
 
-var errWrongAll = errors.New("wrong type for souls.all")
+var errWrongAll = errors.New(`wrong type for "souls.all"`)
 
 type initFieldError struct {
 	Concrete       reflect.Type
