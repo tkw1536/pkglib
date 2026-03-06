@@ -12,6 +12,8 @@ import (
 	"go.tkw01536.de/pkglib/httpx/wrap"
 )
 
+//spellchecker:words nosec
+
 type responseKeyType struct{}
 
 var responseKey = responseKeyType{}
@@ -26,7 +28,7 @@ func ExampleContext() {
 				return
 			}
 
-			_, _ = w.Write([]byte(content))
+			_, _ = w.Write([]byte(content)) // #nosec G705 // testing code
 		}),
 
 		// Wrap it using a function that automatically sets the key

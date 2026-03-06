@@ -8,6 +8,8 @@ import (
 	"golang.org/x/term"
 )
 
+//spellchecker:words nosec
+
 type fdAble interface {
 	Fd() uintptr
 }
@@ -19,7 +21,7 @@ func GetTerminalFD(stream any) (fd int, ok bool) {
 	if !ok {
 		return 0, false
 	}
-	fd = int(file.Fd())
+	fd = int(file.Fd()) // #nosec G115 -- terminal package guarantees fit
 	if !term.IsTerminal(fd) {
 		return 0, false
 	}
@@ -34,5 +36,5 @@ func IsTerminal(stream any) bool {
 }
 
 func isTerminal(file *os.File) bool {
-	return term.IsTerminal(int(file.Fd()))
+	return term.IsTerminal(int(file.Fd())) // #nosec G115 -- terminal package guarantees fit
 }

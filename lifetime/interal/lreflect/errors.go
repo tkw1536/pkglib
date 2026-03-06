@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-//spellchecker:words iface unaddressable
+//spellchecker:words iface unaddressable Unassignable
 
 const (
 	errIfaceIsNilType  = nilTypeError("iface")

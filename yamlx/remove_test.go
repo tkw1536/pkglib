@@ -1,5 +1,7 @@
+//spellchecker:words yamlx
 package yamlx_test
 
+//spellchecker:words testing pkglib yamlx
 import (
 	"testing"
 

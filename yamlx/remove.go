@@ -1,5 +1,7 @@
+//spellchecker:words yamlx
 package yamlx
 
+//spellchecker:words gopkg yaml
 import "gopkg.in/yaml.v3"
 
 var (

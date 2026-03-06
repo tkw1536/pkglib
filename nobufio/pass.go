@@ -10,6 +10,8 @@ import (
 	"golang.org/x/term"
 )
 
+//spellchecker:words nosec
+
 // Reads a password from reader.
 // When reader is not a terminal, behaves like [ReadLine].
 func ReadPassword(reader io.Reader) (value string, err error) {
@@ -32,6 +34,6 @@ func ReadPasswordStrict(reader io.Reader) (value string, err error) {
 	}
 
 	// read the bytes
-	bytes, err := term.ReadPassword(int(fd.Fd()))
+	bytes, err := term.ReadPassword(int(fd.Fd())) // #nosec G115 -- terminal package guarantees fit
 	return string(bytes), err
 }
