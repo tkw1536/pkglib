@@ -163,8 +163,8 @@ func ExampleJSONInterceptor() {
 	makeRequest("/forbidden")
 
 	// Output: "/" returned code 200 with text/plain; charset=utf-8 "Normal response"
-	// "/notfound" returned code 404 with application/json; charset=utf-8 "{\"code\":404,\"status\":\"Not Found\"}"
-	// "/forbidden" returned code 403 with application/json; charset=utf-8 "{\"code\":403,\"status\":\"Forbidden\"}"
+	// "/notfound" returned code 404 with application/json; charset=utf-8 "{\"status\":\"Not Found\",\"code\":404}"
+	// "/forbidden" returned code 403 with application/json; charset=utf-8 "{\"status\":\"Forbidden\",\"code\":403}"
 }
 
 func ExampleHTMLInterceptor() {

@@ -42,10 +42,10 @@ func ExampleJSON() {
 	fmt.Println(makeRequest(handler, "/other"))
 	fmt.Println(makeRequest(handler, "/broken_marshal"))
 
-	// Output: /value returned code 200 with location header "" and body "69\n"
-	// /slice returned code 200 with location header "" and body "[\"hello\",42]\n"
-	// /notfound returned code 404 with location header "" and body "{\"code\":404,\"status\":\"Not Found\"}"
-	// /other returned code 500 with location header "" and body "{\"code\":500,\"status\":\"Internal Server Error\"}"
+	// Output: /value returned code 200 with location header "" and body "69"
+	// /slice returned code 200 with location header "" and body "[\"hello\",42]"
+	// /notfound returned code 404 with location header "" and body "{\"status\":\"Not Found\",\"code\":404}"
+	// /other returned code 500 with location header "" and body "{\"status\":\"Internal Server Error\",\"code\":500}"
 	// /broken_marshal returned code 500 with location header "" and body ""
 }
 

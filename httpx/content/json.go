@@ -3,7 +3,7 @@ package content
 
 //spellchecker:words encoding json http pkglib httpx recovery
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"net/http"
 
@@ -38,7 +38,7 @@ func WriteJSONI[T any](result T, err error, interceptor httpx.ErrInterceptor, w 
 	// write out the response as json
 	w.Header().Set("Content-Type", httpx.ContentTypeJSON)
 	{
-		err := json.NewEncoder(w).Encode(result)
+		err := json.MarshalWrite(w, result)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			err = fmt.Errorf("failed to encode json: %w", err)
