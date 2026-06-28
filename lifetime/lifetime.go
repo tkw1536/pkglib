@@ -25,7 +25,7 @@ import (
 // Components may also refer to other components using a field with an `inject: "auto"` struct tag.
 //
 // Components must be registered using the Register function, see [Registry] for details.
-// Components must be retrieved using [lifetime.Lifetime.All], [Export] or [ExportSlice].
+// Components must be retrieved using [lifetime.Lifetime.All], [[lifetime.Lifetime.Export] or [[lifetime.Lifetime.ExportSlice].
 //
 // When using slices of components (e.g. in dependencies or using the All or ExportSlice methods) their order is undefined by default.
 // This means that multiple lifetimes (even with the same Component and Init functions) may return components in a different order.
@@ -115,10 +115,7 @@ func (lt *Lifetime[Component, InitParams]) All(params InitParams) []Component {
 // See [Lifetime] regarding order of the exported slice.
 //
 // ExportSlice may be safely called concurrently with other calls retrieving components.
-func ExportSlice[ConcreteComponentType any, Component any, InitParams any](
-	lt *Lifetime[Component, InitParams],
-	params InitParams,
-) []ConcreteComponentType {
+func (lt *Lifetime[Component, InitParams]) ExportSlice[ConcreteComponentType any](params InitParams) []ConcreteComponentType {
 	export, err := lt.getSouls(params).ExportClass(reflect.TypeFor[ConcreteComponentType]())
 	if err != nil {
 		panic(err)
@@ -132,10 +129,7 @@ func ExportSlice[ConcreteComponentType any, Component any, InitParams any](
 // Params is passed to all Init functions that are being called.
 //
 // Export may be safely called concurrently with other calls retrieving components.
-func Export[ConcreteComponentType any, Component any, InitParams any](
-	lt *Lifetime[Component, InitParams],
-	params InitParams,
-) ConcreteComponentType {
+func (lt *Lifetime[Component, InitParams]) Export[ConcreteComponentType any](params InitParams) ConcreteComponentType {
 	export, err := lt.getSouls(params).Export(reflect.TypeFor[ConcreteComponentType]())
 	if err != nil {
 		panic(err)

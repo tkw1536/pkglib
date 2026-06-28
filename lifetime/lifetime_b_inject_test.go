@@ -43,7 +43,7 @@ func ExampleLifetime_bInjectTag() {
 
 	// we can now retrieve the house component.
 	// The window is set automatically.
-	house := lifetime.Export[*House](lt, struct{}{})
+	house := lt.Export[*House](struct{}{})
 	house.Window.Open()
 
 	// Output: opening the window

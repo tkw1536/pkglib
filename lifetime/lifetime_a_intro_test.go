@@ -59,7 +59,7 @@ func ExampleLifetime_aIntro() {
 
 	// To initialize and use a single component, we make use of the Export function.
 	// Here it is invoked to retrieve a Company.
-	company := lifetime.Export[*Company](lt, struct{}{})
+	company := lt.Export[*Company](struct{}{})
 	company.SayHello()
 
 	// Output: Hello from the CEO

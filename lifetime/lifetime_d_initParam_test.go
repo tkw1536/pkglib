@@ -47,7 +47,7 @@ func ExampleLifetime_dInitParam() {
 
 	// Again retrieve the a component using the Export function.
 	// This time, pass the additional parameter into all calls to Init.
-	box := lifetime.Export[*Box](lt, 108)
+	box := lt.Export[*Box](108)
 	box.RevealSecret()
 
 	// Output: The secret is: 108
