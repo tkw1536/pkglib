@@ -16,8 +16,8 @@ import (
 // The returned node is guaranteed to never be a document or alias node, these are resolved automatically.
 // As such find should not be used on untrusted input.
 //
-// If the node does not exist, it returns a nil yaml.Node and an error.
-// A nil node being passed in is considered an error.
+// If the node does not exist, it returns a nil yaml.Node and a non-nil error wrapping [ChildNotFoundError] (or an error of that type itself).
+// If a nil node is being passed in, or the node is not of kind [yaml.MappingNode], then a different error is returned.
 func Find(node *yaml.Node, path ...string) (*yaml.Node, error) {
 	switch {
 	// no tree provided => can't find the path
@@ -79,6 +79,9 @@ func Find(node *yaml.Node, path ...string) (*yaml.Node, error) {
 
 // Child finds the child node with the given name.
 // If it does not exist, it returns an error.
+// The function handles alias nodes in "merge" cases.
+//
+// If the node is a non-nil node of kind [yaml.MappingNode], the error is guaranteed to be either nil or a [ChildNotFoundError].
 func Child(node *yaml.Node, name string) (*yaml.Node, error) {
 	// we must have a mapping node
 	// or we cannot find the element with the given key
