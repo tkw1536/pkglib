@@ -68,7 +68,7 @@ func ExampleLifetime_eSlices() {
 	}
 
 	// retrieve the Wheel component and use it as expected.
-	wheel := lt.Export[*Wheel](struct{}{})
+	wheel := lifetime.Export[*Wheel](lt, struct{}{})
 	fmt.Printf("wheel knows the following colors: %v\n", wheel.Colors())
 
 	// Output: wheel knows the following colors: [green rainbow red]

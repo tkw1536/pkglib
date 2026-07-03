@@ -55,7 +55,7 @@ func ExampleLifetime_gExportSliceOrder() {
 
 	// export the ranks using ExportSlice.
 	// The order is now guaranteed by the RankComponentWeight() function.
-	ranks := lt.ExportSlice[RankComponent](struct{}{})
+	ranks := lifetime.ExportSlice[RankComponent](lt, struct{}{})
 	for _, r := range ranks {
 		fmt.Println(r.Rank())
 	}

@@ -23,7 +23,7 @@ func ExampleLifetime_fExportSlice() {
 	}
 
 	// this time retrieve multiple components using the ExportSlice function.
-	colors := lt.ExportSlice[ColorComponent](struct{}{})
+	colors := lifetime.ExportSlice[ColorComponent](lt, struct{}{})
 
 	// sort them according to their color
 	slices.SortFunc(colors, func(a, b ColorComponent) int {
