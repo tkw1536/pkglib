@@ -4,7 +4,7 @@ package wrap_test
 //spellchecker:words context encoding json http httptest time pkglib httpx wrap
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -22,7 +22,7 @@ func ExampleTime() {
 		time.Sleep(delay)         // sleep for a bit
 		took := wrap.TimeSince(r) // record how long it took
 
-		_ = json.NewEncoder(w).Encode(took)
+		_ = json.MarshalWrite(w, int64(took))
 	}))
 
 	// create a new request
@@ -40,10 +40,11 @@ func ExampleTime() {
 	}
 
 	// decode the amount of time taken from the request
-	var took time.Duration
-	_ = json.NewDecoder(rr.Result().Body).Decode(&took)
+	var took int64
+	_ = json.UnmarshalRead(rr.Result().Body, &took)
 
-	if took >= delay {
+	tookDuration := time.Duration(took)
+	if tookDuration >= delay {
 		fmt.Println("Handler returned correct delay")
 	}
 
