@@ -175,7 +175,6 @@ func (conn *Connection) sendMessages() {
 	conn.outgoing = make(chan queuedMessage)
 
 	conn.wg.Go(func() {
-
 		// setup a timer for pings!
 		ticker := time.NewTicker(conn.opts.PingInterval)
 		defer ticker.Stop()
@@ -310,7 +309,6 @@ func (conn *Connection) recvMessages() {
 	})
 
 	conn.wg.Go(func() {
-
 		for {
 			// set a timeout for the next read
 			_ = conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))

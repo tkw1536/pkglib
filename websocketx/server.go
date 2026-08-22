@@ -235,7 +235,6 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn := server.Handler.accept(r, websocket_conn, server.Options)
 
 	server.conns.Go(func() {
-
 		select {
 		case <-conn.Context().Done():
 		case <-server.context.Done():

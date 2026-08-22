@@ -60,7 +60,6 @@ func validate(datum reflect.Value, validators Collection) error {
 	}
 
 	for field := range typ.Fields() {
-
 		// if the recurse tag is set, do the recursion!
 		if field.Tag.Get(recurseTag) != "" {
 			if err := validate(datum.FieldByName(field.Name), validators); err != nil {
