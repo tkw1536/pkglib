@@ -5,6 +5,7 @@ package ringbuffer_test
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"testing"
 
 	"go.tkw01536.de/pkglib/ringbuffer"
@@ -109,10 +110,10 @@ func TestRingBuffer(t *testing.T) {
 						}
 
 						// pop all the elements, one by one
-						for i := len(wantElems) - 1; i >= 0; i-- {
+						for i, wantElem := range slices.Backward(wantElems) {
 							got := popBuffer.Pop()
-							if wantElems[i] != got {
-								t.Errorf("pop got element = %v, want element = %v", wantElems[i], got)
+							if wantElem != got {
+								t.Errorf("pop got element = %v, want element = %v", wantElem, got)
 							}
 
 							if tt.optimized {
