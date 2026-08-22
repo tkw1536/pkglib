@@ -234,9 +234,7 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 	// Accept the handler
 	conn := server.Handler.accept(r, websocket_conn, server.Options)
 
-	server.conns.Add(1)
-	go func() {
-		defer server.conns.Done()
+	server.conns.Go(func() {
 
 		select {
 		case <-conn.Context().Done():
@@ -266,7 +264,7 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 			panic("programming error: server.context received unknown cancel cause")
 		}
-	}()
+	})
 
 	conn.serve()
 }

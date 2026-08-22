@@ -174,9 +174,7 @@ func (conn *Connection) Request() *http.Request {
 func (conn *Connection) sendMessages() {
 	conn.outgoing = make(chan queuedMessage)
 
-	conn.wg.Add(1)
-	go func() {
-		defer conn.wg.Done()
+	conn.wg.Go(func() {
 
 		// setup a timer for pings!
 		ticker := time.NewTicker(conn.opts.PingInterval)
@@ -213,7 +211,7 @@ func (conn *Connection) sendMessages() {
 				}
 			}
 		}
-	}()
+	})
 }
 
 // writeRaw writes an underlying message to the connection.
@@ -311,9 +309,7 @@ func (conn *Connection) recvMessages() {
 		return conn.conn.SetReadDeadline(time.Now().Add(conn.opts.ReadInterval))
 	})
 
-	conn.wg.Add(1)
-	go func() {
-		defer conn.wg.Done()
+	conn.wg.Go(func() {
 
 		for {
 			// set a timeout for the next read
@@ -347,7 +343,7 @@ func (conn *Connection) recvMessages() {
 				return
 			}
 		}
-	}()
+	})
 }
 
 // Read returns a channel that receives Text and Binary Messages from the peer.

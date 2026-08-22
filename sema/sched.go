@@ -45,9 +45,7 @@ func Schedule(worker func(uint64) error, count uint64, concurrency Concurrency) 
 	// create a wait group that waits for all the work to be done!
 	var wg sync.WaitGroup
 	for range count {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 
 			// acquire the semaphore
 			sema.Lock()
@@ -72,7 +70,7 @@ func Schedule(worker func(uint64) error, count uint64, concurrency Concurrency) 
 			if hadAnError.CompareAndSwap(false, true) {
 				err = res
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
