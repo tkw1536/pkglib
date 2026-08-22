@@ -21,10 +21,10 @@ func ExampleLifetime_iInit() {
 		Init: func(c ColorComponent, s struct{}) {
 			colors = append(colors, c.Color())
 		},
-		Register: func(context *lifetime.Registry[ColorComponent, struct{}]) {
-			lifetime.Place[*Wheel](context)
-			lifetime.Place[*Red](context)
-			lifetime.Place[*Green](context)
+		Register: func(registry *lifetime.Registry[ColorComponent, struct{}]) {
+			registry.Place[*Wheel]()
+			registry.Place[*Red]()
+			registry.Place[*Green]()
 		},
 	}
 

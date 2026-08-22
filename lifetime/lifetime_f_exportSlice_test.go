@@ -15,15 +15,15 @@ import (
 func ExampleLifetime_fExportSlice() {
 	// Create a new lifetime which registers the same examples as in the previous example.
 	lt := &lifetime.Lifetime[Component, struct{}]{
-		Register: func(context *lifetime.Registry[Component, struct{}]) {
-			lifetime.Place[*Wheel](context)
-			lifetime.Place[*Red](context)
-			lifetime.Place[*Green](context)
+		Register: func(registry *lifetime.Registry[Component, struct{}]) {
+			registry.Place[*Wheel]()
+			registry.Place[*Red]()
+			registry.Place[*Green]()
 		},
 	}
 
 	// this time retrieve multiple components using the ExportSlice function.
-	colors := lifetime.ExportSlice[ColorComponent](lt, struct{}{})
+	colors := lt.ExportSlice[ColorComponent](struct{}{})
 
 	// sort them according to their color
 	slices.SortFunc(colors, func(a, b ColorComponent) int {

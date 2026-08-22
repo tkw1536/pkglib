@@ -51,15 +51,15 @@ func ExampleLifetime_aIntro() {
 	lt := &lifetime.Lifetime[Component, struct{}]{
 		// Register must register all components.
 		// In this case we register the company and the CEO.
-		Register: func(r *lifetime.Registry[Component, struct{}]) {
-			lifetime.Place[*Company](r)
-			lifetime.Place[*CEO](r)
+		Register: func(registry *lifetime.Registry[Component, struct{}]) {
+			registry.Place[*Company]()
+			registry.Place[*CEO]()
 		},
 	}
 
 	// To initialize and use a single component, we make use of the Export function.
 	// Here it is invoked to retrieve a Company.
-	company := lifetime.Export[*Company](lt, struct{}{})
+	company := lt.Export[*Company](struct{}{})
 	company.SayHello()
 
 	// Output: Hello from the CEO

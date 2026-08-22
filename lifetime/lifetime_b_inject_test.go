@@ -35,15 +35,15 @@ func (window *Window) Open() {
 func ExampleLifetime_bInjectTag() {
 	// Same as before, register all components.
 	lt := &lifetime.Lifetime[Component, struct{}]{
-		Register: func(context *lifetime.Registry[Component, struct{}]) {
-			lifetime.Place[*House](context)
-			lifetime.Place[*Window](context)
+		Register: func(registry *lifetime.Registry[Component, struct{}]) {
+			registry.Place[*House]()
+			registry.Place[*Window]()
 		},
 	}
 
 	// we can now retrieve the house component.
 	// The window is set automatically.
-	house := lifetime.Export[*House](lt, struct{}{})
+	house := lt.Export[*House](struct{}{})
 	house.Window.Open()
 
 	// Output: opening the window

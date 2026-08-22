@@ -47,15 +47,15 @@ func (Admiral) Rank() string {
 func ExampleLifetime_gExportSliceOrder() {
 	// Register components as normal.
 	lt := &lifetime.Lifetime[Component, struct{}]{
-		Register: func(context *lifetime.Registry[Component, struct{}]) {
-			lifetime.Place[*Admiral](context)
-			lifetime.Place[*Captain](context)
+		Register: func(registry *lifetime.Registry[Component, struct{}]) {
+			registry.Place[*Admiral]()
+			registry.Place[*Captain]()
 		},
 	}
 
 	// export the ranks using ExportSlice.
 	// The order is now guaranteed by the RankComponentWeight() function.
-	ranks := lifetime.ExportSlice[RankComponent](lt, struct{}{})
+	ranks := lt.ExportSlice[RankComponent](struct{}{})
 	for _, r := range ranks {
 		fmt.Println(r.Rank())
 	}

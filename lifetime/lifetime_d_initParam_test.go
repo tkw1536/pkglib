@@ -34,12 +34,12 @@ func ExampleLifetime_dInitParam() {
 	// Declare a lifetime, same as before.
 	// Notice that we now pass an additional parameter of type int.
 	lt := &lifetime.Lifetime[Component, int]{
-		Register: func(context *lifetime.Registry[Component, int]) {
-			lifetime.Place[*Box](context)
+		Register: func(registry *lifetime.Registry[Component, int]) {
+			registry.Place[*Box]()
 
 			// We use the Register function to perform additional initialization.
 			// Here, we store the passed parameter into the secret value.
-			lifetime.Register(context, func(s *Secret, secret int) {
+			registry.Register(func(s *Secret, secret int) {
 				s.value = secret
 			})
 		},
@@ -47,7 +47,7 @@ func ExampleLifetime_dInitParam() {
 
 	// Again retrieve the a component using the Export function.
 	// This time, pass the additional parameter into all calls to Init.
-	box := lifetime.Export[*Box](lt, 108)
+	box := lt.Export[*Box](108)
 	box.RevealSecret()
 
 	// Output: The secret is: 108

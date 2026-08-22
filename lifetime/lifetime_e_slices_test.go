@@ -60,15 +60,15 @@ func (wheel *Wheel) Colors() []string {
 func ExampleLifetime_eSlices() {
 	// Register components as normal.
 	lt := &lifetime.Lifetime[Component, struct{}]{
-		Register: func(context *lifetime.Registry[Component, struct{}]) {
-			lifetime.Place[*Wheel](context)
-			lifetime.Place[*Red](context)
-			lifetime.Place[*Green](context)
+		Register: func(registry *lifetime.Registry[Component, struct{}]) {
+			registry.Place[*Wheel]()
+			registry.Place[*Red]()
+			registry.Place[*Green]()
 		},
 	}
 
 	// retrieve the Wheel component and use it as expected.
-	wheel := lifetime.Export[*Wheel](lt, struct{}{})
+	wheel := lt.Export[*Wheel](struct{}{})
 	fmt.Printf("wheel knows the following colors: %v\n", wheel.Colors())
 
 	// Output: wheel knows the following colors: [green rainbow red]

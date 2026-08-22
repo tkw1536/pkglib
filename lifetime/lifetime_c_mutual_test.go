@@ -46,14 +46,14 @@ func (even *Even) IsEven(value uint) bool {
 func ExampleLifetime_cMutual() {
 	// Again register both components.
 	lt := &lifetime.Lifetime[Component, struct{}]{
-		Register: func(context *lifetime.Registry[Component, struct{}]) {
-			lifetime.Place[*Even](context)
-			lifetime.Place[*Odd](context)
+		Register: func(registry *lifetime.Registry[Component, struct{}]) {
+			registry.Place[*Even]()
+			registry.Place[*Odd]()
 		},
 	}
 
 	// retrieve the Even component, the mutual dependencies are set correct.
-	even := lifetime.Export[*Even](lt, struct{}{})
+	even := lt.Export[*Even](struct{}{})
 	fmt.Printf("42 is even: %t\n", even.IsEven(42))
 	fmt.Printf("69 is even: %t\n", even.IsEven(69))
 

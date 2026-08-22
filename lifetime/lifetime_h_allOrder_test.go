@@ -37,10 +37,10 @@ func (Triangle) RankShape() string {
 func ExampleLifetime_hAllOrder() {
 	// Create a lifetime with the square, circle and triangle components
 	lt := &lifetime.Lifetime[Shape, struct{}]{
-		Register: func(context *lifetime.Registry[Shape, struct{}]) {
-			lifetime.Place[*Square](context)
-			lifetime.Place[*Circle](context)
-			lifetime.Place[*Triangle](context)
+		Register: func(registry *lifetime.Registry[Shape, struct{}]) {
+			registry.Place[*Square]()
+			registry.Place[*Circle]()
+			registry.Place[*Triangle]()
 		},
 	}
 
