@@ -3,7 +3,7 @@ package httpx
 
 //spellchecker:words encoding json errors http
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"net/http"
 )

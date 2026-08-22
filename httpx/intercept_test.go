@@ -1,13 +1,15 @@
 //spellchecker:words httpx
 package httpx_test
 
-//spellchecker:words context http httptest pkglib httpx
+//spellchecker:words context encoding json http httptest pkglib httpx
 import (
 	"context"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 
 	"go.tkw01536.de/pkglib/httpx"
 )
@@ -155,6 +157,11 @@ func ExampleJSONInterceptor() {
 
 		rrr := rr.Result()
 		result, _ := io.ReadAll(rrr.Body)
+
+		// We could immediatly use the result here, but encoding/json/v2 does not guarantee stable map key ordering.
+		// Hence we canonicalize the json body here.
+		result = canonicalizeJSONBody(rrr.Header.Get("Content-Type"), result)
+
 		fmt.Printf("%q returned code %d with %s %q\n", path, rrr.StatusCode, rrr.Header.Get("Content-Type"), string(result))
 	}
 
@@ -209,4 +216,23 @@ func ExampleHTMLInterceptor() {
 	// Output: "/" returned code 200 with text/plain; charset=utf-8 "Normal response"
 	// "/notfound" returned code 404 with text/html; charset=utf-8 "<!doctype html><title>Not Found</title>Not Found"
 	// "/forbidden" returned code 403 with text/html; charset=utf-8 "<!doctype html><title>Forbidden</title>Forbidden"
+}
+
+// canonicalizeJSONBody re-marshals JSON response bodies with [json.Deterministic]
+// so example output is stable regardless of map key ordering.
+func canonicalizeJSONBody(contentType string, body []byte) []byte {
+	if !strings.HasPrefix(contentType, "application/json") {
+		return body
+	}
+
+	var v any
+	if err := json.Unmarshal(body, &v); err != nil {
+		return body
+	}
+
+	out, err := json.Marshal(v, json.Deterministic(true))
+	if err != nil {
+		return body
+	}
+	return out
 }
