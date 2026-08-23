@@ -49,7 +49,7 @@ func (msg Message) Prepare() (PreparedMessage, error) {
 	return PreparedMessage{m: m}, nil
 }
 
-// MustPrepare is like Prepare, but panic()s when preparing fails.
+// MustPrepare is like [Prepare], but panic()s when preparing fails.
 func (msg Message) MustPrepare() PreparedMessage {
 	m, err := msg.Prepare()
 	if err != nil {

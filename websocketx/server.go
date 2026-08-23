@@ -35,10 +35,10 @@ type Server struct {
 
 	// Fallback specifies the handler for generating HTTP responses if the client
 	// did not request an upgrade to a websocket connection.
-	// If Fallback is nil, sends an appropriate [http.StatusUpgradeRequired]
+	// If Fallback is nil, sends an appropriate response with status [http.StatusUpgradeRequired].
 	Fallback http.Handler
 
-	// Check check if additional client requirements are met before establishing
+	// Check checks if additional client requirements are met before establishing
 	// a websocket connection and returns a caller-exposed error if
 	// this is not the case. If Check is nil, every potential client is
 	// allowed to connect.
@@ -64,10 +64,11 @@ type Server struct {
 	CheckOrigin func(r *http.Request) bool
 
 	// Error specifies the function for generating HTTP error responses. If Error
-	// is nil, then http.Error is used to generate the HTTP response.
+	// is nil, then [http.Error] is used to generate the HTTP response.
 	Error func(w http.ResponseWriter, r *http.Request, status int, reason error)
 
-	// Options determine further options for future connections.
+	// Options determine options for connections.
+	// It may not be modified after any http request has been processed.
 	Options Options
 }
 
@@ -139,7 +140,8 @@ func (server *Server) RequireProtocols() {
 // Handler may not retain a reference to its' argument past the function returning.
 type Handler func(*Connection)
 
-// If a non http-client.
+// ServeHTTP implements the [http.Handler] interface.
+// It upgrades connections to websockets, or serves a fallback repsonse if not.
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// if the user did not request a websocket, go to the fallback handler
 	if !websocket.IsWebSocketUpgrade(r) {
