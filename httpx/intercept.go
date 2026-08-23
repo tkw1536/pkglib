@@ -129,7 +129,7 @@ var (
 func init() {
 	TextInterceptor = commonInterceptor(ContentTypeText, func(code StatusCode) []byte { return []byte(code.String()) })
 	JSONInterceptor = commonInterceptor(ContentTypeJSON, func(code StatusCode) []byte {
-		res, err := json.Marshal(map[string]any{"status": code.String(), "code": int(code)})
+		res, err := json.Marshal(map[string]any{"status": code.String(), "code": int(code)}, json.Deterministic(true))
 		if err != nil {
 			panic(err)
 		}
