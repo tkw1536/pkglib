@@ -23,13 +23,13 @@ type Collection map[string]any
 
 // Add adds a Validator to the provided collection of validators.
 // Any previously validator of the same name is overwritten.
-func Add[F any](coll Collection, name string, validator func(Value *F, Default string) error) {
+func (coll Collection) Add[F any](name string, validator func(Value *F, Default string) error) {
 	coll[name] = validator
 }
 
 // AddSlice adds a Validator to the provided collection of validators that validates a slice of the given type. The default is separated by sep.
-func AddSlice[F any](coll Collection, name string, sep string, validator func(Value *F, Default string) error) {
-	Add(coll, name, func(Value *[]F, Default string) error {
+func (coll Collection) AddSlice[F any](name string, sep string, validator func(Value *F, Default string) error) {
+	coll.Add(name, func(Value *[]F, Default string) error {
 		// some value is set, so we do not need to set the default!
 		if *Value != nil {
 			for i := range *Value {
@@ -129,4 +129,22 @@ func (coll Collection) Call(name string, field reflect.Value, _default string) e
 		return err
 	}
 	return nil
+}
+
+// Add is a legacy alias for [Collection.Add].
+//
+// Deprecated: Use [Collection.Add] instead.
+//
+//go:fix inline
+func Add[F any](coll Collection, name string, validator func(Value *F, Default string) error) {
+	coll.Add(name, validator)
+}
+
+// AddSlice is a legacy alias for [Collection.AddSlice].
+//
+// Deprecated: Use [Collection.AddSlice] instead.
+//
+//go:fix inline
+func AddSlice[F any](coll Collection, name string, sep string, validator func(Value *F, Default string) error) {
+	coll.AddSlice(name, sep, validator)
 }

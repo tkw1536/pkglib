@@ -30,7 +30,7 @@ func ExampleValidate() {
 	collection := make(validator.Collection, 2)
 
 	// positive checks if a number is positive
-	validator.Add(collection, "positive", func(Value *int, Default string) error {
+	collection.Add("positive", func(Value *int, Default string) error {
 		// if value is unset, parse the default as a string
 		if *Value == 0 {
 			i, err := strconv.ParseInt(Default, 10, 64)
@@ -49,7 +49,7 @@ func ExampleValidate() {
 	})
 
 	// nonempty checks that a string is not empty
-	validator.Add(collection, "nonempty", func(Value *string, Default string) error {
+	collection.Add("nonempty", func(Value *string, Default string) error {
 		// set the default
 		if *Value == "" {
 			*Value = Default
@@ -75,7 +75,7 @@ func ExampleValidate_fail() {
 	collection := make(validator.Collection, 2)
 
 	// positive checks if a number is positive
-	validator.Add(collection, "positive", func(Value *int, Default string) error {
+	collection.Add("positive", func(Value *int, Default string) error {
 		// if value is unset, parse the default as a string
 		if *Value == 0 {
 			i, err := strconv.ParseInt(Default, 10, 64)
@@ -94,7 +94,7 @@ func ExampleValidate_fail() {
 	})
 
 	// nonempty checks that a string is not empty
-	validator.Add(collection, "nonempty", func(Value *string, Default string) error {
+	collection.Add("nonempty", func(Value *string, Default string) error {
 		// set the default
 		if *Value == "" {
 			*Value = Default
