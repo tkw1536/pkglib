@@ -1,3 +1,4 @@
+//spellchecker:words lifetime
 package lifetime
 
 // Register is a legacy alias for [Registry.Register], which was used prior to the introduction of generic methods.

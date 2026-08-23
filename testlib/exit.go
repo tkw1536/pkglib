@@ -1,7 +1,7 @@
 //spellchecker:words testlib
 package testlib
 
-//spellchecker:words context exec runtime strconv sync testing pkglib errorsx
+//spellchecker:words context errors exec runtime strconv sync testing
 import (
 	"context"
 	"errors"

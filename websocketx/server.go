@@ -3,7 +3,7 @@
 //spellchecker:words websocketx
 package websocketx
 
-//spellchecker:words context errors http sync github gorilla websocket pkglib errorsx
+//spellchecker:words context errors http sync github gorilla websocket
 import (
 	"context"
 	"errors"
@@ -140,7 +140,7 @@ func (server *Server) RequireProtocols() {
 type Handler func(*Connection)
 
 // ServeHTTP implements the [http.Handler] interface.
-// It upgrades connections to websockets, or serves a fallback repsonse if not.
+// It upgrades connections to websockets, or serves a fallback response if not.
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// if the user did not request a websocket, go to the fallback handler
 	if !websocket.IsWebSocketUpgrade(r) {

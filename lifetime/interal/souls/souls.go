@@ -3,7 +3,7 @@
 //spellchecker:words souls
 package souls
 
-//spellchecker:words errors math rand reflect pkglib lazy lifetime interal lreflect nosec
+//spellchecker:words errors math rand reflect pkglib lazy lifetime interal lreflect
 import (
 	"errors"
 	"fmt"
@@ -14,7 +14,7 @@ import (
 	"go.tkw01536.de/pkglib/lifetime/interal/lreflect"
 )
 
-//spellchecker:words nolint wrapcheck
+//spellchecker:words nolint wrapcheck nosec
 
 // Souls holds the set of all (possibly initialized) components.
 type Souls struct {

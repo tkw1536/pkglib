@@ -1,7 +1,7 @@
 //spellchecker:words exit
 package exit
 
-//spellchecker:words exec pkglib errorsx
+//spellchecker:words errors exec
 import (
 	"errors"
 	"os/exec"
