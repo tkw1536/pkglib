@@ -12,7 +12,6 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
-	"go.tkw01536.de/pkglib/errorsx"
 )
 
 //spellchecker:words upgrader websockets nolint containedctx errorlint
@@ -258,7 +257,7 @@ func (server *Server) serveWebsocket(w http.ResponseWriter, r *http.Request) {
 
 			// server is shutting down with a specific code =>
 			// close the server with that specific code
-			if cc, ok := errorsx.AsType[CloseCause](cause); ok {
+			if cc, ok := errors.AsType[CloseCause](cause); ok {
 				conn.ShutdownWith(cc.Frame)
 				return
 			}

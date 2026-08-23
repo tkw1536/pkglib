@@ -3,9 +3,8 @@ package exit
 
 //spellchecker:words exec pkglib errorsx
 import (
+	"errors"
 	"os/exec"
-
-	"go.tkw01536.de/pkglib/errorsx"
 )
 
 // errorWithCode is an error that holds an exit code.
@@ -29,7 +28,7 @@ func CodeFromError(err error, generic ExitCode) (code ExitCode, ok bool) {
 	if err == nil {
 		return 0, true
 	}
-	if codeErr, ok := errorsx.AsType[errorWithCode](err); ok {
+	if codeErr, ok := errors.AsType[errorWithCode](err); ok {
 		return codeErr.exitCode(), true
 	}
 	return generic, false

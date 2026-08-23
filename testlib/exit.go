@@ -4,14 +4,13 @@ package testlib
 //spellchecker:words context exec runtime strconv sync testing pkglib errorsx
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"sync"
 	"testing"
-
-	"go.tkw01536.de/pkglib/errorsx"
 )
 
 //spellchecker:words nosec subshell
@@ -80,7 +79,7 @@ func makeExitError(code int) exec.ExitError {
 
 	err := cmd.Run()
 
-	exitErr, ok := errorsx.AsType[*exec.ExitError](err)
+	exitErr, ok := errors.AsType[*exec.ExitError](err)
 	if !ok {
 		panic(fmt.Sprintf("makeExitError: produced type %T, expected *exec.ExitError", err))
 	}

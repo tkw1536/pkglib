@@ -3,9 +3,9 @@ package yamlx
 
 //spellchecker:words gopkg yaml pkglib errorsx
 import (
-	"gopkg.in/yaml.v3"
+	"errors"
 
-	"go.tkw01536.de/pkglib/errorsx"
+	"gopkg.in/yaml.v3"
 )
 
 // Assign sets the key to the value "value" in the given node with kind [yaml.MappingNode].
@@ -19,7 +19,7 @@ func Assign(mappingNode *yaml.Node, key string, value yaml.Node) error {
 
 	valueNode, err := Child(mappingNode, key)
 	if err != nil {
-		_, ok := errorsx.AsType[ChildNotFoundError](err)
+		_, ok := errors.AsType[ChildNotFoundError](err)
 		if !ok {
 			panic("never reached: mappingNode is of kind yaml.MappingNode")
 		}
