@@ -3,11 +3,11 @@
 //spellchecker:words souls
 package souls
 
-//spellchecker:words errors math rand reflect pkglib lazy lifetime interal lreflect
+//spellchecker:words errors math rand reflect pkglib lazy lifetime interal lreflect nosec
 import (
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"reflect"
 
 	"go.tkw01536.de/pkglib/lazy"
@@ -60,7 +60,7 @@ func (r *Souls) Init() error {
 
 		// randomly shuffle all elements, then sort (if needed)
 		l := r.all.Len()
-		rand.Shuffle(l, reflect.Swapper(r.all.Interface()))
+		rand.Shuffle(l, reflect.Swapper(r.all.Interface())) // #nosec G404 -- non-cryptographic shuffle before deterministic sort
 		if err := lreflect.SortSliceByRank(r.all); err != nil {
 			return err //nolint:wrapcheck // don't wrap lreflect errors
 		}
